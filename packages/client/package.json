@@ -1,0 +1,100 @@
+{
+  "name": "@stac-manager/client",
+  "description": "Stac manager app",
+  "version": "1.0.0",
+  "source": "./src/index.html",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/developmentseed/stac-admin.git"
+  },
+  "author": {
+    "name": "Development Seed",
+    "url": "https://developmentseed.org"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/developmentseed/stac-admin/issues"
+  },
+  "homepage": "https://github.com/developmentseed/stac-admin",
+  "scripts": {
+    "serve": "npm run clean && NODE_ENV=development node tasks/server.mjs",
+    "build": "npm run clean && NODE_ENV=production node tasks/build.mjs",
+    "stage": "npm run clean && NODE_ENV=staging node tasks/build.mjs",
+    "clean": "rm -rf dist .parcel-cache",
+    "lint": "yarn lint:scripts",
+    "lint:scripts": "eslint app/",
+    "ts-check": "yarn tsc --noEmit --skipLibCheck",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "browserslist": "> 0.5%, last 2 versions, not dead",
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@parcel/reporter-bundle-analyzer": "^2.12.0",
+    "@parcel/reporter-bundle-buddy": "^2.12.0",
+    "@types/babel__core": "^7",
+    "@types/react": "^18.3.4",
+    "@types/react-dom": "^18.3.0",
+    "buffer": "^6.0.3",
+    "events": "^3.3.0",
+    "fancy-log": "^2.0.0",
+    "fs-extra": "^11.2.0",
+    "parcel": "^2.12.0",
+    "parcel-resolver-ignore": "^2.2.0",
+    "portscanner": "^2.2.0",
+    "posthtml-expressions": "^1.11.4",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0",
+    "watcher": "^2.3.1"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@developmentseed/stac-react": "^0.1.0-alpha.10",
+    "@devseed-ui/collecticons-chakra": "^3.0.3",
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@floating-ui/react": "^0.26.25",
+    "@mapbox/mapbox-gl-draw": "^1.4.3",
+    "@mapbox/mapbox-gl-draw-static-mode": "^1.0.1",
+    "@parcel/core": "^2.12.0",
+    "@radiantearth/stac-fields": "^1.5.0",
+    "@stac-manager/data-core": "*",
+    "@stac-manager/data-plugins": "*",
+    "@stac-manager/data-widgets": "*",
+    "@testing-library/jest-dom": "^6.6.2",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@turf/bbox": "^7.1.0",
+    "@turf/bbox-polygon": "^7.1.0",
+    "@types/jest": "^29.5.14",
+    "@types/mapbox__mapbox-gl-draw": "^1.4.8",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "formik": "^2.4.6",
+    "framer-motion": "^10.16.5",
+    "mapbox-gl-draw-rectangle-mode": "^1.0.4",
+    "maplibre-gl": "^3.6.2",
+    "polished": "^4.3.1",
+    "react": "^18.3.1",
+    "react-cool-dimensions": "^3.0.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.1",
+    "react-icons": "^4.12.0",
+    "react-map-gl": "^7.1.7",
+    "react-router-dom": "^6.27.0",
+    "stac-ts": "^1.0.4"
+  },
+  "parcelIgnore": [
+    ".*/meta/"
+  ],
+  "alias": {
+    "$components": "~/src/components",
+    "$styles": "~/src/styles",
+    "$utils": "~/src/utils",
+    "$hooks": "~/src/hooks",
+    "$pages": "~/src/pages",
+    "$test": "~/test"
+  }
+}

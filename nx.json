@@ -1,0 +1,43 @@
+{
+  "targetDefaults": {
+    "serve": {
+      "dependsOn": []
+    },
+    "build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "outputs": [
+        "{projectRoot}/dist"
+      ]
+    },
+    "stage": {
+      "cache": true,
+      "dependsOn": [],
+      "outputs": [
+        "{projectRoot}/dist"
+      ]
+    },
+    "clean": {
+      "dependsOn": []
+    },
+    "lint": {
+      "cache": true,
+      "dependsOn": []
+    },
+    "lint:scripts": {
+      "cache": true,
+      "dependsOn": []
+    },
+    "ts-check": {
+      "cache": true,
+      "dependsOn": []
+    },
+    "test": {
+      "cache": true,
+      "dependsOn": []
+    },
+    "watch": {
+      "dependsOn": []
+    }
+  }
+}

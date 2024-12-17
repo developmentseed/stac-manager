@@ -1,0 +1,57 @@
+{
+  "name": "@stac-manager/data-widgets",
+  "description": "> TODO: description",
+  "version": "1.0.0",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "source": "lib/index.ts",
+  "sideEffects": false,
+  "scripts": {
+    "build": "rollup -c ../../rollup.config.mjs",
+    "watch": "rollup -c ../../rollup.config.mjs -w",
+    "clean": "rm -rf ./dist node_modules",
+    "lint": "eslint ./lib --no-error-on-unmatched-pattern"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@devseed-ui/collecticons-chakra": "^3.0.3",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@stac-manager/data-core": "*",
+    "formik": "^2.4.6",
+    "framer-motion": "^10.16.5",
+    "jsoneditor": "^10.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-select": "^5.8.3",
+    "react-use": "^17.5.1",
+    "uuid": "^11.0.3"
+  },
+  "devDependencies": {
+    "@types/jsoneditor": "^9.9.5",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/uuid": "^10.0.0"
+  },
+  "peerDependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@stac-manager/data-core": "*",
+    "formik": "^2.4.6",
+    "framer-motion": "^10.16.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

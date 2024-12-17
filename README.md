@@ -1,59 +1,59 @@
-# STAC-Admin :satellite: :page_facing_up: 
+# STAC-Manager :satellite: :page_facing_up: 
 
 ## Introduction
-The STAC-Admin is a tool designed for managing the values of a STAC (SpatioTemporal Asset Catalog) collection and its items. This interface provides a user-friendly way to modify and update the properties of collections and items within a STAC catalog.
+The STAC-Manager is a tool designed for managing the values of a STAC (SpatioTemporal Asset Catalog) collection and its items. This interface provides a user-friendly way to modify and update the properties of collections and items within a STAC catalog.
 
-## Getting Started
+## Repository structure
 
-### Prerequisites
-- Node
-- Yarn
+This repository is a monorepo for the STAC-Manager project managed using [lerna](https://lerna.js.org/).  
+It contains the stac-manager web app along with the form build plugin system that powers it.
 
-### Installation
+All the packages are located in the `packages` directory structured as follows:
 
-Install Yarn packages:
-   ```
-   yarn install
-   ```
+- `@stac-manager/client` - STAC-Manager web app.
+- `@stac-manager/data-core` - Core functionality of the form builder plugin system.
+- `@stac-manager/data-widgets` - Form components to be used by the form builder plugin system, when custom ones are not provided.
+- `@stac-manager/data-plugins` - Data plugins for the forms. Each plugin defines how a section of the data structure is displayed and edited.
 
-### Configuration
-Before running the application, create a `.env.local` file with the required environment variable:
-- `REACT_APP_STAC_API`: Set this to the API endpoint of your STAC server.
+## Installation and Usage
+The steps below will walk you through setting up your own instance of the project.
 
-:warning: *The current implementation of `stac-admin` works against the APIs provided by `stac-fastapi`'s **Transaction Extension**. Make sure the extension is enabled and the server accepts `PUT` requests.*
+### Install Project Dependencies
+To set up the development environment for this website, you'll need to install the following on your system:
 
-For example, you can use the local deployment of [`eoAPI`](https://github.com/developmentseed/eoAPI) with `docker-compose` to get up and running in minutes:
+- [Node](http://nodejs.org/) v20 (To manage multiple node versions we recommend [nvm](https://github.com/creationix/nvm))
+
+### Install Application Dependencies
+
+If you use [`nvm`](https://github.com/creationix/nvm), activate the desired Node version:
+
 ```
-cd eoAPI
-docker-compose up
-```
-
-In your `.env.local` file:
-```
-REACT_APP_STAC_API=http://localhost:8081
+nvm install
 ```
 
-:bulb: *See `eoAPI` directly for its getting started instruction and getting some sample data ingested.*
+Install Node modules:
 
+```
+npm install
+```
 
-### Running the Application
-To start the application in development mode:
-```
-yarn start
-```
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser. The page will reload if you make edits, and lint errors will appear in the console.
+### Running the App
 
-### Running Tests
-Launch the test runner in interactive watch mode:
+To run the client app in development mode:
 ```
-yarn test
+npm run plugins:build
+npm run client:serve
 ```
-More details can be found in the [Create React App testing documentation](https://facebook.github.io/create-react-app/docs/running-tests).
+
+If you're going to work on the form builder plugin system as well, you may want to run the watch mode on the packages:
+```
+npm run plugins:watch
+```
 
 ### Building for Production
 Build the app for production:
 ```
-yarn build
+npm run all:build
 ```
 This bundles the app in production mode, optimizing the build for performance. The build is minified, and filenames include hashes.
 
@@ -62,7 +62,3 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for de
 
 ## License
 This project is licensed under the MIT license - see the LICENSE.md file for details.
-
-## Learn More
-- For more information on React, visit the [React documentation](https://reactjs.org/).
-- Check out the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started) to learn more about Create React App.

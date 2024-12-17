@@ -1,0 +1,31 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "baseUrl": "./",
+    "jsx": "react",
+    "downlevelIteration": true,
+    "paths": {
+      /* Specify a set of entries that re-map imports to additional lookup locations. */
+      "$components/*": ["./src/components/*"],
+      "$utils/*": ["./src/utils/*"],
+      "$styles/*": ["./src/styles/*"],
+      "$hooks/*": ["./src/hooks/*"],
+      "$pages/*": ["./src/pages/*"]
+    },
+    // https://www.credera.com/en-us/insights/typescript-adding-custom-type-definitions-for-existing-libraries/
+    "typeRoots": ["src/_custom-types", "node_modules/@types", "../../node_modules/@types"]
+  },
+  "exclude": [
+    ".git",
+    ".app-cache",
+    ".parcel-cache",
+    "parcel-bundle-reports",
+    ".npm",
+    ".npm-tmp",
+    "dist",
+    "dist*",
+    "node_modules",
+    "**/node_modules/*"
+  ]
+}

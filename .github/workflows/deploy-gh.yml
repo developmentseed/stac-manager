@@ -1,0 +1,77 @@
+name: Deploy Github Pages
+
+on:
+  push:
+    branches:
+    - 'stac-manager'
+
+env:
+  PUBLIC_URL: ${{ vars.PUBLIC_URL }}
+  REACT_APP_STAC_API: ${{ vars.REACT_APP_STAC_API }}
+  REACT_APP_STAC_BROWSER: ${{ vars.REACT_APP_STAC_BROWSER }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: 
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+
+      - name: Cache dist
+        uses: actions/cache@v3
+        id: cache-dist
+        with:
+          path: packages/client/dist
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.sha }}
+
+      - name: Install
+        run: npm install
+
+      - name: Build
+        run: npm run all:build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Restore dist cache
+        uses: actions/cache@v3
+        id: cache-dist
+        with:
+          path: packages/client/dist
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.sha }}
+
+      - name: Copy index as 400 file for github pages
+        run: cp packages/client/dist/index.html packages/client/dist/400.html
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          clean: true
+          single-commit: true
+          folder: packages/client/dist

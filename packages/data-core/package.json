@@ -1,0 +1,52 @@
+{
+  "name": "@stac-manager/data-core",
+  "description": "> TODO: description",
+  "version": "1.0.0",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "source": "lib/index.ts",
+  "sideEffects": false,
+  "scripts": {
+    "build": "rollup -c ../../rollup.config.mjs",
+    "watch": "rollup -c ../../rollup.config.mjs -w",
+    "clean": "rm -rf ./dist node_modules",
+    "lint": "eslint ./lib --no-error-on-unmatched-pattern"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "formik": "^2.4.6",
+    "framer-motion": "^10.16.5",
+    "lodash-es": "^4.17.21",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "yup": "^1.5.0"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1"
+  },
+  "peerDependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "formik": "^2.4.6",
+    "framer-motion": "^10.16.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
