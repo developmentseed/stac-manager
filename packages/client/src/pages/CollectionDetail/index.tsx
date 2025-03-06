@@ -4,7 +4,6 @@ import {
   Box,
   Text,
   Tag,
-  Button,
   Flex,
   IconButton,
   Menu,
@@ -25,18 +24,19 @@ import { useCollection, useStacSearch } from '@developmentseed/stac-react';
 import {
   CollecticonEllipsisVertical,
   CollecticonPencil,
-  CollecticonTextBlock,
-  CollecticonTrashBin
+  CollecticonTextBlock
 } from '@devseed-ui/collecticons-chakra';
 import { StacCollection, StacItem } from 'stac-ts';
 
 import { usePageTitle } from '../../hooks';
 import CollectionMap from './CollectionMap';
-import SmartLink from '$components/SmartLink';
 import { InnerPageHeader } from '$components/InnerPageHeader';
 import { StacBrowserMenuItem } from '$components/StacBrowserMenuItem';
 import { ItemCard, ItemCardLoading } from '$components/ItemCard';
 import { zeroPad } from '$utils/format';
+import { ButtonWithAuth } from '$components/auth/ButtonWithAuth';
+import { DeleteMenuItem } from '$components/auth/DeleteMenuItem';
+import SmartLink from '$components/SmartLink';
 
 const dateFormat: Intl.DateTimeFormatOptions = {
   year: 'numeric',
@@ -128,16 +128,13 @@ function CollectionDetail() {
         title={title || id}
         actions={
           <>
-            <Button
-              as={SmartLink}
+            <ButtonWithAuth
               to={`/collections/${id}/edit`}
-              colorScheme='primary'
-              size='md'
               leftIcon={<CollecticonPencil />}
             >
               Edit
-            </Button>
-            <Menu placement='bottom-end'>
+            </ButtonWithAuth>
+            <Menu>
               <MenuButton
                 as={IconButton}
                 aria-label='Options'
@@ -147,15 +144,7 @@ function CollectionDetail() {
               />
               <MenuList>
                 <StacBrowserMenuItem resourcePath={`/collections/${id}`} />
-                <MenuItem
-                  icon={<CollecticonTrashBin />}
-                  color='danger.500'
-                  _hover={{ bg: 'danger.200' }}
-                  _focus={{ bg: 'danger.200' }}
-                  onClick={() => alert('Soon!')}
-                >
-                  Delete
-                </MenuItem>
+                <DeleteMenuItem />
               </MenuList>
             </Menu>
           </>

@@ -1,11 +1,13 @@
 import React from 'react';
-import { Box, List, ListItem, Button, ButtonProps } from '@chakra-ui/react';
+import { List, ListItem, Button, ButtonProps, Flex } from '@chakra-ui/react';
 import {
   CollecticonFolder,
   CollecticonPlusSmall
 } from '@devseed-ui/collecticons-chakra';
 
 import SmartLink, { SmartLinkProps } from './SmartLink';
+import { UserInfo } from './auth/UserInfo';
+import { useAuth0 } from '@auth0/auth0-react';
 
 function NavItem(props: ButtonProps & SmartLinkProps) {
   return (
@@ -25,17 +27,22 @@ function NavItem(props: ButtonProps & SmartLinkProps) {
 }
 
 function MainNavigation() {
+  const { isAuthenticated } = useAuth0();
+
   return (
-    <Box as='nav' aria-label='Main'>
+    <Flex as='nav' aria-label='Main' gap={8}>
       <List display='flex' gap={2}>
         <NavItem to='/collections/' leftIcon={<CollecticonFolder />}>
           Browse
         </NavItem>
-        <NavItem to='/collections/new' leftIcon={<CollecticonPlusSmall />}>
-          Create
-        </NavItem>
+        {isAuthenticated && (
+          <NavItem to='/collections/new' leftIcon={<CollecticonPlusSmall />}>
+            Create
+          </NavItem>
+        )}
       </List>
-    </Box>
+      <UserInfo />
+    </Flex>
   );
 }
 

@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import {
-  Button,
   Flex,
   Heading,
   Box,
@@ -31,6 +30,7 @@ import { InnerPageHeader } from '$components/InnerPageHeader';
 import SmartLink from '$components/SmartLink';
 import { ItemCard, ItemCardLoading } from '$components/ItemCard';
 import { zeroPad } from '$utils/format';
+import { ButtonWithAuth } from '$components/auth/ButtonWithAuth';
 
 function CollectionList() {
   usePageTitle('Collections');
@@ -76,15 +76,12 @@ function CollectionList() {
         title='Catalog'
         overline='Browsing'
         actions={
-          <Button
-            as={SmartLink}
+          <ButtonWithAuth
             to='/collections/new'
-            colorScheme='primary'
-            size='md'
             leftIcon={<CollecticonPlusSmall />}
           >
             Create
-          </Button>
+          </ButtonWithAuth>
         }
       />
       <Flex direction='column' gap='8' as='section'>

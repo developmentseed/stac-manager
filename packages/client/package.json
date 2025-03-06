@@ -50,6 +50,7 @@
     "watcher": "^2.3.1"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.3.0",
     "@chakra-ui/react": "^2.8.2",
     "@developmentseed/stac-react": "^0.1.0-alpha.10",
     "@devseed-ui/collecticons-chakra": "^3.0.3",
