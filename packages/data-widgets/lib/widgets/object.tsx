@@ -38,8 +38,9 @@ export function WidgetObject(props: WidgetProps) {
 
   const ctx = useFormikContext();
   const values = pointer ? get(ctx.values, pointer) : ctx.values;
+
   const schemaKeys = Object.keys(field.properties);
-  const valueKeys = Object.keys(values);
+  const valueKeys = Object.keys(values || {});
   const unlistedKeys = valueKeys.filter((key) => !schemaKeys.includes(key));
 
   return (

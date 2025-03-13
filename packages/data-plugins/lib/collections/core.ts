@@ -202,6 +202,21 @@ export class PluginCore extends Plugin {
             }
           }
         },
+        thumbnail: {
+          type: 'object',
+          'ui:widget': 'object:fieldset',
+          label: 'Thumbnail',
+          properties: {
+            title: {
+              label: 'Title',
+              type: 'string'
+            },
+            href: {
+              label: 'Href',
+              type: 'string'
+            }
+          }
+        },
         assets: {
           type: 'array',
           label: 'Assets',
@@ -260,6 +275,10 @@ export class PluginCore extends Plugin {
       spatial: data?.extent?.spatial.bbox || [],
       temporal: data?.extent?.temporal.interval.map(null2EmptyString) || [],
       links: data?.links || [],
+      thumbnail: {
+        title: data?.assets?.thumbnail?.title || '',
+        href: data?.assets?.thumbnail?.href || ''
+      },
       assets: Object.entries<Record<string, any>>(data?.assets || {}).map(
         ([key, value]) => ({
           id: key,
@@ -271,6 +290,19 @@ export class PluginCore extends Plugin {
   }
 
   exitData(data: any) {
+    const thumbnail = data.thumbnail.title
+      ? {
+          thumbnail: {
+            href: data.thumbnail.href,
+            title: data.thumbnail.title,
+            roles: ['thumbnail'],
+            type: data.thumbnail.href.match(/\.jpe?g$/)
+              ? 'image/jpeg'
+              : 'image/png'
+          }
+        }
+      : {};
+
     return {
       type: 'Collection',
       stac_version: '1.0.0',
@@ -299,7 +331,7 @@ export class PluginCore extends Plugin {
             [asset.id]: asset
           };
         },
-        {}
+        { ...thumbnail }
       ),
       summaries: data.summaries
     };
