@@ -93,9 +93,22 @@ export class PluginCore extends Plugin {
         stac_extensions: {
           type: 'array',
           label: 'STAC Extensions',
+          'ui:widget': 'tagger',
           items: {
-            label: 'Extension',
-            type: 'string'
+            type: 'string',
+            allowOther: {
+              type: 'string'
+            },
+            enum: [
+              [
+                'https://stac-extensions.github.io/item-assets/v1.0.0/schema.json',
+                'Item Assets Defenition'
+              ],
+              [
+                'https://stac-extensions.github.io/render/v2.0.0/schema.json',
+                'Render'
+              ]
+            ]
           }
         },
         spatial: {
