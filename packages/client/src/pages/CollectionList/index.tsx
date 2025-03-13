@@ -31,6 +31,7 @@ import SmartLink from '$components/SmartLink';
 import { ItemCard, ItemCardLoading } from '$components/ItemCard';
 import { zeroPad } from '$utils/format';
 import { ButtonWithAuth } from '$components/auth/ButtonWithAuth';
+import { MenuItemWithAuth } from '$components/auth/MenuItemWithAuth';
 
 function CollectionList() {
   usePageTitle('Collections');
@@ -77,6 +78,8 @@ function CollectionList() {
         overline='Browsing'
         actions={
           <ButtonWithAuth
+            colorScheme='primary'
+            size='sm'
             to='/collections/new'
             leftIcon={<CollecticonPlusSmall />}
           >
@@ -169,13 +172,13 @@ function CollectionList() {
                       >
                         View
                       </MenuItem>
-                      <MenuItem
+                      <MenuItemWithAuth
                         as={SmartLink}
                         to={`/collections/${col.id}/edit`}
                         icon={<CollecticonPencil />}
                       >
                         Edit
-                      </MenuItem>
+                      </MenuItemWithAuth>
                     </MenuList>
                   </Menu>
                 )}

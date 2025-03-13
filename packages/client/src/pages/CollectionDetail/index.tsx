@@ -129,6 +129,8 @@ function CollectionDetail() {
         actions={
           <>
             <ButtonWithAuth
+              colorScheme='primary'
+              size='sm'
               to={`/collections/${id}/edit`}
               leftIcon={<CollecticonPencil />}
             >
