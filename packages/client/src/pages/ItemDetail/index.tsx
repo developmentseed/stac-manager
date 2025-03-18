@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Box,
@@ -16,35 +16,17 @@ import {
   Skeleton,
   SkeletonText
 } from '@chakra-ui/react';
-import Map, { Source, Layer, MapRef } from 'react-map-gl/maplibre';
-import { StacAsset } from 'stac-ts';
 import { useItem } from '@developmentseed/stac-react';
 import {
   CollecticonEllipsisVertical,
   CollecticonTrashBin
 } from '@devseed-ui/collecticons-chakra';
-import getBbox from '@turf/bbox';
 
 import { usePageTitle } from '../../hooks';
-import { BackgroundTiles } from '$components/Map';
 import AssetList from './AssetList';
 import { InnerPageHeader } from '$components/InnerPageHeader';
 import { StacBrowserMenuItem } from '$components/StacBrowserMenuItem';
-
-const resultsOutline = {
-  'line-color': '#C53030',
-  'line-width': 2
-};
-
-const resultsFill = {
-  'fill-color': '#C53030',
-  'fill-opacity': 0.1
-};
-
-const cogMediaTypes = [
-  'image/tiff; application=geotiff; profile=cloud-optimized',
-  'image/vnd.stac.geotiff'
-];
+import { ItemMap } from './ItemMap';
 
 const dateFormat: Intl.DateTimeFormatOptions = {
   year: 'numeric',
@@ -57,37 +39,6 @@ function ItemDetail() {
   usePageTitle(`Item ${itemId}`);
   const itemResource = `${process.env.REACT_APP_STAC_API}/collections/${collectionId}/items/${itemId}`;
   const { item, state } = useItem(itemResource);
-
-  const [map, setMap] = useState<MapRef>();
-  const setMapRef = (m: MapRef) => setMap(m);
-
-  // Fit the map view around the current results bbox
-  useEffect(() => {
-    const bounds = item && getBbox(item);
-
-    if (map && bounds) {
-      const [x1, y1, x2, y2] = bounds;
-      map.fitBounds([x1, y1, x2, y2], { padding: 30, duration: 0 });
-    }
-  }, [item, map]);
-
-  const previewAsset = useMemo(() => {
-    if (!item) return;
-
-    return Object.values(item.assets).reduce((preview, asset) => {
-      const { type, href, roles } = asset as StacAsset;
-      if (cogMediaTypes.includes(type || '')) {
-        if (!preview) {
-          return href;
-        } else {
-          if (roles && roles.includes('visual')) {
-            return href;
-          }
-        }
-      }
-      return preview;
-    }, undefined);
-  }, [item]);
 
   if (!item || state === 'LOADING') {
     return (
@@ -216,36 +167,7 @@ function ItemDetail() {
                 <VisuallyHidden>Spacial extent</VisuallyHidden>
               </Heading>
               <Box position='absolute' inset='0'>
-                <Map ref={setMapRef}>
-                  <BackgroundTiles />
-                  {previewAsset && (
-                    <Source
-                      id='preview'
-                      type='raster'
-                      tiles={[
-                        `http://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=${previewAsset}`
-                      ]}
-                      tileSize={256}
-                      attribution="Background tiles: © <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap contributors</a>"
-                    >
-                      <Layer id='preview-tiles' type='raster' />
-                    </Source>
-                  )}
-                  <Source id='results' type='geojson' data={item}>
-                    <Layer
-                      id='results-line'
-                      type='line'
-                      paint={resultsOutline}
-                    />
-                    {!previewAsset && (
-                      <Layer
-                        id='results-fill'
-                        type='fill'
-                        paint={resultsFill}
-                      />
-                    )}
-                  </Source>
-                </Map>
+                <ItemMap item={item} />
               </Box>
             </Flex>
           </GridItem>
