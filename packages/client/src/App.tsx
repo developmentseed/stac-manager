@@ -25,11 +25,21 @@ import CollectionDetail from './pages/CollectionDetail';
 import Sandbox from './pages/Sandbox';
 import { config } from './plugin-system/config';
 
+let basename: string | undefined;
+if (process.env.PUBLIC_URL) {
+  try {
+    basename = new URL(process.env.PUBLIC_URL).pathname;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    // no-op
+  }
+}
+
 export const App = () => (
   <ChakraProvider theme={theme}>
     <StacApiProvider apiUrl={process.env.REACT_APP_STAC_API!}>
       <PluginConfigProvider config={config}>
-        <Router>
+        <Router basename={basename}>
           <Container
             maxW='container.xl'
             minH='100vh'
@@ -46,7 +56,7 @@ export const App = () => (
             >
               <Flex gap={4} alignItems='center'>
                 <Image
-                  src='/meta/icon-512.png'
+                  src={`${process.env.PUBLIC_URL}/meta/icon-512.png`}
                   width={8}
                   aspectRatio={1}
                   borderRadius='md'

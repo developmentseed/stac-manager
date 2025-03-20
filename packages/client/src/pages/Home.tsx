@@ -1,10 +1,10 @@
 import React from 'react';
-
-import { usePageTitle } from '../hooks';
 import { Navigate } from 'react-router-dom';
 
+import { usePageTitle } from '../hooks';
+
 function Home() {
-  usePageTitle('STAC Admin');
+  usePageTitle(process.env.APP_TITLE!);
 
   return <Navigate to='/collections' replace />;
 }

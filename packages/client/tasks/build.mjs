@@ -34,7 +34,15 @@ async function copyFiles() {
   log.info('📦 Copied static files to dist.');
 }
 
-async function parcelServe() {
+async function parcelBuild() {
+  const publicUrl = process.env.PUBLIC_URL || '/';
+
+  if (publicUrl && publicUrl !== '/') {
+    log.warn(`🌍 Building using public URL: ${publicUrl}`);
+  } else {
+    log.warn(`🌍 Building without public URL`);
+  }
+
   const bundler = new Parcel({
     entries: `${__dirname}/../src/index.html`,
     defaultConfig: `${__dirname}/../.parcelrc`,
@@ -42,7 +50,7 @@ async function parcelServe() {
     mode: 'production',
     defaultTargetOptions: {
       distDir: `${__dirname}/../dist`,
-      publicUrl: process.env.PUBLIC_URL || '/'
+      publicUrl
     },
     additionalReporters: [
       {
@@ -58,8 +66,9 @@ async function parcelServe() {
     log.info(`✨ Built ${bundles.length} bundles in ${buildTime}ms!`);
   } catch (err) {
     log.warn(err.diagnostics);
+    process.exit(1);
   }
 }
 
 copyFiles();
-parcelServe();
+parcelBuild();

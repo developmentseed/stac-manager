@@ -14,6 +14,7 @@ Some client options are controlled by environment variables. These are:
 ## Title and description of the app for metadata
 APP_TITLE
 APP_DESCRIPTION
+PUBLIC_URL
 
 # API
 ## If the app is being served in from a subfolder, the domain url must be set.
@@ -25,6 +26,15 @@ REACT_APP_STAC_API
 REACT_APP_THEME_PRIMARY_COLOR
 REACT_APP_THEME_SECONDARY_COLOR
 ```
+
+**Public URL**  
+It is recommended to always set the `PUBLIC_URL` environment variable on a production build.
+If the app is being served from a subfolder, the `PUBLIC_URL` should include the subfolder path. **Do not include a trailing slash.**
+
+For example, if the app is being served from `https://example.com/stac-manager`, the `PUBLIC_URL` should be set to `https://example.com/stac-manager`.
+
+> [!IMPORTANT]
+> The `PUBLIC_URL` environment variable must be set before running the build script, and therefore the `.env` file cannot be used to set this variable.
 
 You must provide a value for the `REACT_APP_STAC_API` environment variable. This should be the URL of the STAC API you wish to interact with.
 
