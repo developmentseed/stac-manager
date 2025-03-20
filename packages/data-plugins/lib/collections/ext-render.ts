@@ -70,6 +70,9 @@ export class PluginRender extends Plugin {
                 label: 'Colormap',
                 type: 'string',
                 'ui:widget': 'tagger',
+                allowOther: {
+                  type: 'string'
+                },
                 enum: colorMaps
               },
               colormap: {
@@ -89,6 +92,9 @@ export class PluginRender extends Plugin {
                 label: 'Resampling',
                 type: 'string',
                 'ui:widget': 'tagger',
+                allowOther: {
+                  type: 'string'
+                },
                 enum: [
                   ['near', 'Nearest neighbour'],
                   ['bilinear', 'Bilinear'],
