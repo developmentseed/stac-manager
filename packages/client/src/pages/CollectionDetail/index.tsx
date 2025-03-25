@@ -19,11 +19,17 @@ import {
   HStack,
   VisuallyHidden,
   Skeleton,
-  SkeletonText
+  SkeletonText,
+  Popover,
+  PopoverTrigger,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent
 } from '@chakra-ui/react';
 import { useCollection, useStacSearch } from '@developmentseed/stac-react';
 import {
   CollecticonEllipsisVertical,
+  CollecticonEye,
   CollecticonPencil,
   CollecticonTextBlock,
   CollecticonTrashBin
@@ -37,6 +43,7 @@ import { InnerPageHeader } from '$components/InnerPageHeader';
 import { StacBrowserMenuItem } from '$components/StacBrowserMenuItem';
 import { ItemCard, ItemCardLoading } from '$components/ItemCard';
 import { zeroPad } from '$utils/format';
+import { ItemMap } from '$pages/ItemDetail/ItemMap';
 
 const dateFormat: Intl.DateTimeFormatOptions = {
   year: 'numeric',
@@ -280,27 +287,55 @@ function CollectionDetail() {
                 to={`/collections/${id}/items/${item.id}`}
                 renderMenu={() => {
                   return (
-                    <Menu placement='bottom-end'>
-                      <MenuButton
-                        as={IconButton}
-                        aria-label='Options'
-                        icon={<CollecticonEllipsisVertical />}
-                        variant='outline'
-                        size='sm'
-                      />
-                      <MenuList>
-                        <StacBrowserMenuItem
-                          resourcePath={`/collections/${id}/items/${item.id}`}
+                    <Flex gap={2}>
+                      <Menu placement='bottom-end'>
+                        <MenuButton
+                          as={IconButton}
+                          aria-label='Options'
+                          icon={<CollecticonEllipsisVertical />}
+                          variant='outline'
+                          size='sm'
                         />
-                        <MenuItem
-                          as={SmartLink}
-                          to={`/collections/${id}/items/${item.id}`}
-                          icon={<CollecticonTextBlock />}
+                        <MenuList>
+                          <StacBrowserMenuItem
+                            resourcePath={`/collections/${id}/items/${item.id}`}
+                          />
+                          <MenuItem
+                            as={SmartLink}
+                            to={`/collections/${id}/items/${item.id}`}
+                            icon={<CollecticonTextBlock />}
+                          >
+                            View
+                          </MenuItem>
+                        </MenuList>
+                      </Menu>
+                      <Popover placement='top' isLazy>
+                        <PopoverTrigger>
+                          <IconButton
+                            aria-label='Preview'
+                            icon={<CollecticonEye />}
+                            variant='outline'
+                            size='sm'
+                          />
+                        </PopoverTrigger>
+                        <PopoverContent
+                          boxShadow='sm'
+                          borderColor='base.200'
+                          borderWidth='2px'
                         >
-                          View
-                        </MenuItem>
-                      </MenuList>
-                    </Menu>
+                          <PopoverArrow bg='base.200' />
+                          <PopoverBody
+                            p={0}
+                            overflow='hidden'
+                            borderRadius='md'
+                          >
+                            <Box h='15rem'>
+                              <ItemMap item={item} reuseMaps />
+                            </Box>
+                          </PopoverBody>
+                        </PopoverContent>
+                      </Popover>
+                    </Flex>
                   );
                 }}
               />
