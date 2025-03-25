@@ -23,7 +23,6 @@ import {
   CollecticonPlusSmall,
   CollecticonTextBlock
 } from '@devseed-ui/collecticons-chakra';
-import { useCollections } from '@developmentseed/stac-react';
 import type { StacCollection } from 'stac-ts';
 
 import { usePageTitle } from '../../hooks';
@@ -31,10 +30,24 @@ import { InnerPageHeader } from '$components/InnerPageHeader';
 import SmartLink from '$components/SmartLink';
 import { ItemCard, ItemCardLoading } from '$components/ItemCard';
 import { zeroPad } from '$utils/format';
+import { useCollections } from './useCollections';
 
 function CollectionList() {
   usePageTitle('Collections');
-  const { collections, state } = useCollections();
+
+  // const [urlParams, setUrlParams] = useSearchParams({ page: '1' });
+  // const page = parseInt(urlParams.get('page') || '1', 10);
+  // const setPage = useCallback(
+  //   (v: number | ((v: number) => number)) => {
+  //     const newVal = typeof v === 'function' ? v(page) : v;
+  //     setUrlParams({ page: newVal.toString() });
+  //   },
+  //   [page]
+  // );
+
+  const { collections, state } = useCollections({
+    limit: 1000
+  });
 
   // Quick search system.
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,6 +83,11 @@ function CollectionList() {
     });
   }, [collections, searchTerm, keyword]);
 
+  const collectionsCount = collections?.numberMatched || 0;
+  // const collectionsReturned = collections?.numberReturned || 0;
+  // const numPages = Math.ceil(collectionsCount / pageSize);
+  // const shouldPaginate = collectionsCount > collectionsReturned;
+
   return (
     <Flex direction='column' gap={8}>
       <InnerPageHeader
@@ -92,10 +110,8 @@ function CollectionList() {
           <Box flexBasis='100%'>
             <Heading size='md' as='h2'>
               Collections{' '}
-              {collections && (
-                <Badge variant='solid'>
-                  {zeroPad(filteredCollections.length)}
-                </Badge>
+              {!!collectionsCount && (
+                <Badge variant='solid'>{zeroPad(collectionsCount)}</Badge>
               )}
             </Heading>
           </Box>
@@ -186,6 +202,15 @@ function CollectionList() {
             ))
           )}
         </SimpleGrid>
+        {/* {shouldPaginate && (
+          <Flex direction='column' alignItems='center'>
+            <Pagination
+              numPages={numPages}
+              page={page}
+              onPageChange={setPage}
+            />
+          </Flex>
+        )} */}
       </Flex>
     </Flex>
   );

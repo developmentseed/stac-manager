@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Box,
@@ -24,7 +24,8 @@ import {
   PopoverTrigger,
   PopoverArrow,
   PopoverBody,
-  PopoverContent
+  PopoverContent,
+  ButtonGroup
 } from '@chakra-ui/react';
 import { useCollection, useStacSearch } from '@developmentseed/stac-react';
 import {
@@ -55,19 +56,33 @@ function CollectionDetail() {
   const { collectionId } = useParams();
   usePageTitle(`Collection ${collectionId}`);
 
-  // const [urlParams, setUrlParams] = useSearchParams({ page: '1' });
-  // const page = parseInt(urlParams.get('page') || '1', 10);
-  // const setPage = useCallback(
-  //   (v: number | ((v: number) => number)) => {
-  //     const newVal = typeof v === 'function' ? v(page) : v;
-  //     setUrlParams({ page: newVal.toString() });
-  //   },
-  //   [page]
-  // );
-
   const { collection, state } = useCollection(collectionId!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
 
-  const { results, collections, setCollections, submit } = useStacSearch();
+  const {
+    results,
+    collections,
+    setCollections,
+    submit,
+    nextPage,
+    previousPage
+  } = useStacSearch();
+
+  // The stac search pagination is token based and has no pages, but we can fake
+  // it tracking the prev and next clicks.
+  const [page, setPage] = useState<number>(1);
+
+  const onPageNavigate = useCallback(
+    (actions: 'next' | 'previous') => {
+      if (actions === 'next') {
+        setPage((prev) => prev + 1);
+        nextPage?.();
+      } else {
+        setPage((prev) => prev - 1);
+        previousPage?.();
+      }
+    },
+    [nextPage, previousPage]
+  );
 
   // Initialize the search with the current collection ID
   useEffect(() => {
@@ -127,6 +142,10 @@ function CollectionDetail() {
 
   const { id, title, description, keywords, license } =
     collection as StacCollection;
+
+  const resultCount = results?.numberMatched || 0;
+  const shouldPaginate =
+    results?.links?.length > 1 && resultCount > results?.numberReturned;
 
   return (
     <Flex direction='column' gap={8}>
@@ -258,10 +277,14 @@ function CollectionDetail() {
           <Box flexBasis='100%'>
             <Heading size='md' as='h2'>
               Items{' '}
-              {results && (
-                <Badge variant='solid'>{zeroPad(results.numberMatched)}</Badge>
-              )}
+              {results && <Badge variant='solid'>{zeroPad(resultCount)}</Badge>}
             </Heading>
+            {!!resultCount && (
+              <Text size='sm' color='base.400'>
+                Showing page {page} of{' '}
+                {Math.ceil(resultCount / results.numberReturned)}
+              </Text>
+            )}
           </Box>
           {/* <Flex direction='row' gap='4'>
             <Button
@@ -310,30 +333,35 @@ function CollectionDetail() {
                         </MenuList>
                       </Menu>
                       <Popover placement='top' isLazy>
-                        <PopoverTrigger>
-                          <IconButton
-                            aria-label='Preview'
-                            icon={<CollecticonEye />}
-                            variant='outline'
-                            size='sm'
-                          />
-                        </PopoverTrigger>
-                        <PopoverContent
-                          boxShadow='sm'
-                          borderColor='base.200'
-                          borderWidth='2px'
-                        >
-                          <PopoverArrow bg='base.200' />
-                          <PopoverBody
-                            p={0}
-                            overflow='hidden'
-                            borderRadius='md'
-                          >
-                            <Box h='15rem'>
-                              <ItemMap item={item} reuseMaps />
-                            </Box>
-                          </PopoverBody>
-                        </PopoverContent>
+                        {({ isOpen }) => (
+                          <>
+                            <PopoverTrigger>
+                              <IconButton
+                                aria-label='Preview'
+                                icon={<CollecticonEye />}
+                                variant='outline'
+                                size='sm'
+                                isActive={isOpen}
+                              />
+                            </PopoverTrigger>
+                            <PopoverContent
+                              boxShadow='sm'
+                              borderColor='base.200'
+                              borderWidth='2px'
+                            >
+                              <PopoverArrow bg='base.200' />
+                              <PopoverBody
+                                p={0}
+                                overflow='hidden'
+                                borderRadius='md'
+                              >
+                                <Box h='15rem'>
+                                  <ItemMap item={item} reuseMaps />
+                                </Box>
+                              </PopoverBody>
+                            </PopoverContent>
+                          </>
+                        )}
                       </Popover>
                     </Flex>
                   );
@@ -348,11 +376,25 @@ function CollectionDetail() {
             </>
           )}
         </SimpleGrid>
+        {shouldPaginate && (
+          <Flex direction='column' alignItems='center'>
+            <ButtonGroup size='sm' variant='outline' isAttached>
+              <Button
+                disabled={!previousPage}
+                onClick={() => onPageNavigate('previous')}
+              >
+                Previous
+              </Button>
+              <Button
+                disabled={!nextPage}
+                onClick={() => onPageNavigate('next')}
+              >
+                Next
+              </Button>
+            </ButtonGroup>
+          </Flex>
+        )}
       </Flex>
-
-      {/* <Flex direction='column' alignItems='center'>
-        <Pagination numPages={20} page={page} onPageChange={setPage} />
-      </Flex> */}
     </Flex>
   );
 }
