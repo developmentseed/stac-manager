@@ -14,7 +14,6 @@ import { StacApiProvider } from '@developmentseed/stac-react';
 import { PluginConfigProvider } from '@stac-manager/data-core';
 
 import theme from './theme';
-import { MainNavigation } from './components';
 import Home from './pages/Home';
 import CollectionList from './pages/CollectionList';
 import { CollectionForm } from './pages/CollectionForm';
@@ -23,6 +22,7 @@ import NotFound from './pages/NotFound';
 import CollectionDetail from './pages/CollectionDetail';
 import Sandbox from './pages/Sandbox';
 import { config } from './plugin-system/config';
+import MainNavigation from '$components/MainNavigation';
 
 export const App = () => (
   <ChakraProvider theme={theme}>

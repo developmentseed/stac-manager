@@ -1,7 +1,4 @@
-import usePageTitle from "./usePageTitle";
-import usePrevious from "./usePrevious";
+import usePageTitle from './usePageTitle';
+import usePrevious from './usePrevious';
 
-export {
-  usePageTitle,
-  usePrevious
-};
+export { usePageTitle, usePrevious };

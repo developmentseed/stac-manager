@@ -80,7 +80,7 @@ export function formatThousands(num: number, options?: FormatThousandsOptions) {
     return '--';
   }
 
-  const repeat = (char, length) => {
+  const repeat = (char: string, length: number) => {
     let str = '';
     for (let i = 0; i < length; i++) str += char + '';
     return str;
@@ -104,7 +104,7 @@ export function formatThousands(num: number, options?: FormatThousandsOptions) {
   dec = (dec || '').substring(0, opts.decimals);
   // Add decimals if forced.
   dec = opts.forceDecimals
-    ? `${dec}${repeat(0, opts.decimals - dec.length)}`
+    ? `${dec}${repeat('0', opts.decimals - dec.length)}`
     : dec;
 
   return dec !== ''
@@ -135,18 +135,18 @@ export function formatAsScientificNotation(num: number, decimals = 2) {
   if (!isFinite(num)) return `${Math.sign(num) === -1 ? '-' : ''}∞`;
 
   const [coefficient, exponent] = num
-  .toExponential()
-  .split('e')
-  .map((item) => Number(item));
+    .toExponential()
+    .split('e')
+    .map((item) => Number(item));
 
   const sups = '⁰¹²³⁴⁵⁶⁷⁸⁹';
   const exponentSup = Math.abs(exponent)
     .toString()
     .split('')
-    .map((v) => sups[v])
+    .map((v) => sups[Number(v)])
     .join('');
-  
-  const sign = exponent < 0 ? '⁻':'';
+
+  const sign = exponent < 0 ? '⁻' : '';
 
   return `${round(coefficient, decimals)}x10${sign}${exponentSup}`;
 }
