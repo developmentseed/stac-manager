@@ -14,13 +14,17 @@ Some client options are controlled by environment variables. These are:
 ## Title and description of the app for metadata
 APP_TITLE
 APP_DESCRIPTION
+## If the app is being served in from a subfolder, the domain url must be set.
 PUBLIC_URL
 
 # API
-## If the app is being served in from a subfolder, the domain url must be set.
-PUBLIC_URL
 REACT_APP_STAC_BROWSER
 REACT_APP_STAC_API
+
+# Auth
+REACT_APP_KEYCLOAK_URL
+REACT_APP_KEYCLOAK_CLIENT_ID
+REACT_APP_KEYCLOAK_REALM
 
 # Theming
 REACT_APP_THEME_PRIMARY_COLOR
@@ -39,6 +43,10 @@ For example, if the app is being served from `https://example.com/stac-manager`,
 You must provide a value for the `REACT_APP_STAC_API` environment variable. This should be the URL of the STAC API you wish to interact with.
 
 If the `REACT_APP_STAC_BROWSER` environment variable is not set, [Radiant Earth's STAC Browser](https://radiantearth.github.io/stac-browser/) will be used by default, which will connect to the STAC API specified in `REACT_APP_STAC_API`.
+
+**Auth**  
+The client uses Keycloack for authentication, which is disabled by default. To
+enable it you must provide values for the `REACT_APP_KEYCLOAK_*` environment variables. These can be obtained through the Keycloak server.
 
 ### Theming
 
