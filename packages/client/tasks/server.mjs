@@ -7,9 +7,17 @@ import portscanner from 'portscanner';
 import log from 'fancy-log';
 import { Parcel } from '@parcel/core';
 
+import {
+  checkRequiredEnvVars,
+  loadEnvironmentVariables
+} from './check-env-vars.mjs';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const __appRoot = path.join(__dirname, '..');
+
+loadEnvironmentVariables();
+checkRequiredEnvVars(['REACT_APP_STAC_API']);
 
 // /////////////////////////////////////////////////////////////////////////////
 // --------------------------- Variables -------------------------------------//
