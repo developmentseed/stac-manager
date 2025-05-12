@@ -8,6 +8,15 @@ See root README.md for instructions on how to install and run the project.
 
 ## Client specific instructions
 
+### Environment Configuration
+
+The application uses environment variables for configuration. A template file `.env.example` is provided as a template.
+
+To configure the application:
+1. Copy `.env.example` to `.env`
+2. Modify the `.env` file with your specific configuration values
+3. Never modify `.env.example` directly as it serves as documentation
+
 Some client options are controlled by environment variables. These are:
 ```
 # App config

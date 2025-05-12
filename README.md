@@ -21,3 +21,19 @@ To set up the project for development, follow the instructions in the [developme
 
 ## License
 This project is licensed under the MIT license - see the LICENSE.md file for details.
+
+## Docker
+To run the STAC-Manager in a Docker container, you can use the provided Dockerfile.
+
+**Build the Docker image**
+```bash
+docker build -t stac-manager .
+```
+
+**Run the Docker container**
+```bash
+docker run --rm -p 8080:80 --name stac-manager -e 'PUBLIC_URL=http://your-url.com' stac-manager
+```
+
+> [!NOTE]
+> The application performs a complete build during container startup to ensure environment variables are properly integrated. This process may take a couple minutes to complete.

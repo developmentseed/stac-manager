@@ -47,6 +47,9 @@ jobs:
       - name: Install
         run: npm install
 
+      - name: Create .env file
+        run: mv packages/client/.env.example packages/client/.env
+
       - name: Setup SPA on Github Pages
         run: node packages/client/tasks/setup-gh-pages.mjs
 
