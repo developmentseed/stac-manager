@@ -1,7 +1,17 @@
 # STAC-Manager 📡 📄
 
 ## Introduction
-The STAC-Manager is a tool designed for managing the values of a STAC (SpatioTemporal Asset Catalog) collection and its items. This interface provides a user-friendly way to modify and update the properties of collections and items within a STAC catalog.
+
+STAC Manager allows you to list, create, read, update, and delete STAC collections and items in a web application.
+
+It currently connects to a STAC API via the the [STAC API - Transation Extension](https://github.com/stac-api-extensions/transaction) and can be configured to support standard authentication and authorization flows, if needed.
+
+The application is extendable with plugins to provide user-friendly interfaces for various STAC extensions or custom properties.
+
+The primary intended use is for detail-oriented curation of STAC collections by subject matter experts, for example fine-tuning providers or keywords, adding [STAC Rendering Extension](https://github.com/stac-extensions/render) configurations, or starting a new collection. It does not target the generation and ingestion of large STAC item sets, which is better done programmatically.
+
+We just released this software and are curious to hear about use cases and limitations - please share your experience via this GitHub repository.
+
 
 ## Repository structure
 
