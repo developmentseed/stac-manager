@@ -1,0 +1,37 @@
+name: release helm chart
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+env:
+  HELM_VERSION: v3.17.0
+
+jobs:
+  release:
+    if: ${{ !startsWith(github.ref, 'refs/tags/stac-manager-') }}  # prevent the helm chart releaser from running this release workflow
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: configure git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - name: run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        with:
+          charts_dir: charts
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

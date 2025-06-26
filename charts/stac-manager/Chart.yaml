@@ -1,0 +1,20 @@
+# Copyright Development Seed. All Rights Reserved.
+# SPDX-License-Identifier: MIT
+
+annotations:
+  category: Infrastructure
+  licenses: MIT
+apiVersion: v2
+
+name: stac-manager
+description: Helm chart deployment for web application to update collection and item meta data in STAC catalogs
+version: "0.0.4"
+sources:
+- https://github.com/developmentseed/stac-manager
+
+type: application
+appVersion: "0.0.4"
+
+maintainers:
+- name: Development Seed. All Rights Reserved.
+  url: https://www.developmentseed.org/
