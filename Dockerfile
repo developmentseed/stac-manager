@@ -5,11 +5,13 @@ FROM node:slim
 ARG APP_TITLE="STAC Manager"
 ARG APP_DESCRIPTION="A web application for managing STAC catalogs"
 ARG REACT_APP_STAC_API="https://earth-search.aws.element84.com/v0"
+ARG REACT_APP_STAC_BROWSER="https://radiantearth.github.io/stac-browser"
 ARG PUBLIC_URL="http://127.0.0.1:8080"
 
 ENV APP_TITLE=${APP_TITLE}
 ENV APP_DESCRIPTION=${APP_DESCRIPTION}
 ENV REACT_APP_STAC_API=${REACT_APP_STAC_API}
+ENV REACT_APP_STAC_BROWSER="${REACT_APP_STAC_BROWSER}/#/external/$(echo ${REACT_APP_STAC_API} | sed 's|^https://||')"
 ENV PUBLIC_URL=${PUBLIC_URL}
 
 # Set the working directory
