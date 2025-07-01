@@ -40,6 +40,13 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          env:
+          - name: REACT_APP_STAC_API
+            value: {{ .Values.stacApi | required "Please provide a value for stacApi" }}
+          {{ if .Values.publicUrl }}
+          - name: PUBLIC_URL
+            value: {{ .Values.publicUrl | required "Please provide a value for publicUrl" }}
+          {{ end }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
