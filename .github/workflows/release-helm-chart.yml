@@ -1,4 +1,4 @@
-name: release helm chart
+name: Release Helm Chart
 
 on:
   workflow_run:

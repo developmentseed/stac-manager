@@ -14,7 +14,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions: 
+permissions:
   contents: write
 
 jobs:
@@ -76,5 +76,6 @@ jobs:
         with:
           branch: gh-pages
           clean: true
+          clean-exclude: index.yaml
           single-commit: true
           folder: packages/client/dist
