@@ -1,12 +1,10 @@
 name: release helm chart
 
 on:
-  push:
-    branches:
-      - main
-  release:
+  workflow_run:
+    workflows: ["Deploy Github Pages"]
     types:
-      - published
+      - completed
 
 env:
   HELM_VERSION: v3.17.0
