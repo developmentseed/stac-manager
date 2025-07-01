@@ -4,13 +4,12 @@ FROM node:slim
 # Define default values for environment variables
 ARG APP_TITLE="STAC Manager"
 ARG APP_DESCRIPTION="A web application for managing STAC catalogs"
-ARG REACT_APP_STAC_API=http://localhost:80
-ARG PUBLIC_URL=/
+ARG REACT_APP_STAC_API="https://earth-search.aws.element84.com/v0"
 
 ENV APP_TITLE=${APP_TITLE}
 ENV APP_DESCRIPTION=${APP_DESCRIPTION}
 ENV REACT_APP_STAC_API=${REACT_APP_STAC_API}
-ENV PUBLIC_URL=${PUBLIC_URL}
+ENV PUBLIC_URL="http://127.0.0.1:8080"
 
 # Set the working directory
 WORKDIR /app
@@ -22,8 +21,14 @@ COPY . .
 RUN npm i
 RUN npm i -g http-server
 
-RUN npm run all:build
+
+# Create a start script that respects runtime environment variables
+RUN echo '#!/bin/sh\n\
+npm run all:build\n\
+http-server -p 80 packages/client/dist' > /app/start.sh
+
+RUN chmod +x /app/start.sh
 
 EXPOSE 80
 
-ENTRYPOINT ["http-server", "-p", "80", "packages/client/dist"]
+ENTRYPOINT ["/app/start.sh"]
