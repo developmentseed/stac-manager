@@ -43,9 +43,15 @@ spec:
           env:
           - name: REACT_APP_STAC_API
             value: {{ .Values.stacApi | required "Please provide a value for stacApi" }}
-          {{ if .Values.publicUrl }}
           - name: PUBLIC_URL
             value: {{ .Values.publicUrl | required "Please provide a value for publicUrl" }}
+          {{ if .Values.oidc }}
+          - name: REACT_APP_KEYCLOAK_URL
+            value: {{ .Values.oidc.providerUrl | required "Please provide a value for oidc.providerUrl" }}
+          - name: REACT_APP_KEYCLOAK_CLIENT_ID
+            value: {{ .Values.oidc.clientId | required "Please provide a value for oidc.clientId" }}
+          - name: REACT_APP_KEYCLOAK_REALM
+            value: {{ .Values.oidc.realm | required "Please provide a value for oidc.realm" }}
           {{ end }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
