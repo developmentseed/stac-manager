@@ -1,46 +1,31 @@
-# Use an official Node.js runtime as a parent image
 FROM node:slim
 
-# Define default values for environment variables
-ARG APP_TITLE="STAC Manager"
-ARG APP_DESCRIPTION="A web application for managing STAC catalogs"
-ARG REACT_APP_STAC_API="https://earth-search.aws.element84.com/v0"
-ARG REACT_APP_STAC_BROWSER="https://radiantearth.github.io/stac-browser"
-ARG PUBLIC_URL="http://127.0.0.1:8080"
-ENV REACT_APP_KEYCLOAK_URL=
-ENV REACT_APP_KEYCLOAK_CLIENT_ID=
-ENV REACT_APP_KEYCLOAK_REALM=
+ARG APP_TITLE=%APP_TITLE%
+ARG APP_DESCRIPTION=%APP_DESCRIPTION%
+ARG PUBLIC_URL=%PUBLIC_URL%
+ARG REACT_APP_STAC_API=%REACT_APP_STAC_API%
+ARG REACT_APP_STAC_BROWSER=%REACT_APP_STAC_BROWSER%
+ARG REACT_APP_KEYCLOAK_URL=%REACT_APP_KEYCLOAK_URL%
+ARG REACT_APP_KEYCLOAK_CLIENT_ID=%REACT_APP_KEYCLOAK_CLIENT_ID%
+ARG REACT_APP_KEYCLOAK_REALM=%REACT_APP_KEYCLOAK_REALM%
+ARG PRIMARY_COLOR=%PRIMARY_COLOR%
+ARG SECONDARY_COLOR=%SECONDARY_COLOR%
 
-ENV APP_TITLE=${APP_TITLE}
-ENV APP_DESCRIPTION=${APP_DESCRIPTION}
-ENV REACT_APP_STAC_API=${REACT_APP_STAC_API}
-ENV REACT_APP_STAC_BROWSER=${REACT_APP_STAC_BROWSER}
-ENV PUBLIC_URL=${PUBLIC_URL}
-ENV REACT_APP_KEYCLOAK_URL=${REACT_APP_KEYCLOAK_URL}
-ENV REACT_APP_KEYCLOAK_CLIENT_ID=${REACT_APP_KEYCLOAK_CLIENT_ID}
-ENV REACT_APP_KEYCLOAK_REALM=${REACT_APP_KEYCLOAK_REALM}
-
-# Set the working directory
 WORKDIR /app
 
-# Copy the rest of the application code
 COPY . .
 
-# Install dependencies
 RUN npm i
 RUN npm i -g http-server
+RUN npm run all:build
+RUN cp -v packages/client/dist/index.html packages/client/dist/404.html
 
-# Create a start script that respects runtime environment variables
-RUN echo '#!/bin/sh\n\
-echo "Starting build"\n\
-npm run all:build\n\
-echo "App built successfully"\n\
-cp -v packages/client/dist/index.html packages/client/dist/404.html\n\
-echo "Starting server"\n\
-http-server -p 80 packages/client/dist' > /app/start.sh
+RUN apt-get update && apt-get install -y gettext-base sed
 
-RUN chmod +x /app/start.sh
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 
 EXPOSE 80
 
-ENTRYPOINT ["/app/start.sh"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["http-server", "-p", "80", "packages/client/dist"]
