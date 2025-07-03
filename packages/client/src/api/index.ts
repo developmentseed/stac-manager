@@ -1,7 +1,7 @@
 import { GenericObject, ApiError } from '../types';
 
 class Api {
-  static fetch(url: string, options: GenericObject) {
+  static fetch(url: string, options?: GenericObject) {
     return fetch(url, options).then(async (response) => {
       if (response.ok) {
         return response.json();

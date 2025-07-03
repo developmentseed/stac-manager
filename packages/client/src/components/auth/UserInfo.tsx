@@ -69,6 +69,13 @@ export function UserInfo() {
         />
       }
       pl='2px'
+      onClick={() => {
+        if (!isLoading) {
+          keycloak.logout({
+            redirectUri: window.location.href
+          });
+        }
+      }}
     >
       Logout
     </Button>

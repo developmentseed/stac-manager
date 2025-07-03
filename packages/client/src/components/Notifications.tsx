@@ -16,7 +16,7 @@ import {
 import React, { useEffect } from 'react';
 
 interface DetailResponse {
-  status: 400;
+  status: number;
   statusText: string;
   detail: {
     detail: { loc: string[]; msg: string }[];
@@ -62,6 +62,15 @@ export function parseResponseForNotifications(response: DetailResponse) {
     }, new Map<string, AppNotification>());
 
     return Array.from(notifications.values());
+  } else if (response.status === 403) {
+    return [
+      {
+        id: 0,
+        type: 'error',
+        title: 'Forbidden',
+        message: 'You do not have permission to perform this action.'
+      } as AppNotification
+    ];
   }
   return [
     {
