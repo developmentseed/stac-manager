@@ -5,9 +5,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCollection } from '@developmentseed/stac-react';
 import { StacCollection } from 'stac-ts';
 
-import usePageTitle from '$hooks/usePageTitle';
-import Api from 'src/api';
+import Api from '../../api';
+import { useKeycloak } from '../../auth/Context';
 import { EditForm } from './EditForm';
+import usePageTitle from '$hooks/usePageTitle';
 import {
   AppNotification,
   parseResponseForNotifications
@@ -32,6 +33,8 @@ export function CollectionFormNew() {
     AppNotification[] | undefined
   >();
 
+  const { keycloak } = useKeycloak();
+
   const onSubmit = async (data: any, formikHelpers: FormikHelpers<any>) => {
     try {
       toast.closeAll();
@@ -44,7 +47,7 @@ export function CollectionFormNew() {
         position: 'bottom-right'
       });
 
-      await collectionTransaction().create(data);
+      await collectionTransaction(keycloak?.token).create(data);
 
       toast.update('collection-submit', {
         title: 'Collection created',
@@ -78,6 +81,8 @@ export function CollectionFormEdit(props: { id: string }) {
 
   const toast = useToast();
 
+  const { keycloak } = useKeycloak();
+
   useEffect(() => {
     if (state === 'LOADING') {
       setTriedLoading(true);
@@ -103,7 +108,7 @@ export function CollectionFormEdit(props: { id: string }) {
         duration: null,
         position: 'bottom-right'
       });
-      await collectionTransaction().update(id, data);
+      await collectionTransaction(keycloak?.token).update(id, data);
 
       toast.update('collection-submit', {
         title: 'Collection updated',
@@ -134,7 +139,7 @@ type collectionTransactionType = {
   create: (data: StacCollection) => Promise<StacCollection>;
 };
 
-function collectionTransaction(): collectionTransactionType {
+function collectionTransaction(token?: string): collectionTransactionType {
   const createRequest = async (
     url: string,
     method: string,
@@ -142,7 +147,10 @@ function collectionTransaction(): collectionTransactionType {
   ) => {
     return Api.fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : undefined
+      },
       body: JSON.stringify(data)
     });
   };
