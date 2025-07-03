@@ -81,3 +81,28 @@ Object.defineProperty(Array.prototype, 'last', {
   },
   set: undefined
 });
+
+// 😱😱😱😱😱😱😱
+//
+// stac-manager relies on stac-react for making STAC API requests.
+// Currently, stac-react adds a 'Content-Type: application/json' header to all
+// requests, including GET requests. However, the api server rejects GET
+// requests with this header. Ideally, the server should accept this header, but
+// as a workaround, we remove it from GET requests to avoid server errors. This
+// is a temporary fix is just to get things working while stac-react is updated.
+// I promise it is temporary!
+const fetch = window.fetch;
+window.fetch = (async (input: RequestInfo, init?: RequestInit) => {
+  // If is a GET request, without body, remove the Content-Type header.
+  if (
+    init &&
+    (!init.method || init.method.toUpperCase() === 'GET') &&
+    !init.body &&
+    // @ts-expect-error Content-Type can be a header property
+    init.headers?.['Content-Type']
+  ) {
+    // @ts-expect-error Content-Type can be a header property
+    delete init.headers['Content-Type'];
+  }
+  return fetch(input, init);
+}) as typeof window.fetch;
