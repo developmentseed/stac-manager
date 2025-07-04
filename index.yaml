@@ -5,6 +5,25 @@ entries:
       category: Infrastructure
       licenses: MIT
     apiVersion: v2
+    appVersion: 0.0.10
+    created: "2025-07-04T08:01:25.609734111Z"
+    description: Helm chart deployment for web application to update collection and
+      item meta data in STAC catalogs
+    digest: fdec5e7227491444a633548958bf2ab7c92efb519f8aa9b52617ee6e6c8e6ed6
+    maintainers:
+    - name: Development Seed. All Rights Reserved.
+      url: https://www.developmentseed.org/
+    name: stac-manager
+    sources:
+    - https://github.com/developmentseed/stac-manager
+    type: application
+    urls:
+    - https://github.com/developmentseed/stac-manager/releases/download/stac-manager-0.0.10/stac-manager-0.0.10.tgz
+    version: 0.0.10
+  - annotations:
+      category: Infrastructure
+      licenses: MIT
+    apiVersion: v2
     appVersion: 0.0.9
     created: "2025-07-03T12:03:01.951504424Z"
     description: Helm chart deployment for web application to update collection and
@@ -58,4 +77,4 @@ entries:
     urls:
     - https://github.com/developmentseed/stac-manager/releases/download/stac-manager-0.0.7/stac-manager-0.0.7.tgz
     version: 0.0.7
-generated: "2025-07-03T12:03:01.951533849Z"
+generated: "2025-07-04T08:01:25.609756543Z"
