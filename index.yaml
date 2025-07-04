@@ -1,0 +1,61 @@
+apiVersion: v1
+entries:
+  stac-manager:
+  - annotations:
+      category: Infrastructure
+      licenses: MIT
+    apiVersion: v2
+    appVersion: 0.0.9
+    created: "2025-07-03T12:03:01.951504424Z"
+    description: Helm chart deployment for web application to update collection and
+      item meta data in STAC catalogs
+    digest: f281df3108eff90e5743b7a98802573ce482fd62009791f1800b7ebb12228580
+    maintainers:
+    - name: Development Seed. All Rights Reserved.
+      url: https://www.developmentseed.org/
+    name: stac-manager
+    sources:
+    - https://github.com/developmentseed/stac-manager
+    type: application
+    urls:
+    - https://github.com/developmentseed/stac-manager/releases/download/stac-manager-0.0.9/stac-manager-0.0.9.tgz
+    version: 0.0.9
+  - annotations:
+      category: Infrastructure
+      licenses: MIT
+    apiVersion: v2
+    appVersion: 0.0.8
+    created: "2025-07-02T07:32:00.54499881Z"
+    description: Helm chart deployment for web application to update collection and
+      item meta data in STAC catalogs
+    digest: 4ba76fc9afdc97fa1ae56b9ed387b39135c5d2337046ca6276f541b8aa3ae3d8
+    maintainers:
+    - name: Development Seed. All Rights Reserved.
+      url: https://www.developmentseed.org/
+    name: stac-manager
+    sources:
+    - https://github.com/developmentseed/stac-manager
+    type: application
+    urls:
+    - https://github.com/developmentseed/stac-manager/releases/download/stac-manager-0.0.8/stac-manager-0.0.8.tgz
+    version: 0.0.8
+  - annotations:
+      category: Infrastructure
+      licenses: MIT
+    apiVersion: v2
+    appVersion: 0.0.7
+    created: "2025-07-01T19:24:40.941803502Z"
+    description: Helm chart deployment for web application to update collection and
+      item meta data in STAC catalogs
+    digest: 93145028dfc23283705b4357ea6607a5aeb5dcfa516a110f0850373fbe93bf76
+    maintainers:
+    - name: Development Seed. All Rights Reserved.
+      url: https://www.developmentseed.org/
+    name: stac-manager
+    sources:
+    - https://github.com/developmentseed/stac-manager
+    type: application
+    urls:
+    - https://github.com/developmentseed/stac-manager/releases/download/stac-manager-0.0.7/stac-manager-0.0.7.tgz
+    version: 0.0.7
+generated: "2025-07-03T12:03:01.951533849Z"
