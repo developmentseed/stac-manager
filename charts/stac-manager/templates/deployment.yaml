@@ -45,6 +45,10 @@ spec:
             value: {{ .Values.stacApi | required "Please provide a value for stacApi" }}
           - name: PUBLIC_URL
             value: {{ .Values.publicUrl | required "Please provide a value for publicUrl" }}
+          {{ if .Values.stacBrowser }}
+          - name: REACT_APP_STAC_BROWSER
+            value: {{ .Values.stacBrowser }}
+          {{ end }}
           {{ if .Values.oidc }}
           - name: REACT_APP_KEYCLOAK_URL
             value: {{ .Values.oidc.providerUrl | required "Please provide a value for oidc.providerUrl" }}
@@ -52,6 +56,22 @@ spec:
             value: {{ .Values.oidc.clientId | required "Please provide a value for oidc.clientId" }}
           - name: REACT_APP_KEYCLOAK_REALM
             value: {{ .Values.oidc.realm | required "Please provide a value for oidc.realm" }}
+          {{ end }}
+          {{ if .Values.appTitle }}
+          - name: APP_TITLE
+            value: {{ .Values.appTitle }}
+          {{ end }}
+          {{ if .Values.appDescription }}
+          - name: APP_DESCRIPTION
+            value: {{ .Values.appDescription }}
+          {{ end }}
+          {{ if .Values.primaryColor }}
+          - name: REACT_APP_THEME_PRIMARY_COLOR
+            value: {{ .Values.primaryColor }}
+          {{ end }}
+          {{ if .Values.secondaryColor }}
+          - name: REACT_APP_THEME_SECONDARY_COLOR
+            value: {{ .Values.secondaryColor }}
           {{ end }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
