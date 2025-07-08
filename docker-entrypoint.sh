@@ -14,8 +14,8 @@ find /app/packages/client/dist -type f \( -name "*.html" -o -name "*.js" -o -nam
   -e "s|%REACT_APP_KEYCLOAK_URL%|${REACT_APP_KEYCLOAK_URL:-}|g" \
   -e "s|%REACT_APP_KEYCLOAK_CLIENT_ID%|${REACT_APP_KEYCLOAK_CLIENT_ID:-}|g" \
   -e "s|%REACT_APP_KEYCLOAK_REALM%|${REACT_APP_KEYCLOAK_REALM:-}|g" \
-  -e "s|%REACT_APP_THEME_PRIMARY_COLOR%|${REACT_APP_THEME_PRIMARY_COLOR:-}|g" \
-  -e "s|%REACT_APP_THEME_SECONDARY_COLOR%|${REACT_APP_THEME_SECONDARY_COLOR:-}|g"
+  -e "s|%REACT_APP_THEME_PRIMARY_COLOR%|${REACT_APP_THEME_PRIMARY_COLOR:-#6A5ACD}|g" \
+  -e "s|%REACT_APP_THEME_SECONDARY_COLOR%|${REACT_APP_THEME_SECONDARY_COLOR:-#048A81}|g"
 
 echo "Environment variable replacement complete"
 
