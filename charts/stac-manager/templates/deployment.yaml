@@ -66,11 +66,11 @@ spec:
             value: {{ .Values.appDescription }}
           {{ end }}
           {{ if .Values.primaryColor }}
-          - name: PRIMARY_COLOR
+          - name: REACT_APP_THEME_PRIMARY_COLOR
             value: {{ .Values.primaryColor }}
           {{ end }}
           {{ if .Values.secondaryColor }}
-          - name: SECONDARY_COLOR
+          - name: REACT_APP_THEME_SECONDARY_COLOR
             value: {{ .Values.secondaryColor }}
           {{ end }}
           livenessProbe:
