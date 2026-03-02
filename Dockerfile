@@ -20,10 +20,15 @@ RUN npm i -g http-server
 RUN npm run all:build
 RUN cp -v packages/client/dist/index.html packages/client/dist/404.html
 
-RUN apt-get update && apt-get install -y gettext-base sed
+RUN apt-get update && apt-get install -y gettext-base sed && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd -g 1000 user && \
+    useradd -u 1000 -g user -s /bin/bash -m user
 
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
-RUN chmod +x /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh && chown -R user:user /app
+
+USER user
 
 EXPOSE 80
 
