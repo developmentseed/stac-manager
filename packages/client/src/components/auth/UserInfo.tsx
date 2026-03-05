@@ -6,6 +6,7 @@ import {
 } from '@devseed-ui/collecticons-chakra';
 
 import { useKeycloak } from 'src/auth/Context';
+import { getRedirectUri } from 'src/utils/basePath';
 
 async function hash(string: string) {
   const utf8 = new TextEncoder().encode(string);
@@ -41,7 +42,7 @@ export function UserInfo() {
         onClick={() => {
           if (!isLoading) {
             keycloak.login({
-              redirectUri: window.location.href
+              redirectUri: getRedirectUri()
             });
           }
         }}
@@ -72,7 +73,7 @@ export function UserInfo() {
       onClick={() => {
         if (!isLoading) {
           keycloak.logout({
-            redirectUri: window.location.href
+            redirectUri: getRedirectUri()
           });
         }
       }}
