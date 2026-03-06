@@ -5,7 +5,7 @@ echo "Startup script"
 echo "Replacing environment variables in built files..."
 
 # Replace placeholders with env vars or defaults only in the built files
-find /app/packages/client/dist -type f \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.map" -o -name "*.json" \) | xargs sed -i \
+find /app/packages/client/dist -type f \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.map" -o -name "*.json" -o -name "*.webmanifest" \) | xargs sed -i \
   -e "s|%APP_TITLE%|${APP_TITLE:-STAC Manager}|g" \
   -e "s|%APP_DESCRIPTION%|${APP_DESCRIPTION:-A web application for managing STAC catalogs}|g" \
   -e "s|%PUBLIC_URL%|${PUBLIC_URL:-http://127.0.0.1:8080}|g" \
