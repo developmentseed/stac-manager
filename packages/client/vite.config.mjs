@@ -47,6 +47,14 @@ export default defineConfig({
   },
   server: {
     port: 9000,
+    fs: {
+      // Allow serving files from the stac-react local checkout
+      allow: [
+        __dirname,
+        path.resolve(__dirname, '../..'),
+        ...(stacReactLocal ? [path.resolve(stacReactLocal)] : []),
+      ],
+    },
   },
   build: {
     outDir: 'dist',
