@@ -34,7 +34,6 @@ lib-cov
 *.pid
 npm-debug.log
 yarn-error.log
-.parcel-cache
 
 
 ################################################
@@ -57,5 +56,4 @@ temp
 tmp
 .tmp
 dist
-parcel-bundle-reports
 .nx
