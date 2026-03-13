@@ -5,7 +5,7 @@ import {
   CollecticonLogout
 } from '@devseed-ui/collecticons-chakra';
 
-import { useKeycloak } from 'src/auth/Context';
+import { useKeycloak } from '../../auth/Context';
 
 async function hash(string: string) {
   const utf8 = new TextEncoder().encode(string);

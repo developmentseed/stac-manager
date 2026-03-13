@@ -14,7 +14,7 @@ import {
 
 import SmartLink, { SmartLinkProps } from './SmartLink';
 import { UserInfo } from './auth/UserInfo';
-import { useKeycloak } from 'src/auth/Context';
+import { useKeycloak } from '../auth/Context';
 
 function NavItem(props: ButtonProps & SmartLinkProps) {
   return (

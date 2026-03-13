@@ -1,6 +1,6 @@
 import React from 'react';
 import { forwardRef, MenuItem, MenuItemProps } from '@chakra-ui/react';
-import { useKeycloak } from 'src/auth/Context';
+import { useKeycloak } from '../../auth/Context';
 
 export const MenuItemWithAuth = forwardRef<MenuItemProps, typeof MenuItem>(
   (props, ref) => {

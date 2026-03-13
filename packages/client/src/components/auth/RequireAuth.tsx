@@ -3,7 +3,7 @@ import { Button, Flex, Text } from '@chakra-ui/react';
 
 import { InnerPageHeader } from '$components/InnerPageHeader';
 import usePageTitle from '$hooks/usePageTitle';
-import { useKeycloak } from 'src/auth/Context';
+import { useKeycloak } from '../../auth/Context';
 
 export function RequireAuth(
   props: {
