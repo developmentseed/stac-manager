@@ -47,14 +47,11 @@ jobs:
       - name: Install
         run: npm install
 
-      - name: Create .env file
-        run: mv packages/client/.env.example packages/client/.env
-
-      - name: Setup SPA on Github Pages
-        run: node packages/client/tasks/setup-gh-pages.mjs
-
       - name: Build
         run: npm run all:build
+
+      - name: Create 404.html for SPA routing
+        run: cp packages/client/dist/index.html packages/client/dist/404.html
 
   deploy:
     runs-on: ubuntu-latest
