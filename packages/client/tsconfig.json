@@ -18,9 +18,6 @@
   },
   "exclude": [
     ".git",
-    ".app-cache",
-    ".parcel-cache",
-    "parcel-bundle-reports",
     ".npm",
     ".npm-tmp",
     "dist",
