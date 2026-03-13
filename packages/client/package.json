@@ -2,7 +2,6 @@
   "name": "@stac-manager/client",
   "description": "Stac manager app",
   "version": "1.0.0",
-  "source": "./src/index.html",
   "repository": {
     "type": "git",
     "url": "https://github.com/developmentseed/stac-admin.git"
@@ -17,10 +16,10 @@
   },
   "homepage": "https://github.com/developmentseed/stac-admin",
   "scripts": {
-    "serve": "npm run clean && NODE_ENV=development node tasks/server.mjs",
-    "build": "npm run clean && NODE_ENV=production node tasks/build.mjs",
-    "stage": "npm run clean && NODE_ENV=staging node tasks/build.mjs",
-    "clean": "rm -rf dist .parcel-cache",
+    "serve": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist",
     "lint": "eslint src/",
     "ts-check": "yarn tsc --noEmit --skipLibCheck",
     "test": "jest"
@@ -31,22 +30,11 @@
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "devDependencies": {
     "@babel/core": "^7.26.0",
-    "@parcel/reporter-bundle-analyzer": "^2.12.0",
-    "@parcel/reporter-bundle-buddy": "^2.12.0",
     "@types/babel__core": "^7",
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",
     "buffer": "^6.0.3",
-    "events": "^3.3.0",
-    "fancy-log": "^2.0.0",
-    "fs-extra": "^11.2.0",
-    "parcel": "^2.12.0",
-    "parcel-resolver-ignore": "^2.2.0",
-    "portscanner": "^2.2.0",
-    "posthtml-expressions": "^1.11.4",
-    "process": "^0.11.10",
-    "stream-browserify": "^3.0.0",
-    "watcher": "^2.3.1"
+    "events": "^3.3.0"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
@@ -57,7 +45,6 @@
     "@floating-ui/react": "^0.26.25",
     "@mapbox/mapbox-gl-draw": "^1.4.3",
     "@mapbox/mapbox-gl-draw-static-mode": "^1.0.1",
-    "@parcel/core": "^2.12.0",
     "@radiantearth/stac-fields": "^1.5.0",
     "@stac-manager/data-core": "*",
     "@stac-manager/data-plugins": "*",
@@ -86,16 +73,5 @@
     "react-map-gl": "^7.1.7",
     "react-router-dom": "^6.27.0",
     "stac-ts": "^1.0.4"
-  },
-  "parcelIgnore": [
-    ".*/meta/"
-  ],
-  "alias": {
-    "$components": "~/src/components",
-    "$styles": "~/src/styles",
-    "$utils": "~/src/utils",
-    "$hooks": "~/src/hooks",
-    "$pages": "~/src/pages",
-    "$test": "~/test"
   }
 }
