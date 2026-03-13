@@ -10,8 +10,7 @@
     "plugins:clean": "lerna run clean --ignore='@stac-manager/client'",
     "client:serve": "lerna run serve --scope='@stac-manager/client'",
     "client:build": "lerna run build --scope='@stac-manager/client'",
-    "client:stage": "lerna run stage --scope='@stac-manager/client'",
-    "all:build": "lerna run build",
+"all:build": "lerna run build",
     "all:clean": "lerna run clean",
     "test": "jest",
     "lint": "lerna run lint"
