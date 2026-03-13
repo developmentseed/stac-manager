@@ -10,7 +10,7 @@
     "plugins:clean": "lerna run clean --ignore='@stac-manager/client'",
     "client:serve": "lerna run serve --scope='@stac-manager/client'",
     "client:build": "lerna run build --scope='@stac-manager/client'",
-"all:build": "lerna run build",
+    "all:build": "lerna run build",
     "all:clean": "lerna run clean",
     "test": "jest",
     "lint": "lerna run lint"
@@ -26,6 +26,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.37.2",
+    "jest": "^30.3.0",
     "jest-environment-jsdom": "^29.7.0",
     "lerna": "^8.1.8",
     "prettier": "^3.3.3",

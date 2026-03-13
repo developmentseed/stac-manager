@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, ButtonProps, forwardRef } from '@chakra-ui/react';
 import SmartLink, { SmartLinkProps } from '../SmartLink';
-import { useKeycloak } from 'src/auth/Context';
+import { useKeycloak } from '../../auth/Context';
 
 export const ButtonWithAuth = forwardRef<
   SmartLinkProps & ButtonProps,
