@@ -8,8 +8,8 @@
   "source": "lib/index.ts",
   "sideEffects": false,
   "scripts": {
-    "build": "rollup -c ../../rollup.config.mjs",
-    "watch": "rollup -c ../../rollup.config.mjs -w",
+    "build": "vite build --config ../../vite.config.mjs",
+    "watch": "vite build --config ../../vite.config.mjs --watch",
     "clean": "rm -rf ./dist node_modules",
     "lint": "eslint ./lib --no-error-on-unmatched-pattern"
   },
