@@ -127,8 +127,5 @@ jobs:
       - name: Install
         run: npm install
 
-      - name: Create .env file
-        run: mv packages/client/.env.example packages/client/.env
-
-      - name: Test
+      - name: Build
         run: npm run all:build
