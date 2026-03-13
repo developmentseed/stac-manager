@@ -39,7 +39,11 @@ export default [
         'process.env.NODE_ENV': JSON.stringify(env),
         'process.env.PACKAGE_VERSION': pkg.version
       }),
-      typescript({ useTsconfigDeclarationDir: true, clean: true }),
+      typescript({
+        useTsconfigDeclarationDir: true,
+        clean: true,
+        exclude: ['**/*.test.ts', '**/*.test.tsx']
+      }),
       css()
     ],
     output: [
