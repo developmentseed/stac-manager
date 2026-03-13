@@ -35,6 +35,22 @@ If you're going to work on the form builder plugin system as well, you may want 
 npm run plugins:watch
 ```
 
+### Developing with a Local `stac-react`
+
+To develop against a local checkout of `@developmentseed/stac-react`, set the `STAC_REACT_LOCAL` environment variable to point to its source entry:
+
+```
+STAC_REACT_LOCAL=/path/to/stac-react/src/index.ts npm run client:serve
+```
+
+This aliases `@developmentseed/stac-react` to the local source, giving you HMR on changes to both repos simultaneously. When the variable is unset, the published npm package is used as normal.
+
+The same variable works for library package builds:
+
+```
+STAC_REACT_LOCAL=/path/to/stac-react/src/index.ts npm run plugins:build
+```
+
 ### Building for Production
 Build the app for production:
 ```
