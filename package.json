@@ -36,8 +36,5 @@
     "typescript-eslint": "^8.12.1",
     "vite": "^6.0.0",
     "vite-plugin-dts": "^4.0.0"
-  },
-  "@parcel/resolver-default": {
-    "packageExports": true
   }
 }
