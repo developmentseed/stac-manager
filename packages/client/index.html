@@ -9,16 +9,16 @@
   <link rel="icon" href="{{baseurl}}/meta/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{{baseurl}}/meta/apple-touch-icon.png">
 
-  <meta property="og:image" content='{{baseurl}}/meta/meta-image.png'>
-  <meta name="twitter:image" content='{{baseurl}}/meta/meta-image.png'>
-  <meta property='og:url' content='{{baseurl}}'>
+  <meta property="og:image" content='/meta/meta-image.png'>
+  <meta name="twitter:image" content='/meta/meta-image.png'>
+  <meta property='og:url' content='/'>
 
   <link rel='preconnect' href='https://fonts.googleapis.com'>
   <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
 
-  <title>{{appTitle}}</title>
-  <meta name='title' content='{{appTitle}}'>
-  <meta name='description' content='{{appDescription}}'>
+  <title>STAC Manager</title>
+  <meta name='title' content='STAC Manager'>
+  <meta name='description' content='STAC Manager'>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -66,36 +66,17 @@
   <!-- Welcome banner gets hidden by React -->
   <div id='welcome-banner'>
     <div>
-      <!-- 
-            To avoid an abrupt transition when the app loads, this banner is
-            transitioned out. Replace the contents with something appropriate
-            for the project.
-          -->
-      <h1><img src='./media/layout/logo.svg' alt='logotype' width='188' height='32' /></h1>
-      <p>In the beginning the Universe was created.
-      <p>
+      <h1><img src='/media/layout/logo.svg' alt='logotype' width='188' height='32' /></h1>
+      <p>In the beginning the Universe was created.</p>
       <p>This has made a lot of people very angry and been widely regarded as a bad move.</p>
     </div>
-  </div>
   </div>
 
   <div id='app-container'>
     <!-- Content rendered here via React -->
   </div>
 
-  <script>
-    // https://stackoverflow.com/a/9851769/728583
-
-    // internet explorer 6-11
-    var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-
-    if (isIE) {
-      document.body.innerHTML =
-        'Unfortunately, your browser is not currently supported.<br />Recommended browsers: Edge, Firefox, Safari, Chrome';
-    }
-  </script>
-
-  <script src='./main.tsx' type='module'></script>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 
 </html>
