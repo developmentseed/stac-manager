@@ -1,10 +1,15 @@
 import { readFileSync } from 'fs';
 import path from 'path';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const pkg = JSON.parse(readFileSync(path.join(__dirname, './package.json'), 'utf-8'));
+
+// Load all env vars from .env files (not just VITE_-prefixed ones)
+const env = loadEnv('', __dirname, ['REACT_APP_', 'APP_', 'PUBLIC_']);
+// Merge loaded .env vars into process.env so the define block picks them up
+Object.assign(process.env, env);
 
 const stacReactLocal = process.env.STAC_REACT_LOCAL;
 

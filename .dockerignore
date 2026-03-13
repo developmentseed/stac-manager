@@ -21,7 +21,6 @@ build
 .eslintcache
 .vite
 .nx
-**/.parcel-cache
 
 # Environment files
 .env.*
