@@ -7,6 +7,8 @@ import React, {
 } from 'react';
 import Keycloak, { KeycloakInstance } from 'keycloak-js';
 
+import { getRedirectUri } from '../utils/basePath';
+
 const url = process.env.REACT_APP_KEYCLOAK_URL;
 const realm = process.env.REACT_APP_KEYCLOAK_REALM;
 const clientId = process.env.REACT_APP_KEYCLOAK_CLIENT_ID;
@@ -59,10 +61,14 @@ export const KeycloakProvider = (props: { children: React.ReactNode }) => {
       wasInit.current = true;
 
       try {
+        // Construct redirect URI with base path to handle subpath deployments
+        const redirectUri = getRedirectUri();
+
         await keycloak.init({
           // onLoad: 'login-required',
           onLoad: 'check-sso',
-          checkLoginIframe: false
+          checkLoginIframe: false,
+          redirectUri
         });
         if (keycloak.authenticated) {
           const profile =

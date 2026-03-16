@@ -87,9 +87,6 @@
     "react-router-dom": "^6.27.0",
     "stac-ts": "^1.0.4"
   },
-  "parcelIgnore": [
-    ".*/meta/"
-  ],
   "alias": {
     "$components": "~/src/components",
     "$styles": "~/src/styles",
