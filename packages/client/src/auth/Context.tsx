@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState
 } from 'react';
-import Keycloak, { KeycloakInstance } from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 
 const url = process.env.REACT_APP_KEYCLOAK_URL;
 const realm = process.env.REACT_APP_KEYCLOAK_REALM;
@@ -13,8 +13,8 @@ const clientId = process.env.REACT_APP_KEYCLOAK_CLIENT_ID;
 
 const isAuthEnabled = !!(url && realm && clientId);
 
-const keycloak: KeycloakInstance | undefined = isAuthEnabled
-  ? new (Keycloak as any)({
+const keycloak = isAuthEnabled
+  ? new Keycloak({
       url,
       realm,
       clientId
@@ -27,7 +27,7 @@ export type KeycloakContextProps = {
   profile?: Keycloak.KeycloakProfile;
 } & (
   | {
-      keycloak: KeycloakInstance;
+      keycloak: Keycloak;
       isEnabled: true;
     }
   | {
@@ -65,8 +65,7 @@ export const KeycloakProvider = (props: { children: React.ReactNode }) => {
           checkLoginIframe: false
         });
         if (keycloak.authenticated) {
-          const profile =
-            await (keycloak.loadUserProfile() as unknown as Promise<Keycloak.KeycloakProfile>);
+          const profile = await keycloak.loadUserProfile();
           setProfile(profile);
         }
 
