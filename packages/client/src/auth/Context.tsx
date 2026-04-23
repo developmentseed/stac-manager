@@ -21,16 +21,16 @@ export type AuthContextValue = {
   isAuthenticated: boolean;
   profile?: AuthProfile;
   token?: string;
-  login: (opts?: { redirectUri?: string }) => void;
-  logout: (opts?: { redirectUri?: string }) => void;
+  login: (opts?: { redirectUri?: string }) => Promise<void>;
+  logout: (opts?: { redirectUri?: string }) => Promise<void>;
 };
 
 const DisabledContext: AuthContextValue = {
   isEnabled: false,
   isLoading: false,
   isAuthenticated: false,
-  login: () => {},
-  logout: () => {}
+  login: () => Promise.resolve(),
+  logout: () => Promise.resolve()
 };
 
 const AuthContext = createContext<AuthContextValue>(DisabledContext);
