@@ -11,9 +11,6 @@ find /app/packages/client/dist -type f \( -name "*.html" -o -name "*.js" -o -nam
   -e "s|%PUBLIC_URL%|${PUBLIC_URL:-http://127.0.0.1:8080}|g" \
   -e "s|%REACT_APP_STAC_API%|${REACT_APP_STAC_API:-https://earth-search.aws.element84.com/v0}|g" \
   -e "s|%REACT_APP_STAC_BROWSER%|${REACT_APP_STAC_BROWSER:-https://radiantearth.github.io/stac-browser/#/external/$(echo ${REACT_APP_STAC_API:-earth-search.aws.element84.com/v0} | sed 's|^https://||')}|g" \
-  -e "s|%REACT_APP_KEYCLOAK_URL%|${REACT_APP_KEYCLOAK_URL:-}|g" \
-  -e "s|%REACT_APP_KEYCLOAK_CLIENT_ID%|${REACT_APP_KEYCLOAK_CLIENT_ID:-}|g" \
-  -e "s|%REACT_APP_KEYCLOAK_REALM%|${REACT_APP_KEYCLOAK_REALM:-}|g" \
   -e "s|%REACT_APP_OIDC_AUTHORITY%|${REACT_APP_OIDC_AUTHORITY:-}|g" \
   -e "s|%REACT_APP_OIDC_CLIENT_ID%|${REACT_APP_OIDC_CLIENT_ID:-}|g" \
   -e "s|%REACT_APP_THEME_PRIMARY_COLOR%|${REACT_APP_THEME_PRIMARY_COLOR:-#6A5ACD}|g" \

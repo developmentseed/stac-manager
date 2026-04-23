@@ -78,12 +78,7 @@ affinity: {}
 # When omitted, authentication is disabled.
 #
 # oidc:
-#   # Preferred: the OIDC issuer/authority URL. For Keycloak this is
+#   # The OIDC issuer/authority URL. For Keycloak this is
 #   # <keycloak-url>/realms/<realm>.
 #   authority: https://iam.example.com/realms/my-realm
 #   clientId: my-client
-#
-#   # Legacy (deprecated): supported for backwards compatibility. If `authority`
-#   # is not set, it will be derived as "{providerUrl}/realms/{realm}".
-#   # providerUrl: https://iam.example.com
-#   # realm: my-realm

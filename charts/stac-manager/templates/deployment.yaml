@@ -50,12 +50,8 @@ spec:
             value: {{ .Values.stacBrowser }}
           {{ end }}
           {{ if .Values.oidc }}
-          {{- $authority := .Values.oidc.authority }}
-          {{- if and (not $authority) .Values.oidc.providerUrl .Values.oidc.realm }}
-          {{- $authority = printf "%s/realms/%s" (trimSuffix "/" .Values.oidc.providerUrl) .Values.oidc.realm }}
-          {{- end }}
           - name: REACT_APP_OIDC_AUTHORITY
-            value: {{ $authority | required "Please provide .Values.oidc.authority (or legacy .Values.oidc.providerUrl + .Values.oidc.realm)" }}
+            value: {{ .Values.oidc.authority | required "Please provide a value for oidc.authority" }}
           - name: REACT_APP_OIDC_CLIENT_ID
             value: {{ .Values.oidc.clientId | required "Please provide a value for oidc.clientId" }}
           {{ end }}

@@ -37,10 +37,7 @@ const AuthContext = createContext<AuthContextValue>(DisabledContext);
 
 const config = resolveAuthConfig({
   REACT_APP_OIDC_AUTHORITY: process.env.REACT_APP_OIDC_AUTHORITY,
-  REACT_APP_OIDC_CLIENT_ID: process.env.REACT_APP_OIDC_CLIENT_ID,
-  REACT_APP_KEYCLOAK_URL: process.env.REACT_APP_KEYCLOAK_URL,
-  REACT_APP_KEYCLOAK_REALM: process.env.REACT_APP_KEYCLOAK_REALM,
-  REACT_APP_KEYCLOAK_CLIENT_ID: process.env.REACT_APP_KEYCLOAK_CLIENT_ID
+  REACT_APP_OIDC_CLIENT_ID: process.env.REACT_APP_OIDC_CLIENT_ID
 });
 
 function EnabledAuthBridge(props: { children: React.ReactNode }) {
