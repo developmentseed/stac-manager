@@ -14,7 +14,7 @@ import {
 
 import SmartLink, { SmartLinkProps } from './SmartLink';
 import { UserInfo } from './auth/UserInfo';
-import { useKeycloak } from 'src/auth/Context';
+import { useAuth } from 'src/auth/Context';
 
 function NavItem(props: ButtonProps & SmartLinkProps) {
   return (
@@ -34,7 +34,7 @@ function NavItem(props: ButtonProps & SmartLinkProps) {
 }
 
 function MainNavigation() {
-  const { keycloak, isEnabled } = useKeycloak();
+  const { isEnabled, isAuthenticated } = useAuth();
 
   return (
     <Flex as='nav' aria-label='Main' gap={4} alignItems='center'>
@@ -42,7 +42,7 @@ function MainNavigation() {
         <NavItem to='/collections/' rightIcon={<CollecticonFolder />}>
           Browse
         </NavItem>
-        {keycloak?.authenticated && (
+        {isAuthenticated && (
           <NavItem to='/collections/new' rightIcon={<CollecticonPlusSmall />}>
             Create
           </NavItem>
