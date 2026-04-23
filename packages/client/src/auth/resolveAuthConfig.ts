@@ -20,7 +20,11 @@ export function resolveAuthConfig(env: EnvShape): AuthConfig {
   const oidcClientId = env.REACT_APP_OIDC_CLIENT_ID;
 
   if (oidcAuthority && oidcClientId) {
-    return { isEnabled: true, authority: oidcAuthority, clientId: oidcClientId };
+    return {
+      isEnabled: true,
+      authority: oidcAuthority,
+      clientId: oidcClientId
+    };
   }
 
   const kcUrl = env.REACT_APP_KEYCLOAK_URL;

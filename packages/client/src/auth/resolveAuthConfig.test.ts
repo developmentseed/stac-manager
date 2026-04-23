@@ -45,7 +45,9 @@ describe('resolveAuthConfig', () => {
       clientId: 'eoapi'
     });
     expect(warnSpy).toHaveBeenCalledTimes(1);
-    expect(warnSpy.mock.calls[0][0]).toMatch(/REACT_APP_KEYCLOAK_\*.+deprecated/i);
+    expect(warnSpy.mock.calls[0][0]).toMatch(
+      /REACT_APP_KEYCLOAK_\*.+deprecated/i
+    );
   });
 
   it('strips trailing slash from KEYCLOAK_URL when deriving authority', () => {

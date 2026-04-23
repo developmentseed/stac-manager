@@ -75,7 +75,9 @@ function EnabledAuthBridge(props: { children: React.ReactNode }) {
     };
   }, [oidc]);
 
-  return <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>
+  );
 }
 
 export function AuthProvider(props: { children: React.ReactNode }) {
@@ -92,11 +94,17 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       authority={config.authority}
       client_id={config.clientId}
       redirect_uri={window.location.origin + window.location.pathname}
-      post_logout_redirect_uri={window.location.origin + window.location.pathname}
+      post_logout_redirect_uri={
+        window.location.origin + window.location.pathname
+      }
       userStore={new WebStorageStateStore({ store: window.localStorage })}
       onSigninCallback={() => {
         // Remove code/state params from URL after successful login
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname
+        );
       }}
     >
       <EnabledAuthBridge>{props.children}</EnabledAuthBridge>
