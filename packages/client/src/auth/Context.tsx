@@ -1,117 +1,109 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
-import Keycloak from 'keycloak-js';
+import React, { createContext, useContext, useMemo } from 'react';
+import {
+  AuthProvider as OidcAuthProvider,
+  useAuth as useOidcAuth
+} from 'react-oidc-context';
+import { WebStorageStateStore } from 'oidc-client-ts';
 
-const url = process.env.REACT_APP_KEYCLOAK_URL;
-const realm = process.env.REACT_APP_KEYCLOAK_REALM;
-const clientId = process.env.REACT_APP_KEYCLOAK_CLIENT_ID;
+import { resolveAuthConfig } from './resolveAuthConfig';
 
-const isAuthEnabled = !!(url && realm && clientId);
-
-const keycloak = isAuthEnabled
-  ? new Keycloak({
-      url,
-      realm,
-      clientId
-    })
-  : undefined;
-
-export type KeycloakContextProps = {
-  initStatus: 'loading' | 'success' | 'error';
-  isLoading: boolean;
-  profile?: Keycloak.KeycloakProfile;
-} & (
-  | {
-      keycloak: Keycloak;
-      isEnabled: true;
-    }
-  | {
-      keycloak: undefined;
-      isEnabled: false;
-    }
-);
-
-const KeycloakContext = createContext<KeycloakContextProps>({
-  initStatus: 'loading',
-  isEnabled: isAuthEnabled
-} as KeycloakContextProps);
-
-export const KeycloakProvider = (props: { children: React.ReactNode }) => {
-  const [initStatus, setInitStatus] =
-    useState<KeycloakContextProps['initStatus']>('loading');
-  const [profile, setProfile] = useState<
-    Keycloak.KeycloakProfile | undefined
-  >();
-
-  const wasInit = useRef(false);
-
-  useEffect(() => {
-    async function initialize() {
-      if (!keycloak) return;
-      // Keycloak can only be initialized once. This is a workaround to avoid
-      // multiple initialization attempts, specially by React double rendering.
-      if (wasInit.current) return;
-      wasInit.current = true;
-
-      try {
-        await keycloak.init({
-          // onLoad: 'login-required',
-          onLoad: 'check-sso',
-          checkLoginIframe: false
-        });
-        if (keycloak.authenticated) {
-          const profile = await keycloak.loadUserProfile();
-          setProfile(profile);
-        }
-
-        setInitStatus('success');
-      } catch (err) {
-        setInitStatus('error');
-        // eslint-disable-next-line no-console
-        console.error('Failed to initialize keycloak adapter:', err);
-      }
-    }
-    initialize();
-  }, []);
-
-  const base = {
-    initStatus,
-    isLoading: isAuthEnabled && initStatus === 'loading',
-    profile
-  };
-
-  return (
-    <KeycloakContext.Provider
-      value={
-        isAuthEnabled
-          ? {
-              ...base,
-              keycloak: keycloak!,
-              isEnabled: true
-            }
-          : {
-              ...base,
-              keycloak: undefined,
-              isEnabled: false
-            }
-      }
-    >
-      {props.children}
-    </KeycloakContext.Provider>
-  );
+export type AuthProfile = {
+  username?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  emailVerified?: boolean;
 };
 
-export const useKeycloak = () => {
-  const ctx = useContext(KeycloakContext);
+export type AuthContextValue = {
+  isEnabled: boolean;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  profile?: AuthProfile;
+  token?: string;
+  login: (opts?: { redirectUri?: string }) => void;
+  logout: (opts?: { redirectUri?: string }) => void;
+};
 
-  if (!ctx) {
-    throw new Error('useKeycloak must be used within a KeycloakProvider');
+const DisabledContext: AuthContextValue = {
+  isEnabled: false,
+  isLoading: false,
+  isAuthenticated: false,
+  login: () => {},
+  logout: () => {}
+};
+
+const AuthContext = createContext<AuthContextValue>(DisabledContext);
+
+const config = resolveAuthConfig({
+  REACT_APP_OIDC_AUTHORITY: process.env.REACT_APP_OIDC_AUTHORITY,
+  REACT_APP_OIDC_CLIENT_ID: process.env.REACT_APP_OIDC_CLIENT_ID,
+  REACT_APP_KEYCLOAK_URL: process.env.REACT_APP_KEYCLOAK_URL,
+  REACT_APP_KEYCLOAK_REALM: process.env.REACT_APP_KEYCLOAK_REALM,
+  REACT_APP_KEYCLOAK_CLIENT_ID: process.env.REACT_APP_KEYCLOAK_CLIENT_ID
+});
+
+function EnabledAuthBridge(props: { children: React.ReactNode }) {
+  const oidc = useOidcAuth();
+
+  const value = useMemo<AuthContextValue>(() => {
+    const p = oidc.user?.profile;
+    const profile: AuthProfile | undefined = p
+      ? {
+          username: p.preferred_username,
+          email: p.email,
+          firstName: p.given_name,
+          lastName: p.family_name,
+          emailVerified: p.email_verified
+        }
+      : undefined;
+
+    return {
+      isEnabled: true,
+      isLoading: oidc.isLoading,
+      isAuthenticated: !!oidc.isAuthenticated,
+      profile,
+      token: oidc.user?.access_token,
+      login: (opts) =>
+        oidc.signinRedirect({
+          redirect_uri: opts?.redirectUri ?? window.location.href
+        }),
+      logout: (opts) =>
+        oidc.signoutRedirect({
+          post_logout_redirect_uri: opts?.redirectUri ?? window.location.href
+        })
+    };
+  }, [oidc]);
+
+  return <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>;
+}
+
+export function AuthProvider(props: { children: React.ReactNode }) {
+  if (!config.isEnabled) {
+    return (
+      <AuthContext.Provider value={DisabledContext}>
+        {props.children}
+      </AuthContext.Provider>
+    );
   }
 
-  return ctx;
-};
+  return (
+    <OidcAuthProvider
+      authority={config.authority}
+      client_id={config.clientId}
+      redirect_uri={window.location.origin + window.location.pathname}
+      post_logout_redirect_uri={window.location.origin + window.location.pathname}
+      userStore={new WebStorageStateStore({ store: window.localStorage })}
+      onSigninCallback={() => {
+        // Remove code/state params from URL after successful login
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }}
+    >
+      <EnabledAuthBridge>{props.children}</EnabledAuthBridge>
+    </OidcAuthProvider>
+  );
+}
+
+export function useAuth(): AuthContextValue {
+  return useContext(AuthContext);
+}
