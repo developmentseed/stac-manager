@@ -30,7 +30,11 @@ PUBLIC_URL
 REACT_APP_STAC_BROWSER
 REACT_APP_STAC_API
 
-# Auth
+# Auth (OIDC)
+REACT_APP_OIDC_AUTHORITY
+REACT_APP_OIDC_CLIENT_ID
+
+# Auth (DEPRECATED — Keycloak-specific shim)
 REACT_APP_KEYCLOAK_URL
 REACT_APP_KEYCLOAK_CLIENT_ID
 REACT_APP_KEYCLOAK_REALM
@@ -53,9 +57,27 @@ You must provide a value for the `REACT_APP_STAC_API` environment variable. This
 
 If the `REACT_APP_STAC_BROWSER` environment variable is not set, [Radiant Earth's STAC Browser](https://radiantearth.github.io/stac-browser/) will be used by default, which will connect to the STAC API specified in `REACT_APP_STAC_API`.
 
-**Auth**  
-The client uses Keycloack for authentication, which is disabled by default. To
-enable it you must provide values for the `REACT_APP_KEYCLOAK_*` environment variables. These can be obtained through the Keycloak server.
+**Auth**
+
+The client supports any OIDC-compliant identity provider (Keycloak, Auth0,
+Cognito, Okta, Entra, Google, …). Authentication is disabled by default. To
+enable it, set:
+
+- `REACT_APP_OIDC_AUTHORITY` — the issuer/authority URL. For Keycloak this is
+  `<keycloak-url>/realms/<realm>` (e.g. `https://iam.example.com/realms/my-realm`).
+- `REACT_APP_OIDC_CLIENT_ID` — the client ID registered with your provider.
+
+Your OIDC client must allow the app's origin as a valid redirect URI. For
+Keycloak specifically, ensure **Web Origins** on the client includes the app
+origin (or `+` to inherit from Valid Redirect URIs) so the silent-renew flow
+works.
+
+> [!NOTE]
+> The legacy `REACT_APP_KEYCLOAK_URL`, `REACT_APP_KEYCLOAK_CLIENT_ID`, and
+> `REACT_APP_KEYCLOAK_REALM` environment variables are still supported but are
+> **deprecated**. If they are used, the app logs a console warning at startup
+> and derives `authority = <KEYCLOAK_URL>/realms/<KEYCLOAK_REALM>`. Migrate to
+> the `REACT_APP_OIDC_*` variables at your earliest convenience.
 
 ### Theming
 
