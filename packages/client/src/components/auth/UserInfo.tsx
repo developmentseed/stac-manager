@@ -18,7 +18,8 @@ async function hash(string: string) {
 }
 
 export function UserInfo() {
-  const { profile, isLoading, isEnabled, isAuthenticated, login, logout } = useAuth();
+  const { profile, isLoading, isEnabled, isAuthenticated, login, logout } =
+    useAuth();
 
   const [userEmailHash, setUserEmailHash] = useState<string>('');
   useEffect(() => {
