@@ -8,7 +8,7 @@ import { PluginConfigProvider } from '@stac-manager/data-core';
 import { App } from './App';
 import theme from './theme/theme';
 import { config } from './plugin-system/config';
-import { KeycloakProvider } from './auth/Context';
+import { AuthProvider } from './auth/Context';
 
 const publicUrl = process.env.PUBLIC_URL || '';
 
@@ -37,13 +37,13 @@ function Root() {
       <ColorModeScript />
       <ChakraProvider theme={theme}>
         <Router basename={basename}>
-          <KeycloakProvider>
+          <AuthProvider>
             <StacApiProvider apiUrl={process.env.REACT_APP_STAC_API!}>
               <PluginConfigProvider config={config}>
                 <App />
               </PluginConfigProvider>
             </StacApiProvider>
-          </KeycloakProvider>
+          </AuthProvider>
         </Router>
       </ChakraProvider>
     </React.StrictMode>
