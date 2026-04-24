@@ -8,7 +8,9 @@ export function setApiAuthToken(token: string | undefined) {
 
 function isStacApiUrl(url: string): boolean {
   const base = process.env.REACT_APP_STAC_API;
-  return !!base && url.startsWith(base);
+  if (!base) return false;
+  const normalized = base.endsWith('/') ? base : `${base}/`;
+  return url === base || url.startsWith(normalized);
 }
 
 class Api {
@@ -36,6 +38,8 @@ class Api {
         status,
         statusText
       };
+      // Some STAC APIs return errors as JSON others as string.
+      // Clone the response so we can read the body as text if json fails.
       const clone = response.clone();
       try {
         e.detail = await response.json();
