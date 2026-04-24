@@ -6,8 +6,10 @@
  */
 
 import { useStacApi } from '@developmentseed/stac-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StacCollection, StacLink } from 'stac-ts';
+
+import { useAuth } from '../../auth/Context';
 
 type ApiError = {
   detail?: { [key: string]: any } | string;
@@ -49,7 +51,17 @@ export function useCollections(opts?: {
 }): StacCollectionsHook {
   const { limit = 10, initialOffset = 0 } = opts || {};
 
-  const { stacApi } = useStacApi(process.env.REACT_APP_STAC_API!);
+  const { token } = useAuth();
+  const stacApiOptions = useMemo(
+    () =>
+      token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
+    [token]
+  );
+
+  const { stacApi } = useStacApi(
+    process.env.REACT_APP_STAC_API!,
+    stacApiOptions
+  );
 
   const [collections, setCollections] = useState<ApiResponse>();
   const [state, setState] = useState<LoadingState>('IDLE');
