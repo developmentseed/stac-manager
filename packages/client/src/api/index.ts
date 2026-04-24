@@ -1,8 +1,32 @@
 import { GenericObject, ApiError } from '../types';
 
+let authToken: string | undefined;
+
+export function setApiAuthToken(token: string | undefined) {
+  authToken = token;
+}
+
+function isStacApiUrl(url: string): boolean {
+  const base = process.env.REACT_APP_STAC_API;
+  return !!base && url.startsWith(base);
+}
+
 class Api {
-  static fetch(url: string, options?: GenericObject) {
-    return fetch(url, options).then(async (response) => {
+  static fetch(url: string, options: GenericObject = {}) {
+    const injected =
+      authToken && isStacApiUrl(url)
+        ? { Authorization: `Bearer ${authToken}` }
+        : {};
+
+    const finalOptions: GenericObject = {
+      ...options,
+      headers: {
+        ...injected,
+        ...(options.headers || {})
+      }
+    };
+
+    return fetch(url, finalOptions).then(async (response) => {
       if (response.ok) {
         return response.json();
       }
@@ -12,8 +36,6 @@ class Api {
         status,
         statusText
       };
-      // Some STAC APIs return errors as JSON others as string.
-      // Clone the response so we can read the body as text if json fails.
       const clone = response.clone();
       try {
         e.detail = await response.json();
