@@ -6,7 +6,6 @@ import { useCollection } from '@developmentseed/stac-react';
 import { StacCollection } from 'stac-ts';
 
 import Api from '../../api';
-import { useAuth } from '../../auth/Context';
 import { EditForm } from './EditForm';
 import usePageTitle from '$hooks/usePageTitle';
 import {
@@ -33,8 +32,6 @@ export function CollectionFormNew() {
     AppNotification[] | undefined
   >();
 
-  const { token } = useAuth();
-
   const onSubmit = async (data: any, formikHelpers: FormikHelpers<any>) => {
     try {
       toast.closeAll();
@@ -47,7 +44,7 @@ export function CollectionFormNew() {
         position: 'bottom-right'
       });
 
-      await collectionTransaction(token).create(data);
+      await collectionTransaction().create(data);
 
       toast.update('collection-submit', {
         title: 'Collection created',
@@ -81,8 +78,6 @@ export function CollectionFormEdit(props: { id: string }) {
 
   const toast = useToast();
 
-  const { token } = useAuth();
-
   useEffect(() => {
     if (state === 'LOADING') {
       setTriedLoading(true);
@@ -108,7 +103,7 @@ export function CollectionFormEdit(props: { id: string }) {
         duration: null,
         position: 'bottom-right'
       });
-      await collectionTransaction(token).update(id, data);
+      await collectionTransaction().update(id, data);
 
       toast.update('collection-submit', {
         title: 'Collection updated',
@@ -139,7 +134,7 @@ type collectionTransactionType = {
   create: (data: StacCollection) => Promise<StacCollection>;
 };
 
-function collectionTransaction(token?: string): collectionTransactionType {
+function collectionTransaction(): collectionTransactionType {
   const createRequest = async (
     url: string,
     method: string,
@@ -148,8 +143,7 @@ function collectionTransaction(token?: string): collectionTransactionType {
     return Api.fetch(url, {
       method,
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : undefined
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
     });
