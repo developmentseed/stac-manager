@@ -6,7 +6,7 @@ import { useCollection } from '@developmentseed/stac-react';
 import { StacCollection } from 'stac-ts';
 
 import Api from '../../api';
-import { useKeycloak } from '../../auth/Context';
+import { useAuth } from '../../auth/Context';
 import { EditForm } from './EditForm';
 import usePageTitle from '$hooks/usePageTitle';
 import {
@@ -33,7 +33,7 @@ export function CollectionFormNew() {
     AppNotification[] | undefined
   >();
 
-  const { keycloak } = useKeycloak();
+  const { token } = useAuth();
 
   const onSubmit = async (data: any, formikHelpers: FormikHelpers<any>) => {
     try {
@@ -47,7 +47,7 @@ export function CollectionFormNew() {
         position: 'bottom-right'
       });
 
-      await collectionTransaction(keycloak?.token).create(data);
+      await collectionTransaction(token).create(data);
 
       toast.update('collection-submit', {
         title: 'Collection created',
@@ -81,7 +81,7 @@ export function CollectionFormEdit(props: { id: string }) {
 
   const toast = useToast();
 
-  const { keycloak } = useKeycloak();
+  const { token } = useAuth();
 
   useEffect(() => {
     if (state === 'LOADING') {
@@ -108,7 +108,7 @@ export function CollectionFormEdit(props: { id: string }) {
         duration: null,
         position: 'bottom-right'
       });
-      await collectionTransaction(keycloak?.token).update(id, data);
+      await collectionTransaction(token).update(id, data);
 
       toast.update('collection-submit', {
         title: 'Collection updated',

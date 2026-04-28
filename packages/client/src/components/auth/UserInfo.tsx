@@ -5,7 +5,7 @@ import {
   CollecticonLogout
 } from '@devseed-ui/collecticons-chakra';
 
-import { useKeycloak } from 'src/auth/Context';
+import { useAuth } from 'src/auth/Context';
 
 async function hash(string: string) {
   const utf8 = new TextEncoder().encode(string);
@@ -18,7 +18,8 @@ async function hash(string: string) {
 }
 
 export function UserInfo() {
-  const { profile, isLoading, isEnabled, keycloak } = useKeycloak();
+  const { profile, isLoading, isEnabled, isAuthenticated, login, logout } =
+    useAuth();
 
   const [userEmailHash, setUserEmailHash] = useState<string>('');
   useEffect(() => {
@@ -31,8 +32,6 @@ export function UserInfo() {
     return null;
   }
 
-  const isAuthenticated = keycloak.authenticated;
-
   if (!isAuthenticated || !profile || isLoading) {
     return (
       <Button
@@ -40,7 +39,7 @@ export function UserInfo() {
         rightIcon={<CollecticonLogin />}
         onClick={() => {
           if (!isLoading) {
-            keycloak.login({
+            login({
               redirectUri: window.location.href
             });
           }
@@ -71,7 +70,7 @@ export function UserInfo() {
       pl='2px'
       onClick={() => {
         if (!isLoading) {
-          keycloak.logout({
+          logout({
             redirectUri: window.location.href
           });
         }

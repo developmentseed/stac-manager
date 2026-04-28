@@ -4,7 +4,7 @@
 
 STAC Manager allows you to list, create, read, update, and delete STAC collections and items in a web application.
 
-It currently connects to a STAC API via the the [STAC API - Transation Extension](https://github.com/stac-api-extensions/transaction) and can be configured to support standard authentication and authorization flows, if needed.
+It currently connects to a STAC API via the [STAC API - Transaction Extension](https://github.com/stac-api-extensions/transaction) and can be configured to use any OIDC-compliant identity provider (Keycloak, Auth0, Cognito, Okta, Entra, Google, …) for authentication. See [packages/client/README.md](./packages/client/README.md#auth) for configuration details.
 
 The application is extendable with plugins to provide user-friendly interfaces for various STAC extensions or custom properties.
 

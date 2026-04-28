@@ -50,12 +50,10 @@ spec:
             value: {{ .Values.stacBrowser }}
           {{ end }}
           {{ if .Values.oidc }}
-          - name: REACT_APP_KEYCLOAK_URL
-            value: {{ .Values.oidc.providerUrl | required "Please provide a value for oidc.providerUrl" }}
-          - name: REACT_APP_KEYCLOAK_CLIENT_ID
+          - name: REACT_APP_OIDC_AUTHORITY
+            value: {{ .Values.oidc.authority | required "Please provide a value for oidc.authority" }}
+          - name: REACT_APP_OIDC_CLIENT_ID
             value: {{ .Values.oidc.clientId | required "Please provide a value for oidc.clientId" }}
-          - name: REACT_APP_KEYCLOAK_REALM
-            value: {{ .Values.oidc.realm | required "Please provide a value for oidc.realm" }}
           {{ end }}
           {{ if .Values.appTitle }}
           - name: APP_TITLE

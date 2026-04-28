@@ -74,9 +74,9 @@
     "@types/react-dom": "^18.3.1",
     "formik": "^2.4.6",
     "framer-motion": "^10.16.5",
-    "keycloak-js": "^26.1.4",
     "mapbox-gl-draw-rectangle-mode": "^1.0.4",
     "maplibre-gl": "^3.6.2",
+    "oidc-client-ts": "^3.0.1",
     "polished": "^4.3.1",
     "react": "^18.3.1",
     "react-cool-dimensions": "^3.0.1",
@@ -84,6 +84,7 @@
     "react-hook-form": "^7.53.1",
     "react-icons": "^4.12.0",
     "react-map-gl": "^7.1.7",
+    "react-oidc-context": "^3.1.1",
     "react-router-dom": "^6.27.0",
     "stac-ts": "^1.0.4"
   },

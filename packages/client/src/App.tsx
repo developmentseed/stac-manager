@@ -27,7 +27,7 @@ import NotFound from '$pages/NotFound';
 import CollectionDetail from '$pages/CollectionDetail';
 import Sandbox from '$pages/Sandbox';
 
-import { useKeycloak } from './auth/Context';
+import { useAuth } from './auth/Context';
 import SmartLink from '$components/SmartLink';
 
 const rotate = keyframes`
@@ -49,7 +49,7 @@ const rotate2 = keyframes`
 `;
 
 export function App() {
-  const { isLoading } = useKeycloak();
+  const { isLoading } = useAuth();
 
   return (
     <>

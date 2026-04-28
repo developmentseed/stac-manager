@@ -73,3 +73,12 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# OIDC authentication configuration (optional).
+# When omitted, authentication is disabled.
+#
+# oidc:
+#   # The OIDC issuer/authority URL. For Keycloak this is
+#   # <keycloak-url>/realms/<realm>.
+#   authority: https://iam.example.com/realms/my-realm
+#   clientId: my-client
