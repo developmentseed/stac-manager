@@ -1,8 +1,34 @@
 import { GenericObject, ApiError } from '../types';
 
+let authToken: string | undefined;
+
+export function setApiAuthToken(token: string | undefined) {
+  authToken = token;
+}
+
+function isStacApiUrl(url: string): boolean {
+  const base = process.env.REACT_APP_STAC_API;
+  if (!base) return false;
+  const normalized = base.endsWith('/') ? base : `${base}/`;
+  return url === base || url.startsWith(normalized);
+}
+
 class Api {
-  static fetch(url: string, options?: GenericObject) {
-    return fetch(url, options).then(async (response) => {
+  static fetch(url: string, options: GenericObject = {}) {
+    const injected =
+      authToken && isStacApiUrl(url)
+        ? { Authorization: `Bearer ${authToken}` }
+        : {};
+
+    const finalOptions: GenericObject = {
+      ...options,
+      headers: {
+        ...injected,
+        ...(options.headers || {})
+      }
+    };
+
+    return fetch(url, finalOptions).then(async (response) => {
       if (response.ok) {
         return response.json();
       }

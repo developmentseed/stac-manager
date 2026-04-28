@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
@@ -8,9 +8,11 @@ import { PluginConfigProvider } from '@stac-manager/data-core';
 import { App } from './App';
 import theme from './theme/theme';
 import { config } from './plugin-system/config';
-import { AuthProvider } from './auth/Context';
+import { AuthProvider, useAuth } from './auth/Context';
+import { setApiAuthToken } from './api';
 
 const publicUrl = process.env.PUBLIC_URL || '';
+const stacApiUrl = process.env.REACT_APP_STAC_API!;
 
 let basename: string | undefined;
 if (publicUrl) {
@@ -20,6 +22,29 @@ if (publicUrl) {
   } catch (error) {
     // no-op
   }
+}
+
+function StacApiAuthBridge({ children }: { children: React.ReactNode }) {
+  const { token } = useAuth();
+
+  useEffect(() => {
+    setApiAuthToken(token);
+  }, [token]);
+
+  // Re-creating options on every token change intentionally triggers
+  // useStacApi's effect to rebuild StacApi (and re-probe the landing page)
+  // so subsequent requests carry the new token.
+  const options = useMemo(
+    () =>
+      token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
+    [token]
+  );
+
+  return (
+    <StacApiProvider apiUrl={stacApiUrl} options={options}>
+      {children}
+    </StacApiProvider>
+  );
 }
 
 // Root component.
@@ -38,11 +63,11 @@ function Root() {
       <ChakraProvider theme={theme}>
         <Router basename={basename}>
           <AuthProvider>
-            <StacApiProvider apiUrl={process.env.REACT_APP_STAC_API!}>
+            <StacApiAuthBridge>
               <PluginConfigProvider config={config}>
                 <App />
               </PluginConfigProvider>
-            </StacApiProvider>
+            </StacApiAuthBridge>
           </AuthProvider>
         </Router>
       </ChakraProvider>
