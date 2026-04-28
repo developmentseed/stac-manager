@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCollection } from '@developmentseed/stac-react';
 import { StacCollection } from 'stac-ts';
 
-import Api from '../../api';
+import Api, { STAC_API_URL } from '../../api';
 import { EditForm } from './EditForm';
 import usePageTitle from '$hooks/usePageTitle';
 import {
@@ -151,16 +151,8 @@ function collectionTransaction(): collectionTransactionType {
 
   return {
     update: (id: string, data: StacCollection) =>
-      createRequest(
-        `${process.env.REACT_APP_STAC_API}/collections/${id}`,
-        'PUT',
-        data
-      ),
+      createRequest(`${STAC_API_URL}/collections/${id}`, 'PUT', data),
     create: (data: StacCollection) =>
-      createRequest(
-        `${process.env.REACT_APP_STAC_API}/collections/`,
-        'POST',
-        data
-      )
+      createRequest(`${STAC_API_URL}/collections/`, 'POST', data)
   };
 }
