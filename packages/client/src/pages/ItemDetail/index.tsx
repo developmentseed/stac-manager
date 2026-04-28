@@ -23,6 +23,7 @@ import {
 } from '@devseed-ui/collecticons-chakra';
 
 import { usePageTitle } from '../../hooks';
+import { STAC_API_URL } from '../../api';
 import AssetList from './AssetList';
 import { InnerPageHeader } from '$components/InnerPageHeader';
 import { StacBrowserMenuItem } from '$components/StacBrowserMenuItem';
@@ -37,7 +38,7 @@ const dateFormat: Intl.DateTimeFormatOptions = {
 function ItemDetail() {
   const { collectionId, itemId } = useParams();
   usePageTitle(`Item ${itemId}`);
-  const itemResource = `${process.env.REACT_APP_STAC_API}/collections/${collectionId}/items/${itemId}`;
+  const itemResource = `${STAC_API_URL}/collections/${collectionId}/items/${itemId}`;
   const { item, state } = useItem(itemResource);
 
   if (!item || state === 'LOADING') {
