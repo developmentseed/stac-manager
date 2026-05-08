@@ -16,14 +16,13 @@ import {
   Skeleton,
   SkeletonText
 } from '@chakra-ui/react';
-import { useItem } from '@developmentseed/stac-react';
+import { useItem, useStacApiContext } from '@developmentseed/stac-react';
 import {
   CollecticonEllipsisVertical,
   CollecticonTrashBin
 } from '@devseed-ui/collecticons-chakra';
 
 import { usePageTitle } from '../../hooks';
-import { STAC_API_URL } from '../../api';
 import AssetList from './AssetList';
 import { InnerPageHeader } from '$components/InnerPageHeader';
 import { StacBrowserMenuItem } from '$components/StacBrowserMenuItem';
@@ -37,11 +36,14 @@ const dateFormat: Intl.DateTimeFormatOptions = {
 
 function ItemDetail() {
   const { collectionId, itemId } = useParams();
+  const { stacApi } = useStacApiContext();
   usePageTitle(`Item ${itemId}`);
-  const itemResource = `${STAC_API_URL}/collections/${collectionId}/items/${itemId}`;
-  const { item, state } = useItem(itemResource);
+  const itemResource = stacApi
+    ? `${stacApi.baseUrl}/collections/${collectionId}/items/${itemId}`
+    : '';
+  const { item, isLoading } = useItem(itemResource);
 
-  if (!item || state === 'LOADING') {
+  if (!item || isLoading) {
     return (
       <Box p={8}>
         <Flex direction='column' gap={4}>
@@ -88,7 +90,7 @@ function ItemDetail() {
               />
               <MenuList>
                 <StacBrowserMenuItem
-                  resourcePath={`/collections/${item.collection}/items/${item.id}`}
+                  resourcePath={`/collections/${item.properties.collection}/items/${item.id}`}
                 />
                 <MenuItem
                   icon={<CollecticonTrashBin />}
@@ -128,7 +130,7 @@ function ItemDetail() {
                 <Heading size='sm' as='h3'>
                   Collection
                 </Heading>
-                <Text size='md'>{item.collection}</Text>
+                <Text size='md'>{item.properties.collection}</Text>
               </Flex>
               {description && (
                 <Flex direction='column' gap='2'>

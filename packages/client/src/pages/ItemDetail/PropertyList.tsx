@@ -40,7 +40,6 @@ function PropertyList({ properties, headerLevel = 'h2' }: PropertyListProps) {
                   <Thead>
                     <Tr>
                       {val.itemOrder.map((item) => (
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         <Th key={item}>{val.items![item].label}</Th>
                       ))}
                     </Tr>

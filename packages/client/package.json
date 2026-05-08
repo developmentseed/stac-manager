@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
-    "@developmentseed/stac-react": "^0.1.0-alpha.10",
+    "@developmentseed/stac-react": "1.0.0-alpha.2",
     "@devseed-ui/collecticons-chakra": "^3.0.3",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
@@ -62,6 +62,7 @@
     "@stac-manager/data-core": "*",
     "@stac-manager/data-plugins": "*",
     "@stac-manager/data-widgets": "*",
+    "@tanstack/react-query": "^5.100.9",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.2",
     "@testing-library/react": "^16.2.0",

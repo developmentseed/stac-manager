@@ -34,8 +34,6 @@ import {
   CollecticonPencil,
   CollecticonTextBlock
 } from '@devseed-ui/collecticons-chakra';
-import { StacCollection, StacItem } from 'stac-ts';
-
 import { usePageTitle } from '../../hooks';
 import CollectionMap from './CollectionMap';
 import { InnerPageHeader } from '$components/InnerPageHeader';
@@ -57,7 +55,7 @@ function CollectionDetail() {
   const { collectionId } = useParams();
   usePageTitle(`Collection ${collectionId}`);
 
-  const { collection, state } = useCollection(collectionId!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+  const { collection, isLoading } = useCollection(collectionId!);
 
   const {
     results,
@@ -87,6 +85,7 @@ function CollectionDetail() {
 
   // Initialize the search with the current collection ID
   useEffect(() => {
+    if (!collectionId) return;
     setCollections([collectionId]);
   }, [collectionId, setCollections]);
 
@@ -122,7 +121,7 @@ function CollectionDetail() {
     return '—';
   }, [collection]);
 
-  if (!collection || state === 'LOADING') {
+  if (!collection || isLoading) {
     return (
       <Box p={8}>
         <Flex direction='column' gap={4}>
@@ -141,12 +140,15 @@ function CollectionDetail() {
     );
   }
 
-  const { id, title, description, keywords, license } =
-    collection as StacCollection;
+  const { id, title, license } = collection;
+  const description = (collection as { description?: string }).description;
+  const keywords = collection.keywords;
 
-  const resultCount = results?.numberMatched || 0;
+  const pageItemCount = results?.features.length ?? 0;
   const shouldPaginate =
-    results?.links?.length > 1 && resultCount > results?.numberReturned;
+    !!results &&
+    (results.links?.length ?? 0) > 1 &&
+    (!!nextPage || !!previousPage);
 
   return (
     <Flex direction='column' gap={8}>
@@ -268,12 +270,13 @@ function CollectionDetail() {
           <Box flexBasis='100%'>
             <Heading size='md' as='h2'>
               Items{' '}
-              {results && <Badge variant='solid'>{zeroPad(resultCount)}</Badge>}
+              {results && (
+                <Badge variant='solid'>{zeroPad(pageItemCount)}</Badge>
+              )}
             </Heading>
-            {!!resultCount && (
+            {!!pageItemCount && (
               <Text size='sm' color='base.400'>
-                Showing page {page} of{' '}
-                {Math.ceil(resultCount / results.numberReturned)}
+                Page {page}
               </Text>
             )}
           </Box>
@@ -294,7 +297,7 @@ function CollectionDetail() {
           templateColumns='repeat(auto-fill, minmax(18rem, 1fr))'
         >
           {results ? (
-            results.features.map((item: StacItem) => (
+            results.features.map((item) => (
               <ItemCard
                 key={item.id}
                 title={item.id}

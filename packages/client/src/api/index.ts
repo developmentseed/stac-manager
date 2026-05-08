@@ -1,58 +1,57 @@
-import { GenericObject, ApiError } from '../types';
+import { useCallback } from 'react';
+import { useStacApiContext } from '@developmentseed/stac-react';
 
-let authToken: string | undefined;
+import { ApiError, GenericObject } from '../types';
 
-export function setApiAuthToken(token: string | undefined) {
-  authToken = token;
-}
+export type { ApiError };
 
-// Normalized STAC API base (no trailing slash) so callers can safely
-// concatenate paths without producing `/stac//collections`.
-export const STAC_API_URL: string | undefined =
-  process.env.REACT_APP_STAC_API?.replace(/\/+$/, '');
+/**
+ * Hook returning a fetcher that issues requests with the provider's
+ * resolved auth headers and returns parsed JSON. Bypasses stac-react's
+ * StacApi.fetch (which is shaped for STAC search payloads, not arbitrary
+ * bodies) and uses the global fetch directly so callers can pass `body`,
+ * `signal`, etc.
+ *
+ * Rejects with an ApiError on non-2xx, with the server's JSON body when
+ * available, falling back to text.
+ */
+export function useStacFetchJson() {
+  const { stacApi } = useStacApiContext();
 
-function isStacApiUrl(url: string): boolean {
-  if (!STAC_API_URL) return false;
-  return url === STAC_API_URL || url.startsWith(`${STAC_API_URL}/`);
-}
-
-class Api {
-  static fetch(url: string, options: GenericObject = {}) {
-    const injected =
-      authToken && isStacApiUrl(url)
-        ? { Authorization: `Bearer ${authToken}` }
-        : {};
-
-    const finalOptions: GenericObject = {
-      ...options,
-      headers: {
-        ...injected,
-        ...(options.headers || {})
+  return useCallback(
+    async <T = unknown>(url: string, init: RequestInit = {}): Promise<T> => {
+      if (!stacApi) {
+        throw new Error('StacApi not yet initialized');
       }
-    };
 
-    return fetch(url, finalOptions).then(async (response) => {
+      const options: GenericObject | undefined =
+        typeof stacApi.options === 'function'
+          ? stacApi.options()
+          : stacApi.options;
+
+      const response = await fetch(url, {
+        ...init,
+        headers: {
+          ...(options?.headers || {}),
+          ...(init.headers || {})
+        }
+      });
+
       if (response.ok) {
-        return response.json();
+        return response.json() as Promise<T>;
       }
 
       const { status, statusText } = response;
-      const e: ApiError = {
-        status,
-        statusText
-      };
-      // Some STAC APIs return errors as JSON others as string.
-      // Clone the response so we can read the body as text if json fails.
+      const e: ApiError = { status, statusText };
       const clone = response.clone();
       try {
         e.detail = await response.json();
-        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      } catch (err) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_) {
         e.detail = await clone.text();
       }
-      return Promise.reject(e);
-    });
-  }
+      throw e;
+    },
+    [stacApi]
+  );
 }
-
-export default Api;

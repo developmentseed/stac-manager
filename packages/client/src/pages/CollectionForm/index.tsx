@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Box, useToast } from '@chakra-ui/react';
 import { FormikHelpers } from 'formik';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useCollection } from '@developmentseed/stac-react';
+import { useCollection, useStacApiContext } from '@developmentseed/stac-react';
 import { StacCollection } from 'stac-ts';
 
-import Api, { STAC_API_URL } from '../../api';
+import { useStacFetchJson } from '../../api';
 import { EditForm } from './EditForm';
 import usePageTitle from '$hooks/usePageTitle';
 import {
@@ -28,6 +28,7 @@ export function CollectionFormNew() {
 
   const toast = useToast();
   const navigate = useNavigate();
+  const collectionTransaction = useCollectionTransaction();
   const [notifications, setNotifications] = useState<
     AppNotification[] | undefined
   >();
@@ -44,7 +45,7 @@ export function CollectionFormNew() {
         position: 'bottom-right'
       });
 
-      await collectionTransaction().create(data);
+      await collectionTransaction.create(data);
 
       toast.update('collection-submit', {
         title: 'Collection created',
@@ -66,7 +67,8 @@ export function CollectionFormNew() {
 
 export function CollectionFormEdit(props: { id: string }) {
   const { id } = props;
-  const { collection, state, error } = useCollection(id);
+  const { collection, isLoading, error } = useCollection(id);
+  const collectionTransaction = useCollectionTransaction();
   const [triedLoading, setTriedLoading] = useState(!!collection);
   const [notifications, setNotifications] = useState<
     AppNotification[] | undefined
@@ -79,17 +81,21 @@ export function CollectionFormEdit(props: { id: string }) {
   const toast = useToast();
 
   useEffect(() => {
-    if (state === 'LOADING') {
+    if (isLoading) {
       setTriedLoading(true);
     }
-  }, [state]);
+  }, [isLoading]);
 
-  if (state === 'LOADING' || !triedLoading) {
+  if (isLoading || !triedLoading) {
     return <Box>Loading collection...</Box>;
   }
 
   if (error) {
-    return <Box>Error loading collection: {error.detail}</Box>;
+    const detail =
+      typeof error.detail === 'string'
+        ? error.detail
+        : JSON.stringify(error.detail);
+    return <Box>Error loading collection: {detail}</Box>;
   }
 
   const onSubmit = async (data: any, formikHelpers: FormikHelpers<any>) => {
@@ -103,7 +109,7 @@ export function CollectionFormEdit(props: { id: string }) {
         duration: null,
         position: 'bottom-right'
       });
-      await collectionTransaction().update(id, data);
+      await collectionTransaction.update(id, data);
 
       toast.update('collection-submit', {
         title: 'Collection updated',
@@ -129,30 +135,25 @@ export function CollectionFormEdit(props: { id: string }) {
   );
 }
 
-type collectionTransactionType = {
+type CollectionTransaction = {
   update: (id: string, data: StacCollection) => Promise<StacCollection>;
   create: (data: StacCollection) => Promise<StacCollection>;
 };
 
-function collectionTransaction(): collectionTransactionType {
-  const createRequest = async (
-    url: string,
-    method: string,
-    data: StacCollection
-  ) => {
-    return Api.fetch(url, {
+function useCollectionTransaction(): CollectionTransaction {
+  const { stacApi } = useStacApiContext();
+  const fetchJson = useStacFetchJson();
+
+  const send = (url: string, method: string, data: StacCollection) =>
+    fetchJson<StacCollection>(url, {
       method,
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-  };
 
   return {
-    update: (id: string, data: StacCollection) =>
-      createRequest(`${STAC_API_URL}/collections/${id}`, 'PUT', data),
-    create: (data: StacCollection) =>
-      createRequest(`${STAC_API_URL}/collections/`, 'POST', data)
+    update: (id, data) =>
+      send(`${stacApi?.baseUrl}/collections/${id}`, 'PUT', data),
+    create: (data) => send(`${stacApi?.baseUrl}/collections/`, 'POST', data)
   };
 }

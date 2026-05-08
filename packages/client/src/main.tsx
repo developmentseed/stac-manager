@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
@@ -9,7 +9,6 @@ import { App } from './App';
 import theme from './theme/theme';
 import { config } from './plugin-system/config';
 import { AuthProvider, useAuth } from './auth/Context';
-import { setApiAuthToken } from './api';
 
 const publicUrl = process.env.PUBLIC_URL || '';
 const stacApiUrl = process.env.REACT_APP_STAC_API!;
@@ -27,18 +26,18 @@ if (publicUrl) {
 function StacApiAuthBridge({ children }: { children: React.ReactNode }) {
   const { token } = useAuth();
 
+  // Hold the latest token in a ref so the StacApi instance receives a
+  // stable options getter — token rotation no longer rebuilds the client
+  // or re-fires the landing-page probe.
+  const tokenRef = useRef(token);
   useEffect(() => {
-    setApiAuthToken(token);
+    tokenRef.current = token;
   }, [token]);
 
-  // Re-creating options on every token change intentionally triggers
-  // useStacApi's effect to rebuild StacApi (and re-probe the landing page)
-  // so subsequent requests carry the new token.
-  const options = useMemo(
-    () =>
-      token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
-    [token]
-  );
+  const options = useCallback(() => {
+    const t = tokenRef.current;
+    return t ? { headers: { Authorization: `Bearer ${t}` } } : undefined;
+  }, []);
 
   return (
     <StacApiProvider apiUrl={stacApiUrl} options={options}>

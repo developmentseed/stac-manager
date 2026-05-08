@@ -3,8 +3,9 @@ import Map, { Layer, Source, MapRef } from 'react-map-gl/maplibre';
 import { LngLatBounds } from 'maplibre-gl';
 import bboxPolygon from '@turf/bbox-polygon';
 
+import { Collection } from '@developmentseed/stac-react';
+
 import { BackgroundTiles } from '../../components/Map';
-import { StacCollection } from 'stac-ts';
 
 const extentOutline = {
   'line-color': '#276749',
@@ -18,7 +19,7 @@ const dataOutline = {
 };
 
 type CollectionMapProps = {
-  collection: StacCollection;
+  collection: Collection;
 };
 
 function CollectionMap({ collection }: CollectionMapProps) {

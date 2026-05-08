@@ -5,17 +5,11 @@
  * pagination.
  */
 
-import { useStacApi } from '@developmentseed/stac-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useStacApiContext } from '@developmentseed/stac-react';
 import { StacCollection, StacLink } from 'stac-ts';
 
-import { useAuth } from '../../auth/Context';
-
-type ApiError = {
-  detail?: { [key: string]: any } | string;
-  status: number;
-  statusText: string;
-};
+import { useStacFetchJson, ApiError } from '../../api';
 
 type LoadingState = 'IDLE' | 'LOADING';
 
@@ -51,17 +45,8 @@ export function useCollections(opts?: {
 }): StacCollectionsHook {
   const { limit = 10, initialOffset = 0 } = opts || {};
 
-  const { token } = useAuth();
-  const stacApiOptions = useMemo(
-    () =>
-      token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
-    [token]
-  );
-
-  const { stacApi } = useStacApi(
-    process.env.REACT_APP_STAC_API!,
-    stacApiOptions
-  );
+  const { stacApi } = useStacApiContext();
+  const fetchJson = useStacFetchJson();
 
   const [collections, setCollections] = useState<ApiResponse>();
   const [state, setState] = useState<LoadingState>('IDLE');
@@ -74,30 +59,28 @@ export function useCollections(opts?: {
 
   const _getCollections = useCallback(
     async (offset: number, limit: number) => {
-      if (stacApi) {
-        setState('LOADING');
+      if (!stacApi) return;
+      setState('LOADING');
 
-        try {
-          const res = await stacApi.fetch(
-            `${stacApi.baseUrl}/collections?limit=${limit}&offset=${offset}`
-          );
-          const data: ApiResponse = await res.json();
+      try {
+        const data = await fetchJson<ApiResponse>(
+          `${stacApi.baseUrl}/collections?limit=${limit}&offset=${offset}`
+        );
 
-          setHasNext(!!data.links.find((l) => l.rel === 'next'));
-          setHasPrev(
-            !!data.links.find((l) => ['prev', 'previous'].includes(l.rel))
-          );
+        setHasNext(!!data.links.find((l) => l.rel === 'next'));
+        setHasPrev(
+          !!data.links.find((l) => ['prev', 'previous'].includes(l.rel))
+        );
 
-          setCollections(data);
-        } catch (err: any) {
-          setError(err);
-          setCollections(undefined);
-        } finally {
-          setState('IDLE');
-        }
+        setCollections(data);
+      } catch (err: any) {
+        setError(err);
+        setCollections(undefined);
+      } finally {
+        setState('IDLE');
       }
     },
-    [stacApi]
+    [stacApi, fetchJson]
   );
 
   const getCollections = useCallback(
