@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useMemo } from 'react';
 import {
   AuthProvider as OidcAuthProvider,
   useAuth as useOidcAuth
@@ -42,6 +42,48 @@ const config = resolveAuthConfig({
 
 function EnabledAuthBridge(props: { children: React.ReactNode }) {
   const oidc = useOidcAuth();
+
+  // Timer-based silent renewal does not fire while the tab is suspended
+  // (laptop closed, backgrounded), so the access token can be expired by
+  // the time the user returns. On visibility change, renew only if the
+  // current token is actually expired so we don't hammer the IdP on every
+  // tab focus.
+  useEffect(() => {
+    if (!oidc.isAuthenticated) {
+      console.debug('[auth] user not authenticated, skipping...');
+      return;
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') return;
+      const expiresIn = oidc.user?.expires_in;
+      const expired = oidc.user?.expired;
+      console.debug(
+        '[auth] visibilitychange: expired=%s expires_in=%ss',
+        expired,
+        expiresIn
+      );
+      if (!expired) return;
+      console.debug('[auth] token expired, calling signinSilent');
+      oidc
+        .signinSilent()
+        .then((user) => {
+          console.debug(
+            '[auth] signinSilent ok, new expires_in=%ss',
+            user?.expires_in
+          );
+        })
+        .catch((err) => {
+          // If silent renew fails, the next API call's 401 surfaces re-auth.
+          console.debug('[auth] signinSilent failed', err);
+        });
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [oidc.isAuthenticated, oidc.signinSilent, oidc.user]);
 
   const value = useMemo<AuthContextValue>(() => {
     const p = oidc.user?.profile;
@@ -94,6 +136,10 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       post_logout_redirect_uri={
         window.location.origin + window.location.pathname
       }
+      // offline_access requests a refresh_token so signinSilent() can renew
+      // via the refresh grant instead of relying on a hidden-iframe session
+      // check at the IdP (which is fragile under third-party-cookie policies).
+      scope='openid offline_access'
       userStore={new WebStorageStateStore({ store: window.localStorage })}
       onSigninCallback={() => {
         // Remove code/state params from URL after successful login
