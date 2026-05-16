@@ -25,20 +25,22 @@ if (publicUrl) {
 }
 
 function StacApiAuthBridge({ children }: { children: React.ReactNode }) {
-  const { token } = useAuth();
+  const { token, isLoading } = useAuth();
 
   useEffect(() => {
     setApiAuthToken(token);
   }, [token]);
 
-  // Re-creating options on every token change intentionally triggers
-  // useStacApi's effect to rebuild StacApi (and re-probe the landing page)
-  // so subsequent requests carry the new token.
   const options = useMemo(
     () =>
       token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
     [token]
   );
+
+  // defer mounting StacApiProvider until OIDC has resolved
+  if (isLoading) {
+    return <>{children}</>;
+  }
 
   return (
     <StacApiProvider apiUrl={stacApiUrl} options={options}>
