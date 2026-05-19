@@ -12,9 +12,8 @@ export const STAC_API_URL: string | undefined =
   process.env.REACT_APP_STAC_API?.replace(/\/+$/, '');
 
 function isStacApiUrl(url: string): boolean {
-  const base = process.env.REACT_APP_STAC_API?.replace(/\/+$/, '');
-  if (!base) return false;
-  return url === base || url.startsWith(`${base}/`);
+  if (!STAC_API_URL) return false;
+  return url === STAC_API_URL || url.startsWith(`${STAC_API_URL}/`);
 }
 
 class Api {
