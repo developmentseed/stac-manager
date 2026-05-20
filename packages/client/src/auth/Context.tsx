@@ -80,6 +80,7 @@ function EnabledAuthBridge(props: { children: React.ReactNode }) {
 
 export function AuthProvider(props: { children: React.ReactNode }) {
   if (!config) {
+    // eslint-disable-next-line no-console
     console.debug(
       'OIDC config not found, authentication disabled. To enable, set REACT_APP_OIDC_AUTHORITY and REACT_APP_OIDC_CLIENT_ID environment variables.'
     );

@@ -63,15 +63,20 @@ describe('Api.fetch auth injection', () => {
   it('omits Authorization when REACT_APP_STAC_API is unset', async () => {
     const original = process.env.REACT_APP_STAC_API;
     delete process.env.REACT_APP_STAC_API;
-    setApiAuthToken('abc123');
 
     try {
-      await Api.fetch('https://fake-stac-api.net/collections/foo', {
-        method: 'GET'
-      });
+      await jest.isolateModulesAsync(async () => {
+        const freshModule = await import('./index');
+        freshModule.setApiAuthToken('abc123');
 
-      const init = fetchSpy.mock.calls[0][1] as RequestInit;
-      expect(init.headers || {}).not.toHaveProperty('Authorization');
+        await freshModule.default.fetch(
+          'https://fake-stac-api.net/collections/foo',
+          { method: 'GET' }
+        );
+
+        const init = fetchSpy.mock.calls[0][1] as RequestInit;
+        expect(init.headers || {}).not.toHaveProperty('Authorization');
+      });
     } finally {
       process.env.REACT_APP_STAC_API = original;
     }
