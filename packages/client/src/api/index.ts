@@ -7,6 +7,10 @@ import { GenericObject, ApiError } from '../types';
 export const STAC_API_URL: string | undefined =
   process.env.REACT_APP_STAC_API?.replace(/\/+$/, '');
 
+// Authed fetcher for direct (non-stac-react) calls to the STAC API — used by
+// mutations (PUT/POST/DELETE) and any reads outside the stac-react hook tree.
+// Each instance is immutable; the bridge constructs a new one when the token
+// changes, which propagates to consumers via ApiContext.
 class Api {
   private token: string | undefined;
   private stacBaseUrl: string | undefined;
@@ -19,6 +23,10 @@ class Api {
     this.stacBaseUrl = stacBaseUrl;
   }
 
+  // Scope guard: only attach Authorization for URLs under the configured STAC
+  // base. Prevents leaking the bearer to OIDC discovery, static assets, or
+  // unrelated third-party origins. Path-boundary check ensures `/stac-admin`
+  // does not match a `/stac` base.
   private isStacUrl(url: string): boolean {
     if (!this.stacBaseUrl) return false;
     return url === this.stacBaseUrl || url.startsWith(`${this.stacBaseUrl}/`);
@@ -30,6 +38,8 @@ class Api {
         ? { Authorization: `Bearer ${this.token}` }
         : {};
 
+    // Caller-provided headers win on collision, so a caller can override the
+    // injected Authorization (e.g. force an explicit anonymous request).
     const finalOptions: GenericObject = {
       ...options,
       headers: {
@@ -62,8 +72,13 @@ class Api {
   }
 }
 
+// Context carrying the currently-authed Api instance. The bridge in main.tsx
+// is the only producer; consumers read via useApi().
 export const ApiContext = createContext<Api | null>(null);
 
+// Hook for components and custom hooks that need to issue direct STAC API
+// calls. Throws if used outside the bridge — that's a wiring bug, not a
+// runtime condition worth handling gracefully.
 export function useApi(): Api {
   const api = useContext(ApiContext);
   if (!api) {

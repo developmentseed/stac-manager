@@ -24,6 +24,17 @@ if (publicUrl) {
   }
 }
 
+// Single source of truth for auth-to-API wiring. Reads the current OIDC token
+// from useAuth() and feeds it into two consumers:
+//   1. ApiContext — for direct Api.fetch calls (mutations, ad-hoc reads).
+//   2. StacApiProvider — for stac-react hooks (useCollection, useStacSearch…).
+// A token change rebuilds both: a new Api instance via useMemo, and a new
+// `options` identity that triggers stac-react's useStacApi effect to rebuild
+// its StacApi with fresh headers.
+//
+// During OIDC load we render children without StacApiProvider so the rest of
+// the app can still mount and read from ApiContext; stac-react hooks defer
+// their requests until the provider appears.
 function StacApiAuthBridge({ children }: { children: React.ReactNode }) {
   const { token, isLoading } = useAuth();
 
