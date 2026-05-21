@@ -9,7 +9,7 @@ import { App } from './App';
 import theme from './theme/theme';
 import { config } from './plugin-system/config';
 import { AuthProvider, useAuth } from './auth/Context';
-import { setApiAuthToken } from './api';
+import Api, { ApiContext } from './api';
 
 const publicUrl = process.env.PUBLIC_URL || '';
 const stacApiUrl = process.env.REACT_APP_STAC_API!;
@@ -27,25 +27,23 @@ if (publicUrl) {
 function StacApiAuthBridge({ children }: { children: React.ReactNode }) {
   const { token, isLoading } = useAuth();
 
-  useEffect(() => {
-    setApiAuthToken(token);
-  }, [token]);
-
+  const api = useMemo(() => new Api(token), [token]);
   const options = useMemo(
     () =>
       token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
     [token]
   );
 
-  // defer mounting StacApiProvider until OIDC has resolved
-  if (isLoading) {
-    return <>{children}</>;
-  }
-
   return (
-    <StacApiProvider apiUrl={stacApiUrl} options={options}>
-      {children}
-    </StacApiProvider>
+    <ApiContext.Provider value={api}>
+      {isLoading ? (
+        children
+      ) : (
+        <StacApiProvider apiUrl={stacApiUrl} options={options}>
+          {children}
+        </StacApiProvider>
+      )}
+    </ApiContext.Provider>
   );
 }
 

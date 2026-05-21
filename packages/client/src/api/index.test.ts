@@ -1,9 +1,9 @@
 /**
  * @jest-environment node
  */
-import Api, { setApiAuthToken } from './index';
+import Api from './index';
 
-const STAC_API = process.env.REACT_APP_STAC_API!;
+const STAC_BASE = 'https://stac.example.com';
 
 describe('Api.fetch auth injection', () => {
   let fetchSpy: jest.SpyInstance;
@@ -18,40 +18,39 @@ describe('Api.fetch auth injection', () => {
 
   afterEach(() => {
     fetchSpy.mockRestore();
-    setApiAuthToken(undefined);
   });
 
   it('adds Authorization when token is set and URL is under the STAC API base', async () => {
-    setApiAuthToken('abc123');
+    const api = new Api('abc123', STAC_BASE);
 
-    await Api.fetch(`${STAC_API}/collections/foo`, { method: 'GET' });
+    await api.fetch(`${STAC_BASE}/collections/foo`, { method: 'GET' });
 
     const init = fetchSpy.mock.calls[0][1] as RequestInit;
     expect(init.headers).toMatchObject({ Authorization: 'Bearer abc123' });
   });
 
   it('omits Authorization when token is absent', async () => {
-    setApiAuthToken(undefined);
+    const api = new Api(undefined, STAC_BASE);
 
-    await Api.fetch(`${STAC_API}/collections/foo`, { method: 'GET' });
+    await api.fetch(`${STAC_BASE}/collections/foo`, { method: 'GET' });
 
     const init = fetchSpy.mock.calls[0][1] as RequestInit;
     expect(init.headers || {}).not.toHaveProperty('Authorization');
   });
 
   it('omits Authorization for URLs outside the STAC API base', async () => {
-    setApiAuthToken('abc123');
+    const api = new Api('abc123', STAC_BASE);
 
-    await Api.fetch('https://other.example.com/foo', { method: 'GET' });
+    await api.fetch('https://other.example.com/foo', { method: 'GET' });
 
     const init = fetchSpy.mock.calls[0][1] as RequestInit;
     expect(init.headers || {}).not.toHaveProperty('Authorization');
   });
 
   it('lets caller headers override the injected Authorization', async () => {
-    setApiAuthToken('abc123');
+    const api = new Api('abc123', STAC_BASE);
 
-    await Api.fetch(`${STAC_API}/collections/foo`, {
+    await api.fetch(`${STAC_BASE}/collections/foo`, {
       method: 'GET',
       headers: { Authorization: 'Bearer override' }
     });
@@ -60,25 +59,23 @@ describe('Api.fetch auth injection', () => {
     expect(init.headers).toMatchObject({ Authorization: 'Bearer override' });
   });
 
-  it('omits Authorization when REACT_APP_STAC_API is unset', async () => {
-    const original = process.env.REACT_APP_STAC_API;
-    delete process.env.REACT_APP_STAC_API;
+  it('omits Authorization when no STAC base URL is configured', async () => {
+    const api = new Api('abc123', undefined);
 
-    try {
-      await jest.isolateModulesAsync(async () => {
-        const freshModule = await import('./index');
-        freshModule.setApiAuthToken('abc123');
+    await api.fetch(`${STAC_BASE}/collections/foo`, { method: 'GET' });
 
-        await freshModule.default.fetch(
-          'https://fake-stac-api.net/collections/foo',
-          { method: 'GET' }
-        );
+    const init = fetchSpy.mock.calls[0][1] as RequestInit;
+    expect(init.headers || {}).not.toHaveProperty('Authorization');
+  });
 
-        const init = fetchSpy.mock.calls[0][1] as RequestInit;
-        expect(init.headers || {}).not.toHaveProperty('Authorization');
-      });
-    } finally {
-      process.env.REACT_APP_STAC_API = original;
-    }
+  it('does not match sibling paths (e.g. /stac-admin against /stac)', async () => {
+    const api = new Api('abc123', 'https://stac.example.com/stac');
+
+    await api.fetch('https://stac.example.com/stac-admin/collections', {
+      method: 'GET'
+    });
+
+    const init = fetchSpy.mock.calls[0][1] as RequestInit;
+    expect(init.headers || {}).not.toHaveProperty('Authorization');
   });
 });

@@ -1,26 +1,33 @@
+import { createContext, useContext } from 'react';
+
 import { GenericObject, ApiError } from '../types';
-
-let authToken: string | undefined;
-
-export function setApiAuthToken(token: string | undefined) {
-  authToken = token;
-}
 
 // Normalized STAC API base (no trailing slash) so callers can safely
 // concatenate paths without producing `/stac//collections`.
 export const STAC_API_URL: string | undefined =
   process.env.REACT_APP_STAC_API?.replace(/\/+$/, '');
 
-function isStacApiUrl(url: string): boolean {
-  if (!STAC_API_URL) return false;
-  return url === STAC_API_URL || url.startsWith(`${STAC_API_URL}/`);
-}
-
 class Api {
-  static fetch(url: string, options: GenericObject = {}) {
+  private token: string | undefined;
+  private stacBaseUrl: string | undefined;
+
+  constructor(
+    token: string | undefined,
+    stacBaseUrl: string | undefined = STAC_API_URL
+  ) {
+    this.token = token;
+    this.stacBaseUrl = stacBaseUrl;
+  }
+
+  private isStacUrl(url: string): boolean {
+    if (!this.stacBaseUrl) return false;
+    return url === this.stacBaseUrl || url.startsWith(`${this.stacBaseUrl}/`);
+  }
+
+  fetch(url: string, options: GenericObject = {}) {
     const injected =
-      authToken && isStacApiUrl(url)
-        ? { Authorization: `Bearer ${authToken}` }
+      this.token && this.isStacUrl(url)
+        ? { Authorization: `Bearer ${this.token}` }
         : {};
 
     const finalOptions: GenericObject = {
@@ -53,6 +60,16 @@ class Api {
       return Promise.reject(e);
     });
   }
+}
+
+export const ApiContext = createContext<Api | null>(null);
+
+export function useApi(): Api {
+  const api = useContext(ApiContext);
+  if (!api) {
+    throw new Error('useApi must be used within an ApiContext.Provider');
+  }
+  return api;
 }
 
 export default Api;
