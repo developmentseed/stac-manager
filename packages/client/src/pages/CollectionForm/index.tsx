@@ -5,8 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCollection } from '@developmentseed/stac-react';
 import { StacCollection } from 'stac-ts';
 
-import Api from '../../api';
-import { useAuth } from '../../auth/Context';
+import Api, { STAC_API_URL, useApi } from '../../api';
 import { EditForm } from './EditForm';
 import usePageTitle from '$hooks/usePageTitle';
 import {
@@ -29,11 +28,10 @@ export function CollectionFormNew() {
 
   const toast = useToast();
   const navigate = useNavigate();
+  const api = useApi();
   const [notifications, setNotifications] = useState<
     AppNotification[] | undefined
   >();
-
-  const { token } = useAuth();
 
   const onSubmit = async (data: any, formikHelpers: FormikHelpers<any>) => {
     try {
@@ -47,7 +45,7 @@ export function CollectionFormNew() {
         position: 'bottom-right'
       });
 
-      await collectionTransaction(token).create(data);
+      await collectionTransaction(api).create(data);
 
       toast.update('collection-submit', {
         title: 'Collection created',
@@ -70,6 +68,7 @@ export function CollectionFormNew() {
 export function CollectionFormEdit(props: { id: string }) {
   const { id } = props;
   const { collection, state, error } = useCollection(id);
+  const api = useApi();
   const [triedLoading, setTriedLoading] = useState(!!collection);
   const [notifications, setNotifications] = useState<
     AppNotification[] | undefined
@@ -80,8 +79,6 @@ export function CollectionFormEdit(props: { id: string }) {
   const navigate = useNavigate();
 
   const toast = useToast();
-
-  const { token } = useAuth();
 
   useEffect(() => {
     if (state === 'LOADING') {
@@ -108,7 +105,7 @@ export function CollectionFormEdit(props: { id: string }) {
         duration: null,
         position: 'bottom-right'
       });
-      await collectionTransaction(token).update(id, data);
+      await collectionTransaction(api).update(id, data);
 
       toast.update('collection-submit', {
         title: 'Collection updated',
@@ -139,17 +136,16 @@ type collectionTransactionType = {
   create: (data: StacCollection) => Promise<StacCollection>;
 };
 
-function collectionTransaction(token?: string): collectionTransactionType {
+function collectionTransaction(api: Api): collectionTransactionType {
   const createRequest = async (
     url: string,
     method: string,
     data: StacCollection
   ) => {
-    return Api.fetch(url, {
+    return api.fetch(url, {
       method,
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? `Bearer ${token}` : undefined
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
     });
@@ -157,16 +153,8 @@ function collectionTransaction(token?: string): collectionTransactionType {
 
   return {
     update: (id: string, data: StacCollection) =>
-      createRequest(
-        `${process.env.REACT_APP_STAC_API}/collections/${id}`,
-        'PUT',
-        data
-      ),
+      createRequest(`${STAC_API_URL}/collections/${id}`, 'PUT', data),
     create: (data: StacCollection) =>
-      createRequest(
-        `${process.env.REACT_APP_STAC_API}/collections/`,
-        'POST',
-        data
-      )
+      createRequest(`${STAC_API_URL}/collections/`, 'POST', data)
   };
 }

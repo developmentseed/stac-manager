@@ -5,8 +5,6 @@ import {
 } from 'react-oidc-context';
 import { WebStorageStateStore } from 'oidc-client-ts';
 
-import { resolveAuthConfig } from './resolveAuthConfig';
-
 export type AuthProfile = {
   username?: string;
   email?: string;
@@ -35,10 +33,13 @@ const DisabledContext: AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue>(DisabledContext);
 
-const config = resolveAuthConfig({
-  REACT_APP_OIDC_AUTHORITY: process.env.REACT_APP_OIDC_AUTHORITY,
-  REACT_APP_OIDC_CLIENT_ID: process.env.REACT_APP_OIDC_CLIENT_ID
-});
+const config: { authority: string; clientId: string } | undefined =
+  process.env.REACT_APP_OIDC_AUTHORITY && process.env.REACT_APP_OIDC_CLIENT_ID
+    ? {
+        authority: process.env.REACT_APP_OIDC_AUTHORITY,
+        clientId: process.env.REACT_APP_OIDC_CLIENT_ID
+      }
+    : undefined;
 
 function EnabledAuthBridge(props: { children: React.ReactNode }) {
   const oidc = useOidcAuth();
@@ -78,7 +79,11 @@ function EnabledAuthBridge(props: { children: React.ReactNode }) {
 }
 
 export function AuthProvider(props: { children: React.ReactNode }) {
-  if (!config.isEnabled) {
+  if (!config) {
+    // eslint-disable-next-line no-console
+    console.debug(
+      'OIDC config not found, authentication disabled. To enable, set REACT_APP_OIDC_AUTHORITY and REACT_APP_OIDC_CLIENT_ID environment variables.'
+    );
     return (
       <AuthContext.Provider value={DisabledContext}>
         {props.children}
