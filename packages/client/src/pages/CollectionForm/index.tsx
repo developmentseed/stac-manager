@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@chakra-ui/react';
-// TODO(B-7): replace shim with Chakra v3 toaster singleton + <Toaster /> mount.
-import { useToast } from 'src/_legacy/useToast';
+import { toaster } from '$components/Toaster';
 import { FormikHelpers } from 'formik';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCollection } from '@developmentseed/stac-react';
@@ -28,7 +27,6 @@ export function CollectionForm() {
 export function CollectionFormNew() {
   usePageTitle('New collection');
 
-  const toast = useToast();
   const navigate = useNavigate();
   const api = useApi();
   const [notifications, setNotifications] = useState<
@@ -37,28 +35,27 @@ export function CollectionFormNew() {
 
   const onSubmit = async (data: any, formikHelpers: FormikHelpers<any>) => {
     try {
-      toast.closeAll();
+      toaster.dismiss();
       setNotifications(undefined);
-      toast({
+      toaster.create({
         id: 'collection-submit',
         title: 'Creating collection...',
-        status: 'loading',
-        duration: null,
-        position: 'bottom-right'
+        type: 'loading',
+        duration: Number.POSITIVE_INFINITY
       });
 
       await collectionTransaction(api).create(data);
 
-      toast.update('collection-submit', {
+      toaster.update('collection-submit', {
         title: 'Collection created',
-        status: 'success',
+        type: 'success',
         duration: 5000,
-        isClosable: true
+        closable: true
       });
 
       navigate(`/collections/${data.id}`);
     } catch (error: any) {
-      toast.close('collection-submit');
+      toaster.dismiss('collection-submit');
       setNotifications(parseResponseForNotifications(error));
     }
     formikHelpers.setSubmitting(false);
@@ -80,8 +77,6 @@ export function CollectionFormEdit(props: { id: string }) {
 
   const navigate = useNavigate();
 
-  const toast = useToast();
-
   useEffect(() => {
     if (isLoading) {
       setTriedLoading(true);
@@ -98,27 +93,26 @@ export function CollectionFormEdit(props: { id: string }) {
 
   const onSubmit = async (data: any, formikHelpers: FormikHelpers<any>) => {
     try {
-      toast.closeAll();
+      toaster.dismiss();
       setNotifications(undefined);
-      toast({
+      toaster.create({
         id: 'collection-submit',
         title: 'Updating collection...',
-        status: 'loading',
-        duration: null,
-        position: 'bottom-right'
+        type: 'loading',
+        duration: Number.POSITIVE_INFINITY
       });
       await collectionTransaction(api).update(id, data);
 
-      toast.update('collection-submit', {
+      toaster.update('collection-submit', {
         title: 'Collection updated',
-        status: 'success',
+        type: 'success',
         duration: 5000,
-        isClosable: true
+        closable: true
       });
 
       navigate(`/collections/${data.id}`);
     } catch (error: any) {
-      toast.close('collection-submit');
+      toaster.dismiss('collection-submit');
       setNotifications(parseResponseForNotifications(error));
     }
     formikHelpers.setSubmitting(false);

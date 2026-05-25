@@ -7,8 +7,7 @@ import {
   IconButton,
   Text
 } from '@chakra-ui/react';
-// TODO(B-7): replace shim with Chakra v3 toaster singleton + <Toaster /> mount.
-import { useToast } from 'src/_legacy/useToast';
+import { toaster } from '$components/Toaster';
 import {
   CollecticonBell,
   CollecticonCircleExclamation,
@@ -88,22 +87,15 @@ interface NotificationButtonProps {
 }
 
 function useNotificationsToast(notifications: AppNotification[]) {
-  const toast = useToast();
-
   const show = () => {
-    if (!toast.isActive('notifications')) {
-      toast({
+    const meta = { kind: 'notifications' as const, notifications };
+    if (toaster.isVisible('notifications')) {
+      toaster.update('notifications', { meta });
+    } else {
+      toaster.create({
         id: 'notifications',
-        position: 'bottom-right',
-        duration: null,
-        render: () => (
-          <NotificationBox
-            notifications={notifications}
-            onCloseClick={() => {
-              toast.close('notifications');
-            }}
-          />
-        )
+        duration: Number.POSITIVE_INFINITY,
+        meta
       });
     }
   };
@@ -112,14 +104,15 @@ function useNotificationsToast(notifications: AppNotification[]) {
     if (notifications.length !== 0) {
       show();
     } else {
-      toast.close('notifications');
+      toaster.dismiss('notifications');
     }
-  }, [notifications.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notifications]);
 
   return {
     show,
     hide: () => {
-      toast.close('notifications');
+      toaster.dismiss('notifications');
     }
   };
 }

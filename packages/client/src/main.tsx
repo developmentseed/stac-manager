@@ -10,6 +10,7 @@ import system from './theme/theme';
 import { config } from './plugin-system/config';
 import { AuthProvider, useAuth } from './auth/Context';
 import Api, { ApiContext } from './api';
+import { Toaster } from './components/Toaster';
 
 const publicUrl = process.env.PUBLIC_URL || '';
 const stacApiUrl = process.env.REACT_APP_STAC_API!;
@@ -71,6 +72,7 @@ function Root() {
   return (
     <React.StrictMode>
       <ChakraProvider value={system}>
+        <Toaster />
         <Router basename={basename}>
           <AuthProvider>
             <StacApiAuthBridge>
