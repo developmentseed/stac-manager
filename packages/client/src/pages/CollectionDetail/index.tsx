@@ -132,7 +132,13 @@ function CollectionDetail() {
   const { id, title, description, keywords, license } =
     collection as StacCollection;
 
-  const resultCount = results?.features?.length || 0;
+  // STAC APIs commonly include `numberMatched` (OAFeat / OGC Features
+  // convention), but stac-react v1 dropped it from the typed SearchResponse.
+  // Read it off the raw response when present; otherwise hide the badge to
+  // avoid showing a misleading page-size count.
+  const numberMatched = (results as { numberMatched?: number } | undefined)
+    ?.numberMatched;
+  const pageItemsCount = results?.features?.length ?? 0;
   const shouldPaginate =
     (results?.links?.length ?? 0) > 1 && (!!nextPage || !!previousPage);
 
@@ -264,9 +270,11 @@ function CollectionDetail() {
           <Box flexBasis='100%'>
             <Heading size='md' as='h2'>
               Items{' '}
-              {results && <Badge variant='solid'>{zeroPad(resultCount)}</Badge>}
+              {numberMatched !== undefined && (
+                <Badge variant='solid'>{zeroPad(numberMatched)}</Badge>
+              )}
             </Heading>
-            {!!resultCount && (
+            {pageItemsCount > 0 && (
               <Text fontSize='sm' color='base.400'>
                 Showing page {page}
               </Text>

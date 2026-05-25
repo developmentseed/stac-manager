@@ -88,7 +88,14 @@ export function CollectionFormEdit(props: { id: string }) {
   }
 
   if (error) {
-    return <Box>Error loading collection: {String(error.detail)}</Box>;
+    return (
+      <Box>
+        Error loading collection:{' '}
+        {typeof error.detail === 'string'
+          ? error.detail
+          : JSON.stringify(error.detail)}
+      </Box>
+    );
   }
 
   const onSubmit = async (data: any, formikHelpers: FormikHelpers<any>) => {

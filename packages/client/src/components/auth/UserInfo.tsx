@@ -66,15 +66,18 @@ export function UserInfo() {
       }}
     >
       <Avatar.Root
+        asChild
         size='sm'
         bg='secondary.500'
         color='white'
         borderRadius='4px'
       >
-        <Avatar.Image
-          src={`https://www.gravatar.com/avatar/${userEmailHash}?d=404`}
-        />
-        <Avatar.Fallback name={username} />
+        <span>
+          <Avatar.Image
+            src={`https://www.gravatar.com/avatar/${userEmailHash}?d=404`}
+          />
+          <Avatar.Fallback name={username} />
+        </span>
       </Avatar.Root>
       Logout
       <CollecticonLogout />
