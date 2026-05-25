@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, ListItem } from '@chakra-ui/react';
+import { List } from '@chakra-ui/react';
 import {
   SchemaFieldArray,
   schemaToFormDataStructure,
@@ -40,9 +40,14 @@ export function WidgetArrayInput(props: WidgetProps) {
           addDisabled={fields.length >= maxItems}
         >
           {fields.length ? (
-            <List display='flex' gap={4} flexDir={isFixed ? 'row' : 'column'}>
+            <List.Root
+              display='flex'
+              gap={4}
+              flexDir={isFixed ? 'row' : 'column'}
+              listStyle='none'
+            >
               {fields.map((_, index) => (
-                <ListItem
+                <List.Item
                   key={index /* eslint-disable-line react/no-array-index-key */}
                   display='flex'
                   width='100%'
@@ -65,9 +70,9 @@ export function WidgetArrayInput(props: WidgetProps) {
                     }}
                     isDeleteDisabled={fields.length <= minItems}
                   />
-                </ListItem>
+                </List.Item>
               ))}
-            </List>
+            </List.Root>
           ) : (
             <p>No items</p>
           )}

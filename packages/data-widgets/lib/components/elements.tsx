@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import {
   Box,
   Flex,
-  forwardRef,
   Heading,
   IconButton,
   Button,
@@ -16,7 +15,7 @@ import {
   CollecticonPlusSmall
 } from '@devseed-ui/collecticons-chakra';
 
-export const Fieldset = forwardRef<FlexProps, 'div'>((props, ref) => {
+export const Fieldset = forwardRef<HTMLDivElement, FlexProps>((props, ref) => {
   return (
     <Flex
       ref={ref}
@@ -31,49 +30,56 @@ export const Fieldset = forwardRef<FlexProps, 'div'>((props, ref) => {
   );
 });
 
-export const FieldsetHeader = forwardRef<FlexProps, 'div'>((props, ref) => {
-  return <Flex ref={ref} justifyContent='space-between' gap={4} {...props} />;
-});
+export const FieldsetHeader = forwardRef<HTMLDivElement, FlexProps>(
+  (props, ref) => {
+    return <Flex ref={ref} justifyContent='space-between' gap={4} {...props} />;
+  }
+);
 
-export const FieldsetBody = forwardRef<FlexProps, 'div'>((props, ref) => {
-  return <Flex ref={ref} flexDirection='column' gap={4} {...props} />;
-});
+export const FieldsetBody = forwardRef<HTMLDivElement, FlexProps>(
+  (props, ref) => {
+    return <Flex ref={ref} flexDirection='column' gap={4} {...props} />;
+  }
+);
 
-export const FieldsetFooter = forwardRef<FlexProps, 'div'>((props, ref) => {
-  return <Flex ref={ref} gap={4} {...props} />;
-});
+export const FieldsetFooter = forwardRef<HTMLDivElement, FlexProps>(
+  (props, ref) => {
+    return <Flex ref={ref} gap={4} {...props} />;
+  }
+);
 
-export const FieldLabel = forwardRef<HeadingProps, 'span'>((props, ref) => {
-  return (
-    <Heading
-      ref={ref}
-      as='span'
-      size='sm'
-      display='inline-flex'
-      alignItems='center'
-      gap={2}
-      {...props}
-      sx={{
-        ...(props?.sx ?? {}),
-        small: {
-          borderRadius: 'sm',
-          bg: 'base.400a',
-          color: 'surface.500',
-          px: '0.5rem',
-          fontSize: 'xs'
-        }
-      }}
-    />
-  );
-});
+export const FieldLabel = forwardRef<HTMLHeadingElement, HeadingProps>(
+  (props, ref) => {
+    return (
+      <Heading
+        ref={ref}
+        as='span'
+        size='sm'
+        display='inline-flex'
+        alignItems='center'
+        gap={2}
+        {...props}
+        css={{
+          '& small': {
+            borderRadius: 'sm',
+            bg: 'base.400a',
+            color: 'surface.500',
+            px: '0.5rem',
+            fontSize: 'xs'
+          }
+        }}
+      />
+    );
+  }
+);
 
-export const FieldIconBtn = forwardRef<IconButtonProps, 'button'>(
+export const FieldIconBtn = forwardRef<HTMLButtonElement, IconButtonProps>(
   (props, ref) => {
     return (
       <IconButton
         ref={ref}
-        colorScheme='base'
-        variant='soft-outline'
+        colorPalette='base'
+        variant={'soft-outline' as 'outline'}
         size='xs'
         {...props}
       />
@@ -81,15 +87,12 @@ export const FieldIconBtn = forwardRef<IconButtonProps, 'button'>(
   }
 );
 
-export const FieldsetDeleteBtn = forwardRef<IconButtonProps, 'button'>(
+export const FieldsetDeleteBtn = forwardRef<HTMLButtonElement, IconButtonProps>(
   (props, ref) => {
     return (
-      <FieldIconBtn
-        ref={ref}
-        size='sm'
-        icon={<CollecticonTrashBin />}
-        {...props}
-      />
+      <FieldIconBtn ref={ref} size='sm' aria-label='Delete' {...props}>
+        <CollecticonTrashBin />
+      </FieldIconBtn>
     );
   }
 );
@@ -140,7 +143,7 @@ export function ArrayFieldset(props: ArrayFieldsetProps) {
             <Box>
               <FieldsetDeleteBtn
                 onClick={onRemove}
-                isDisabled={removeDisabled}
+                disabled={removeDisabled}
                 aria-label='Remove item'
               />
             </Box>
@@ -151,13 +154,13 @@ export function ArrayFieldset(props: ArrayFieldsetProps) {
       {onAdd && (
         <FieldsetFooter>
           <Button
-            colorScheme='base'
+            colorPalette='base'
             size='sm'
             onClick={onAdd}
             aria-label='Add item'
-            leftIcon={<CollecticonPlusSmall />}
-            isDisabled={addDisabled}
+            disabled={addDisabled}
           >
+            <CollecticonPlusSmall />
             Add another
           </Button>
         </FieldsetFooter>

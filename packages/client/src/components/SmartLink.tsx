@@ -6,7 +6,7 @@ export interface SmartLinkProps extends LinkProps {
   to: string;
 }
 
-export default React.forwardRef<HTMLLinkElement, SmartLinkProps>(
+export default React.forwardRef<HTMLAnchorElement, SmartLinkProps>(
   function SmartLink(props, ref) {
     const { to, ...rest } = props;
 
@@ -16,7 +16,9 @@ export default React.forwardRef<HTMLLinkElement, SmartLinkProps>(
     return isExternal ? (
       <ChLink ref={ref} href={to} {...rest} />
     ) : (
-      <ChLink ref={ref} as={Link} to={to} {...rest} />
+      <ChLink ref={ref} {...rest} asChild>
+        <Link to={to} />
+      </ChLink>
     );
   }
 );

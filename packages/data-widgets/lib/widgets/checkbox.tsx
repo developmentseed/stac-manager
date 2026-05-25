@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Checkbox,
-  CheckboxGroup,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel
-} from '@chakra-ui/react';
+import { Checkbox, CheckboxGroup, Field, Flex } from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import {
   SchemaFieldArray,
@@ -39,32 +32,34 @@ export function WidgetCheckbox(props: WidgetProps) {
         meta,
         form: { setFieldValue, setFieldTouched }
       }: FastFieldProps) => (
-        <FormControl
-          isRequired={isRequired}
-          isInvalid={!!(meta.touched && meta.error)}
+        <Field.Root
+          required={isRequired}
+          invalid={!!(meta.touched && meta.error)}
         >
           {field.label && (
-            <FormLabel>
+            <Field.Label>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
-            </FormLabel>
+            </Field.Label>
           )}
           <Flex gap={4}>
             <CheckboxGroup
               value={value}
-              onChange={(v) => {
+              onValueChange={(v: string[]) => {
                 setFieldValue(pointer, v);
                 setFieldTouched(pointer, true);
               }}
             >
               {options.map(([checkboxVal, label]) => (
-                <Checkbox key={checkboxVal} size='sm' value={checkboxVal}>
-                  {label}
-                </Checkbox>
+                <Checkbox.Root key={checkboxVal} size='sm' value={checkboxVal}>
+                  <Checkbox.HiddenInput />
+                  <Checkbox.Control />
+                  <Checkbox.Label>{label}</Checkbox.Label>
+                </Checkbox.Root>
               ))}
             </CheckboxGroup>
           </Flex>
-          <FormErrorMessage>{meta.error}</FormErrorMessage>
-        </FormControl>
+          <Field.ErrorText>{meta.error}</Field.ErrorText>
+        </Field.Root>
       )}
     </FastField>
   );

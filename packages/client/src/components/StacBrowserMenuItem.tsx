@@ -1,5 +1,5 @@
 import React from 'react';
-import { MenuItem, MenuItemProps } from '@chakra-ui/react';
+import { Menu, MenuItemProps } from '@chakra-ui/react';
 import { CollecticonGlobe } from '@devseed-ui/collecticons-chakra';
 import SmartLink from './SmartLink';
 
@@ -8,17 +8,15 @@ const baseStacBrowserUrl =
   `https://radiantearth.github.io/stac-browser/#/external/${process.env.REACT_APP_STAC_API}`;
 
 export function StacBrowserMenuItem(
-  props: MenuItemProps & { resourcePath: string }
+  props: Omit<MenuItemProps, 'value'> & { resourcePath: string; value?: string }
 ) {
-  const { resourcePath, ...rest } = props;
+  const { resourcePath, value, ...rest } = props;
   return (
-    <MenuItem
-      icon={<CollecticonGlobe />}
-      as={SmartLink}
-      to={`${baseStacBrowserUrl}${resourcePath}`}
-      {...rest}
-    >
-      View in STAC Browser
-    </MenuItem>
+    <Menu.Item value={value ?? 'stac-browser'} {...rest} asChild>
+      <SmartLink to={`${baseStacBrowserUrl}${resourcePath}`}>
+        <CollecticonGlobe />
+        View in STAC Browser
+      </SmartLink>
+    </Menu.Item>
   );
 }

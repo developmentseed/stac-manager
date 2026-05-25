@@ -6,10 +6,10 @@ import {
   Heading,
   Text,
   Badge,
-  Divider,
-  Fade,
+  Separator,
   Image
 } from '@chakra-ui/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { keyframes } from '@emotion/react';
 import { Route, Routes } from 'react-router-dom';
 import {
@@ -53,27 +53,35 @@ export function App() {
 
   return (
     <>
-      <Fade in={isLoading} unmountOnExit>
-        <Flex
-          minW='100vw'
-          minH='100vh'
-          bg='white'
-          align='center'
-          justify='center'
-        >
-          <CollecticonCog
-            size='5em'
-            color='base.300'
-            animation={`${rotate} 4s linear infinite`}
-          />
-          <CollecticonCog
-            ml={-2}
-            size='5em'
-            color='base.300'
-            animation={`${rotate2} 4s linear infinite reverse`}
-          />
-        </Flex>
-      </Fade>
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Flex
+              minW='100vw'
+              minH='100vh'
+              bg='white'
+              align='center'
+              justify='center'
+            >
+              <CollecticonCog
+                boxSize='5em'
+                color='base.300'
+                animation={`${rotate} 4s linear infinite`}
+              />
+              <CollecticonCog
+                ml={-2}
+                boxSize='5em'
+                color='base.300'
+                animation={`${rotate2} 4s linear infinite reverse`}
+              />
+            </Flex>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {!isLoading && (
         <Container
           maxW='container.xl'
@@ -96,7 +104,7 @@ export function App() {
                 aspectRatio={1}
                 borderRadius='md'
               />
-              <Divider
+              <Separator
                 orientation='vertical'
                 borderColor='base.200a'
                 h='1rem'
@@ -160,7 +168,7 @@ function AppFooter() {
             </Badge>
           </strong>{' '}
         </Text>
-        <Divider orientation='vertical' borderColor='base.200a' h='1em' />
+        <Separator orientation='vertical' borderColor='base.200a' h='1em' />
         {new Date().getFullYear()}
         <Text as='span' ml='auto'>
           Made with <CollecticonHeart meaningful title='love' /> by{' '}

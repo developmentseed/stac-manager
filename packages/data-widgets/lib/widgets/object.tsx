@@ -64,7 +64,7 @@ export function WidgetObject(props: WidgetProps) {
             />
           ))}
           <Button
-            colorScheme='base'
+            colorPalette='base'
             size='sm'
             onClick={() => {
               const nextKey = findNextValue('property', valueKeys);
@@ -74,8 +74,8 @@ export function WidgetObject(props: WidgetProps) {
               );
             }}
             aria-label='Add property'
-            leftIcon={<CollecticonPlusSmall />}
           >
+            <CollecticonPlusSmall />
             Add property
           </Button>
         </>

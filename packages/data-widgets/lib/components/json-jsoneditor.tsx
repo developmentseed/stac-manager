@@ -68,19 +68,17 @@ export default function JsonEditor(props: {
     <Box
       ref={element}
       h='20rem'
-      sx={{
-        '.jsoneditor': {
+      css={{
+        '& .jsoneditor': {
           borderColor: 'base.200',
           borderWidth: '2px',
           borderRadius: 'md'
         },
-        '.ace-jsoneditor': {
-          '.ace_tooltip': {
-            minHeight: 'auto'
-          },
-          '.ace_marker-layer .ace_active-line': {
-            bg: 'primary.100a'
-          }
+        '& .ace-jsoneditor .ace_tooltip': {
+          minHeight: 'auto'
+        },
+        '& .ace-jsoneditor .ace_marker-layer .ace_active-line': {
+          bg: 'primary.100a'
         }
       }}
     />

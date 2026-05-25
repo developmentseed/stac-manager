@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input
-} from '@chakra-ui/react';
+import { Field, Flex, Input } from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import { SchemaFieldString, WidgetProps } from '@stac-manager/data-core';
 import { CollecticonTrashBin } from '@devseed-ui/collecticons-chakra';
@@ -45,24 +39,25 @@ export function WidgetInput(props: WidgetInputProps) {
         meta,
         form: { setFieldValue }
       }: FastFieldProps) => (
-        <FormControl
-          isRequired={isRequired}
-          isInvalid={meta.touched && meta.error ? true : false}
+        <Field.Root
+          required={isRequired}
+          invalid={meta.touched && meta.error ? true : false}
         >
           <Flex gap={4}>
             {fieldLabel && (
-              <FormLabel>
+              <Field.Label>
                 <FieldLabel size='xs'>{fieldLabel}</FieldLabel>
-              </FormLabel>
+              </Field.Label>
             )}
             <Flex ml='auto' gap={2}>
               {isDeletable && (
                 <FieldIconBtn
                   aria-label='Remove item'
                   onClick={onDeleteClick}
-                  icon={<CollecticonTrashBin size={3} />}
-                  isDisabled={isDeleteDisabled}
-                />
+                  disabled={isDeleteDisabled}
+                >
+                  <CollecticonTrashBin boxSize={3} />
+                </FieldIconBtn>
               )}
             </Flex>
           </Flex>
@@ -79,8 +74,8 @@ export function WidgetInput(props: WidgetInputProps) {
               setFieldValue(pointer, transformValue(e.target.value));
             }}
           />
-          <FormErrorMessage>{meta.error}</FormErrorMessage>
-        </FormControl>
+          <Field.ErrorText>{meta.error}</Field.ErrorText>
+        </Field.Root>
       )}
     </FastField>
   );

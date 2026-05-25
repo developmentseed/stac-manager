@@ -19,7 +19,7 @@ export function Pagination(props: PaginationProps) {
   });
 
   return (
-    <ButtonGroup size='sm' variant='outline' isAttached>
+    <ButtonGroup size='sm' variant='outline' attached>
       <Button onClick={paginate.goFirst} disabled={!paginate.hasPrevious}>
         First
       </Button>
@@ -37,7 +37,7 @@ export function Pagination(props: PaginationProps) {
           key={p}
           onClick={() => paginate.goToPage(p)}
           variant={p === page ? 'solid' : 'outline'}
-          colorScheme={p === page ? 'primary' : undefined}
+          colorPalette={p === page ? 'primary' : undefined}
         >
           {zeroPad(p)}
         </Button>

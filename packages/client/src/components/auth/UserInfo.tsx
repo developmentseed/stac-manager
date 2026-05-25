@@ -36,7 +36,6 @@ export function UserInfo() {
     return (
       <Button
         variant='outline'
-        rightIcon={<CollecticonLogin />}
         onClick={() => {
           if (!isLoading) {
             login({
@@ -46,6 +45,7 @@ export function UserInfo() {
         }}
       >
         Login
+        <CollecticonLogin />
       </Button>
     );
   }
@@ -56,17 +56,6 @@ export function UserInfo() {
   return (
     <Button
       variant='outline'
-      rightIcon={<CollecticonLogout />}
-      leftIcon={
-        <Avatar
-          size='sm'
-          name={username}
-          bg='secondary.500'
-          color='white'
-          borderRadius='4px'
-          src={`https://www.gravatar.com/avatar/${userEmailHash}?d=404`}
-        />
-      }
       pl='2px'
       onClick={() => {
         if (!isLoading) {
@@ -76,7 +65,19 @@ export function UserInfo() {
         }
       }}
     >
+      <Avatar.Root
+        size='sm'
+        bg='secondary.500'
+        color='white'
+        borderRadius='4px'
+      >
+        <Avatar.Image
+          src={`https://www.gravatar.com/avatar/${userEmailHash}?d=404`}
+        />
+        <Avatar.Fallback name={username} />
+      </Avatar.Root>
       Logout
+      <CollecticonLogout />
     </Button>
   );
 }

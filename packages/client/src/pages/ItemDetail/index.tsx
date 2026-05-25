@@ -6,15 +6,13 @@ import {
   Flex,
   IconButton,
   Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   Heading,
   GridItem,
   Grid,
   VisuallyHidden,
   Skeleton,
-  SkeletonText
+  SkeletonText,
+  Portal
 } from '@chakra-ui/react';
 import { useItem } from '@developmentseed/stac-react';
 import {
@@ -39,9 +37,9 @@ function ItemDetail() {
   const { collectionId, itemId } = useParams();
   usePageTitle(`Item ${itemId}`);
   const itemResource = `${STAC_API_URL}/collections/${collectionId}/items/${itemId}`;
-  const { item, state } = useItem(itemResource);
+  const { item, isLoading } = useItem(itemResource);
 
-  if (!item || state === 'LOADING') {
+  if (!item || isLoading) {
     return (
       <Box p={8}>
         <Flex direction='column' gap={4}>
@@ -49,13 +47,7 @@ function ItemDetail() {
           <Skeleton h={12} maxW='30rem' />
         </Flex>
 
-        <SkeletonText
-          mt={8}
-          noOfLines={4}
-          spacing='4'
-          skeletonHeight='2'
-          maxW='50rem'
-        />
+        <SkeletonText mt={8} noOfLines={4} maxW='50rem' />
       </Box>
     );
   }
@@ -78,29 +70,36 @@ function ItemDetail() {
             >
               Edit
             </Button> */}
-            <Menu placement='bottom-end'>
-              <MenuButton
-                as={IconButton}
-                aria-label='Options'
-                icon={<CollecticonEllipsisVertical />}
-                variant='outline'
-                size='md'
-              />
-              <MenuList>
-                <StacBrowserMenuItem
-                  resourcePath={`/collections/${item.collection}/items/${item.id}`}
-                />
-                <MenuItem
-                  icon={<CollecticonTrashBin />}
-                  color='danger.500'
-                  _hover={{ bg: 'danger.200' }}
-                  _focus={{ bg: 'danger.200' }}
-                  onClick={() => alert('Soon!')}
+            <Menu.Root positioning={{ placement: 'bottom-end' }}>
+              <Menu.Trigger asChild>
+                <IconButton
+                  aria-label='Options'
+                  variant='outline'
+                  size='md'
                 >
-                  Delete
-                </MenuItem>
-              </MenuList>
-            </Menu>
+                  <CollecticonEllipsisVertical />
+                </IconButton>
+              </Menu.Trigger>
+              <Portal>
+                <Menu.Positioner>
+                  <Menu.Content>
+                    <StacBrowserMenuItem
+                      resourcePath={`/collections/${item.collection}/items/${item.id}`}
+                    />
+                    <Menu.Item
+                      value='delete'
+                      color='danger.500'
+                      _hover={{ bg: 'danger.200' }}
+                      _focus={{ bg: 'danger.200' }}
+                      onClick={() => alert('Soon!')}
+                    >
+                      <CollecticonTrashBin />
+                      Delete
+                    </Menu.Item>
+                  </Menu.Content>
+                </Menu.Positioner>
+              </Portal>
+            </Menu.Root>
           </>
         }
       />
@@ -128,14 +127,14 @@ function ItemDetail() {
                 <Heading size='sm' as='h3'>
                   Collection
                 </Heading>
-                <Text size='md'>{item.collection}</Text>
+                <Text fontSize='md'>{item.collection}</Text>
               </Flex>
               {description && (
                 <Flex direction='column' gap='2'>
                   <Heading size='sm' as='h3'>
                     Description
                   </Heading>
-                  <Text size='md'>{description} </Text>
+                  <Text fontSize='md'>{description} </Text>
                 </Flex>
               )}
               {properties.datetime && (
@@ -143,7 +142,7 @@ function ItemDetail() {
                   <Heading size='sm' as='h3'>
                     Date
                   </Heading>
-                  <Text size='md'>
+                  <Text fontSize='md'>
                     {new Date(properties.datetime).toLocaleString(
                       'en-GB',
                       dateFormat

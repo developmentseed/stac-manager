@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Radio,
-  RadioGroup
-} from '@chakra-ui/react';
+import { Field, RadioGroup } from '@chakra-ui/react';
 import { SchemaFieldString, WidgetProps } from '@stac-manager/data-core';
 import { FastField, FastFieldProps } from 'formik';
 
@@ -34,33 +28,35 @@ export function WidgetRadio(props: WidgetProps) {
         meta,
         form: { setFieldValue, setFieldTouched }
       }: FastFieldProps) => (
-        <FormControl
-          isRequired={isRequired}
-          isInvalid={!!(meta.touched && meta.error)}
+        <Field.Root
+          required={isRequired}
+          invalid={!!(meta.touched && meta.error)}
         >
           {field.label && (
-            <FormLabel>
+            <Field.Label>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
-            </FormLabel>
+            </Field.Label>
           )}
-          <RadioGroup
+          <RadioGroup.Root
             size='sm'
             gap={4}
             display='flex'
             value={value}
-            onChange={(v) => {
-              setFieldValue(pointer, v);
+            onValueChange={(details: { value: string | null }) => {
+              setFieldValue(pointer, details.value);
               setFieldTouched(pointer, true);
             }}
           >
             {options.map(([radioValue, label]) => (
-              <Radio key={radioValue} size='sm' value={radioValue}>
-                {label}
-              </Radio>
+              <RadioGroup.Item key={radioValue} value={radioValue}>
+                <RadioGroup.ItemHiddenInput />
+                <RadioGroup.ItemControl />
+                <RadioGroup.ItemText>{label}</RadioGroup.ItemText>
+              </RadioGroup.Item>
             ))}
-          </RadioGroup>
-          <FormErrorMessage>{meta.error}</FormErrorMessage>
-        </FormControl>
+          </RadioGroup.Root>
+          <Field.ErrorText>{meta.error}</Field.ErrorText>
+        </Field.Root>
       )}
     </FastField>
   );

@@ -9,7 +9,7 @@ import { SchemaField } from '../schema/types';
 
 interface PluginBoxProps {
   plugin: Plugin;
-  children: ({ field }: { field: SchemaField }) => JSX.Element;
+  children: ({ field }: { field: SchemaField }) => React.JSX.Element;
 }
 
 /**

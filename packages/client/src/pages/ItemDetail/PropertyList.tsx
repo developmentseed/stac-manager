@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr
-} from '@chakra-ui/react';
+import { Box, Table, Text } from '@chakra-ui/react';
 import { Property, PropertyGroup } from '../../types';
 import TableValue from './TableValue';
 
@@ -35,29 +25,31 @@ function PropertyList({ properties, headerLevel = 'h2' }: PropertyListProps) {
           val.itemOrder && val.itemOrder.length > 1 ? (
             <Box key={key}>
               <Text>{val.label}</Text>
-              <TableContainer>
-                <Table size='sm'>
-                  <Thead>
-                    <Tr>
+              <Table.ScrollArea>
+                <Table.Root size='sm'>
+                  <Table.Header>
+                    <Table.Row>
                       {val.itemOrder.map((item) => (
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        <Th key={item}>{val.items![item].label}</Th>
+                        <Table.ColumnHeader key={item}>
+                          {val.items![item].label}
+                        </Table.ColumnHeader>
                       ))}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
                     {val.value.map((value) => (
-                      <Tr key={JSON.stringify(value)}>
+                      <Table.Row key={JSON.stringify(value)}>
                         {val.itemOrder.map((item) => (
-                          <Td key={item} valign='top'>
+                          <Table.Cell key={item} valign='top'>
                             <TableValue value={value[item]} />
-                          </Td>
+                          </Table.Cell>
                         ))}
-                      </Tr>
+                      </Table.Row>
                     ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+                  </Table.Body>
+                </Table.Root>
+              </Table.ScrollArea>
             </Box>
           ) : (
             <Box

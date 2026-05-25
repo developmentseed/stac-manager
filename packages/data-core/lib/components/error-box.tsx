@@ -1,7 +1,7 @@
-import React from 'react';
-import { Flex, FlexProps, forwardRef } from '@chakra-ui/react';
+import React, { forwardRef } from 'react';
+import { Flex, FlexProps } from '@chakra-ui/react';
 
-export const ErrorBox = forwardRef<FlexProps, typeof Flex>((props, ref) => (
+export const ErrorBox = forwardRef<HTMLDivElement, FlexProps>((props, ref) => (
   <Flex
     ref={ref}
     maxW='container.md'

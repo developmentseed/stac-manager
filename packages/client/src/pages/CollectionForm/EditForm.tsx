@@ -83,11 +83,11 @@ export function EditForm(props: {
                       <NotificationButton notifications={notifications} />
                       <Button
                         type='submit'
-                        isDisabled={isSubmitting}
-                        colorScheme='primary'
+                        disabled={isSubmitting}
+                        colorPalette='primary'
                         size='md'
-                        leftIcon={<CollecticonTickSmall />}
                       >
+                        <CollecticonTickSmall />
                         {initialData ? 'Save' : 'Create'}
                       </Button>
                     </Flex>
@@ -98,27 +98,27 @@ export function EditForm(props: {
                     {initialData ? 'Edit' : 'New'}
                   </Heading>
 
-                  <ButtonGroup isAttached variant='outline' size='md'>
+                  <ButtonGroup attached variant='outline' size='md'>
                     <Button
                       aria-label='Edit Form'
-                      leftIcon={<CollecticonForm />}
                       onClick={() => {
                         setView('fields');
                         setStacData(values.jsonData);
                       }}
-                      isActive={view === 'fields'}
+                      data-active={view === 'fields' ? '' : undefined}
                     >
+                      <CollecticonForm />
                       Form
                     </Button>
                     <Button
                       aria-label='Edit JSON'
-                      leftIcon={<CollecticonCode />}
                       onClick={() => {
                         setView('json');
                         setStacData(toOutData(values));
                       }}
-                      isActive={view === 'json'}
+                      data-active={view === 'json' ? '' : undefined}
                     >
+                      <CollecticonCode />
                       JSON
                     </Button>
                   </ButtonGroup>

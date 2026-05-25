@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Flex, Heading, Text, forwardRef, FlexProps } from '@chakra-ui/react';
+import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import { Flex, Heading, Text, FlexProps } from '@chakra-ui/react';
 
 interface InnerPageHeaderProps extends FlexProps {
   title: string;
@@ -7,7 +7,7 @@ interface InnerPageHeaderProps extends FlexProps {
   actions?: React.ReactNode;
 }
 
-export const InnerPageHeader = forwardRef<InnerPageHeaderProps, 'div'>(
+export const InnerPageHeader = forwardRef<HTMLDivElement, InnerPageHeaderProps>(
   ({ title, overline, actions, ...rest }, ref) => {
     return (
       <Flex
@@ -25,7 +25,7 @@ export const InnerPageHeader = forwardRef<InnerPageHeaderProps, 'div'>(
           </Text>
         )}
         <Flex gap={4} justifyContent='space-between' alignItems='center'>
-          <Heading size='lg' noOfLines={1} as='h1'>
+          <Heading size='lg' lineClamp={1} as='h1'>
             {title}
           </Heading>
           {actions && <Flex gap={2}>{actions}</Flex>}
@@ -35,8 +35,10 @@ export const InnerPageHeader = forwardRef<InnerPageHeaderProps, 'div'>(
   }
 );
 
-export const InnerPageHeaderSticky = forwardRef<InnerPageHeaderProps, 'div'>(
-  (props, ref) => {
+export const InnerPageHeaderSticky = forwardRef<
+  HTMLDivElement,
+  InnerPageHeaderProps
+>((props, ref) => {
     const [isAtTop, setIsAtTop] = useState(false);
 
     const localRef = useRef<HTMLDivElement | null>(null);
@@ -79,3 +81,4 @@ export const InnerPageHeaderSticky = forwardRef<InnerPageHeaderProps, 'div'>(
     );
   }
 );
+

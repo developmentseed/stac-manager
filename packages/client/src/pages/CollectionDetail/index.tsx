@@ -7,9 +7,6 @@ import {
   Flex,
   IconButton,
   Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   SimpleGrid,
   Heading,
   Badge,
@@ -20,12 +17,9 @@ import {
   Skeleton,
   SkeletonText,
   Popover,
-  PopoverTrigger,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
   ButtonGroup,
-  Button
+  Button,
+  Portal
 } from '@chakra-ui/react';
 import { useCollection, useStacSearch } from '@developmentseed/stac-react';
 import {
@@ -57,7 +51,7 @@ function CollectionDetail() {
   const { collectionId } = useParams();
   usePageTitle(`Collection ${collectionId}`);
 
-  const { collection, state } = useCollection(collectionId!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+  const { collection, isLoading } = useCollection(collectionId!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
 
   const {
     results,
@@ -87,7 +81,7 @@ function CollectionDetail() {
 
   // Initialize the search with the current collection ID
   useEffect(() => {
-    setCollections([collectionId]);
+    if (collectionId) setCollections([collectionId]);
   }, [collectionId, setCollections]);
 
   // Automatically submit whenever the collection ID changes
@@ -122,7 +116,7 @@ function CollectionDetail() {
     return '—';
   }, [collection]);
 
-  if (!collection || state === 'LOADING') {
+  if (!collection || isLoading) {
     return (
       <Box p={8}>
         <Flex direction='column' gap={4}>
@@ -130,13 +124,7 @@ function CollectionDetail() {
           <Skeleton h={12} maxW='30rem' />
         </Flex>
 
-        <SkeletonText
-          mt={8}
-          noOfLines={4}
-          spacing='4'
-          skeletonHeight='2'
-          maxW='50rem'
-        />
+        <SkeletonText mt={8} noOfLines={4} maxW='50rem' />
       </Box>
     );
   }
@@ -144,9 +132,9 @@ function CollectionDetail() {
   const { id, title, description, keywords, license } =
     collection as StacCollection;
 
-  const resultCount = results?.numberMatched || 0;
+  const resultCount = results?.features?.length || 0;
   const shouldPaginate =
-    results?.links?.length > 1 && resultCount > results?.numberReturned;
+    (results?.links?.length ?? 0) > 1 && (!!nextPage || !!previousPage);
 
   return (
     <Flex direction='column' gap={8}>
@@ -156,25 +144,29 @@ function CollectionDetail() {
         actions={
           <>
             <ButtonWithAuth
-              colorScheme='primary'
+              colorPalette='primary'
               to={`/collections/${id}/edit`}
-              leftIcon={<CollecticonPencil />}
             >
+              <CollecticonPencil />
               Edit
             </ButtonWithAuth>
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                aria-label='Options'
-                icon={<CollecticonEllipsisVertical />}
-                variant='outline'
-                size='md'
-              />
-              <MenuList>
-                <StacBrowserMenuItem resourcePath={`/collections/${id}`} />
-                <DeleteMenuItem />
-              </MenuList>
-            </Menu>
+            <Menu.Root>
+              <Menu.Trigger asChild>
+                <IconButton aria-label='Options' variant='outline' size='md'>
+                  <CollecticonEllipsisVertical />
+                </IconButton>
+              </Menu.Trigger>
+              <Portal>
+                <Menu.Positioner>
+                  <Menu.Content>
+                    <StacBrowserMenuItem
+                      resourcePath={`/collections/${id}`}
+                    />
+                    <DeleteMenuItem />
+                  </Menu.Content>
+                </Menu.Positioner>
+              </Portal>
+            </Menu.Root>
           </>
         }
       />
@@ -203,7 +195,7 @@ function CollectionDetail() {
                   <Heading size='sm' as='h3'>
                     Description
                   </Heading>
-                  <Text size='md'>{description}</Text>
+                  <Text fontSize='md'>{description}</Text>
                 </Flex>
               )}
 
@@ -212,7 +204,7 @@ function CollectionDetail() {
                   <Heading size='sm' as='h3'>
                     Temporal extent
                   </Heading>
-                  <Text size='md'>{dateLabel}</Text>
+                  <Text fontSize='md'>{dateLabel}</Text>
                 </Flex>
               )}
 
@@ -221,7 +213,7 @@ function CollectionDetail() {
                   <Heading size='sm' as='h3'>
                     License
                   </Heading>
-                  <Text size='md'>{license}</Text>
+                  <Text fontSize='md'>{license}</Text>
                 </Flex>
               )}
 
@@ -230,11 +222,15 @@ function CollectionDetail() {
                   <Heading size='sm' as='h3'>
                     Keywords
                   </Heading>
-                  <HStack spacing={2}>
+                  <HStack gap={2}>
                     {keywords.map((keyword) => (
-                      <Tag key={keyword} size='md' colorScheme='primary'>
-                        {keyword}
-                      </Tag>
+                      <Tag.Root
+                        key={keyword}
+                        size='md'
+                        colorPalette='primary'
+                      >
+                        <Tag.Label>{keyword}</Tag.Label>
+                      </Tag.Root>
                     ))}
                   </HStack>
                 </Flex>
@@ -271,9 +267,8 @@ function CollectionDetail() {
               {results && <Badge variant='solid'>{zeroPad(resultCount)}</Badge>}
             </Heading>
             {!!resultCount && (
-              <Text size='sm' color='base.400'>
-                Showing page {page} of{' '}
-                {Math.ceil(resultCount / results.numberReturned)}
+              <Text fontSize='sm' color='base.400'>
+                Showing page {page}
               </Text>
             )}
           </Box>
@@ -302,46 +297,55 @@ function CollectionDetail() {
                 renderMenu={() => {
                   return (
                     <Flex gap={2}>
-                      <Menu placement='bottom-end'>
-                        <MenuButton
-                          as={IconButton}
-                          aria-label='Options'
-                          icon={<CollecticonEllipsisVertical />}
-                          variant='outline'
-                          size='sm'
-                        />
-                        <MenuList>
-                          <StacBrowserMenuItem
-                            resourcePath={`/collections/${id}/items/${item.id}`}
-                          />
-                          <MenuItem
-                            as={SmartLink}
-                            to={`/collections/${id}/items/${item.id}`}
-                            icon={<CollecticonTextBlock />}
+                      <Menu.Root positioning={{ placement: 'bottom-end' }}>
+                        <Menu.Trigger asChild>
+                          <IconButton
+                            aria-label='Options'
+                            variant='outline'
+                            size='sm'
                           >
-                            View
-                          </MenuItem>
-                        </MenuList>
-                      </Menu>
-                      <Popover placement='top' isLazy>
-                        {({ isOpen }) => (
-                          <>
-                            <PopoverTrigger>
-                              <IconButton
-                                aria-label='Preview'
-                                icon={<CollecticonEye />}
-                                variant='outline'
-                                size='sm'
-                                isActive={isOpen}
+                            <CollecticonEllipsisVertical />
+                          </IconButton>
+                        </Menu.Trigger>
+                        <Portal>
+                          <Menu.Positioner>
+                            <Menu.Content>
+                              <StacBrowserMenuItem
+                                resourcePath={`/collections/${id}/items/${item.id}`}
                               />
-                            </PopoverTrigger>
-                            <PopoverContent
+                              <Menu.Item value='view' asChild>
+                                <SmartLink
+                                  to={`/collections/${id}/items/${item.id}`}
+                                >
+                                  <CollecticonTextBlock />
+                                  View
+                                </SmartLink>
+                              </Menu.Item>
+                            </Menu.Content>
+                          </Menu.Positioner>
+                        </Portal>
+                      </Menu.Root>
+                      <Popover.Root positioning={{ placement: 'top' }} lazyMount>
+                        <Popover.Trigger asChild>
+                          <IconButton
+                            aria-label='Preview'
+                            variant='outline'
+                            size='sm'
+                          >
+                            <CollecticonEye />
+                          </IconButton>
+                        </Popover.Trigger>
+                        <Portal>
+                          <Popover.Positioner>
+                            <Popover.Content
                               boxShadow='sm'
                               borderColor='base.200'
                               borderWidth='2px'
                             >
-                              <PopoverArrow bg='base.200' />
-                              <PopoverBody
+                              <Popover.Arrow>
+                                <Popover.ArrowTip />
+                              </Popover.Arrow>
+                              <Popover.Body
                                 p={0}
                                 overflow='hidden'
                                 borderRadius='md'
@@ -349,11 +353,11 @@ function CollectionDetail() {
                                 <Box h='15rem'>
                                   <ItemMap item={item} reuseMaps />
                                 </Box>
-                              </PopoverBody>
-                            </PopoverContent>
-                          </>
-                        )}
-                      </Popover>
+                              </Popover.Body>
+                            </Popover.Content>
+                          </Popover.Positioner>
+                        </Portal>
+                      </Popover.Root>
                     </Flex>
                   );
                 }}
@@ -369,7 +373,7 @@ function CollectionDetail() {
         </SimpleGrid>
         {shouldPaginate && (
           <Flex direction='column' alignItems='center'>
-            <ButtonGroup size='sm' variant='outline' isAttached>
+            <ButtonGroup size='sm' variant='outline' attached>
               <Button
                 disabled={!previousPage}
                 onClick={() => onPageNavigate('previous')}

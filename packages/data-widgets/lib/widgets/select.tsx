@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react';
+import { Field } from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import ReactSelect from 'react-select';
 import {
@@ -65,14 +65,14 @@ export function WidgetSelect(props: WidgetProps) {
         );
 
         return (
-          <FormControl
-            isRequired={isRequired}
-            isInvalid={!!(meta.touched && meta.error)}
+          <Field.Root
+            required={isRequired}
+            invalid={!!(meta.touched && meta.error)}
           >
             {field.label && (
-              <FormLabel>
+              <Field.Label>
                 <FieldLabel size='xs'>{field.label}</FieldLabel>
-              </FormLabel>
+              </Field.Label>
             )}
             <ReactSelect
               name={name}
@@ -93,8 +93,8 @@ export function WidgetSelect(props: WidgetProps) {
               }}
               value={selectedOpts}
             />
-            <FormErrorMessage>{meta.error}</FormErrorMessage>
-          </FormControl>
+            <Field.ErrorText>{meta.error}</Field.ErrorText>
+          </Field.Root>
         );
       }}
     </FastField>

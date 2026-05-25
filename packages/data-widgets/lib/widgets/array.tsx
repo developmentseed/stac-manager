@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, ListItem } from '@chakra-ui/react';
+import { List } from '@chakra-ui/react';
 import {
   WidgetRenderer,
   SchemaFieldArray,
@@ -69,9 +69,9 @@ function ArrayItem(props: ArrayItemProps) {
           removeDisabled={removeDisabled}
         >
           {fields.length ? (
-            <List display='flex' flexDirection='column' gap={4}>
+            <List.Root display='flex' flexDirection='column' gap={4} listStyle='none'>
               {fields.map((_, index) => (
-                <ListItem
+                <List.Item
                   key={index /* eslint-disable-line react/no-array-index-key */}
                 >
                   {isRegularNestedArray ? (
@@ -107,9 +107,9 @@ function ArrayItem(props: ArrayItemProps) {
                       />
                     </ArrayFieldset>
                   )}
-                </ListItem>
+                </List.Item>
               ))}
-            </List>
+            </List.Root>
           ) : (
             <p>No items</p>
           )}

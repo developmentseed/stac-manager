@@ -1,15 +1,15 @@
-import React from 'react';
-import { forwardRef, MenuItem, MenuItemProps } from '@chakra-ui/react';
+import React, { forwardRef } from 'react';
+import { Menu, MenuItemProps } from '@chakra-ui/react';
 import { useAuth } from 'src/auth/Context';
 
-export const MenuItemWithAuth = forwardRef<MenuItemProps, typeof MenuItem>(
+export const MenuItemWithAuth = forwardRef<HTMLDivElement, MenuItemProps>(
   (props, ref) => {
     const { isEnabled, isAuthenticated } = useAuth();
 
     if (!isEnabled) {
-      return <MenuItem ref={ref} {...props} />;
+      return <Menu.Item ref={ref} {...props} />;
     }
 
-    return isAuthenticated && <MenuItem ref={ref} {...props} />;
+    return isAuthenticated && <Menu.Item ref={ref} {...props} />;
   }
 );

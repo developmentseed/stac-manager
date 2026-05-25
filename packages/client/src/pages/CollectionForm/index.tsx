@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useToast } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
+// TODO(B-7): replace shim with Chakra v3 toaster singleton + <Toaster /> mount.
+import { useToast } from 'src/_legacy/useToast';
 import { FormikHelpers } from 'formik';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCollection } from '@developmentseed/stac-react';
@@ -67,7 +69,7 @@ export function CollectionFormNew() {
 
 export function CollectionFormEdit(props: { id: string }) {
   const { id } = props;
-  const { collection, state, error } = useCollection(id);
+  const { collection, isLoading, error } = useCollection(id);
   const api = useApi();
   const [triedLoading, setTriedLoading] = useState(!!collection);
   const [notifications, setNotifications] = useState<
@@ -81,17 +83,17 @@ export function CollectionFormEdit(props: { id: string }) {
   const toast = useToast();
 
   useEffect(() => {
-    if (state === 'LOADING') {
+    if (isLoading) {
       setTriedLoading(true);
     }
-  }, [state]);
+  }, [isLoading]);
 
-  if (state === 'LOADING' || !triedLoading) {
+  if (isLoading || !triedLoading) {
     return <Box>Loading collection...</Box>;
   }
 
   if (error) {
-    return <Box>Error loading collection: {error.detail}</Box>;
+    return <Box>Error loading collection: {String(error.detail)}</Box>;
   }
 
   const onSubmit = async (data: any, formikHelpers: FormikHelpers<any>) => {

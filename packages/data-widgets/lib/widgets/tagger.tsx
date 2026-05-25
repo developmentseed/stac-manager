@@ -4,12 +4,7 @@ import React, {
   useMemo,
   useState
 } from 'react';
-import {
-  Kbd,
-  FormControl,
-  FormLabel,
-  FormErrorMessage
-} from '@chakra-ui/react';
+import { Field, Kbd } from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import CreatableSelect from 'react-select/creatable';
 import {
@@ -110,22 +105,22 @@ function WidgetTaggerNoOptions(props: WidgetProps) {
         meta,
         form: { setFieldValue }
       }: FastFieldProps) => (
-        <FormControl
-          isRequired={isRequired}
-          isInvalid={!!(meta.touched && meta.error)}
+        <Field.Root
+          required={isRequired}
+          invalid={!!(meta.touched && meta.error)}
         >
           {field.label && (
-            <FormLabel>
+            <Field.Label>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
-            </FormLabel>
+            </Field.Label>
           )}
           <WidgetTaggerNoOptionsSelect
             pointer={pointer}
             value={value}
             onChange={(v: string | string[]) => setFieldValue(name, v)}
           />
-          <FormErrorMessage>{meta.error}</FormErrorMessage>
-        </FormControl>
+          <Field.ErrorText>{meta.error}</Field.ErrorText>
+        </Field.Root>
       )}
     </FastField>
   );
@@ -211,14 +206,14 @@ function WidgetTaggerWithOptions(props: WidgetProps & { isMulti?: boolean }) {
         meta,
         form: { setFieldValue }
       }: FastFieldProps) => (
-        <FormControl
-          isRequired={isRequired}
-          isInvalid={!!(meta.touched && meta.error)}
+        <Field.Root
+          required={isRequired}
+          invalid={!!(meta.touched && meta.error)}
         >
           {field.label && (
-            <FormLabel>
+            <Field.Label>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
-            </FormLabel>
+            </Field.Label>
           )}
 
           <WidgetTaggerWithOptionsSelect
@@ -228,8 +223,8 @@ function WidgetTaggerWithOptions(props: WidgetProps & { isMulti?: boolean }) {
             onChange={(v: string | string[]) => setFieldValue(name, v)}
             options={options}
           />
-          <FormErrorMessage>{meta.error}</FormErrorMessage>
-        </FormControl>
+          <Field.ErrorText>{meta.error}</Field.ErrorText>
+        </Field.Root>
       )}
     </FastField>
   );

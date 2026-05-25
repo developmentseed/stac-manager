@@ -5,9 +5,10 @@ import {
   Flex,
   Heading,
   IconButton,
-  Text,
-  useToast
+  Text
 } from '@chakra-ui/react';
+// TODO(B-7): replace shim with Chakra v3 toaster singleton + <Toaster /> mount.
+import { useToast } from 'src/_legacy/useToast';
 import {
   CollecticonBell,
   CollecticonCircleExclamation,
@@ -191,13 +192,14 @@ export function NotificationBox(props: NotificationBoxProps) {
           </Badge>
         )}
         <IconButton
-          icon={<CollecticonXmarkSmall />}
           aria-label='Close notifications'
           size='sm'
           variant='outline'
           onClick={onCloseClick}
           ml='auto'
-        />
+        >
+          <CollecticonXmarkSmall />
+        </IconButton>
       </Flex>
       <Box overflowY='scroll' maxH='30rem'>
         {notifications.length ? (
