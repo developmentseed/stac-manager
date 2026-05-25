@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
+import { ChakraProvider } from '@chakra-ui/react';
 import { StacApiProvider } from '@developmentseed/stac-react';
 import { PluginConfigProvider } from '@stac-manager/data-core';
 
 import { App } from './App';
-import theme from './theme/theme';
+import system from './theme/theme';
 import { config } from './plugin-system/config';
 import { AuthProvider, useAuth } from './auth/Context';
 import Api, { ApiContext } from './api';
@@ -70,8 +70,7 @@ function Root() {
 
   return (
     <React.StrictMode>
-      <ColorModeScript />
-      <ChakraProvider theme={theme}>
+      <ChakraProvider value={system}>
         <Router basename={basename}>
           <AuthProvider>
             <StacApiAuthBridge>
