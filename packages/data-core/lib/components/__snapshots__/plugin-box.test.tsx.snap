@@ -2,12 +2,12 @@
 
 exports[`PluginBox renders ErrorBox when editSchema is null 1`] = `
 <div
-  class="css-133ygyc"
+  class="css-7al7hk"
   data-testid="plugin-box-error"
 >
   Plugin 
   <code
-    class="chakra-code css-1fu8sp0"
+    class="chakra-code css-5qrum9"
   >
     TestPlugin
   </code>

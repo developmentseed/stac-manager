@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
 import { ArrayFieldset } from './elements';
 
 // Custom renderer to add context or providers if needed
@@ -11,7 +11,9 @@ const renderWithProviders = (
 ) => {
   // You can wrap the component with any context providers here
   return render(ui, {
-    wrapper: ({ children }) => <ChakraProvider>{children}</ChakraProvider>,
+    wrapper: ({ children }) => (
+      <ChakraProvider value={defaultSystem}>{children}</ChakraProvider>
+    ),
     ...renderOptions
   });
 };

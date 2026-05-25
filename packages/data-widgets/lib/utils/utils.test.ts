@@ -1,5 +1,21 @@
+import React from 'react';
+import { render } from '@testing-library/react';
+import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
+
 import { getArrayLabel } from './index';
 import { SchemaField } from '@stac-manager/data-core';
+
+// Snapshotting a raw React element broke under React 19 (pretty-format's
+// ReactElement plugin no longer recognizes Symbol(react.transitional.element)
+// and falls back to printing the raw element internals). Render the formatted
+// node to DOM and snapshot the resulting markup instead.
+const renderFormatted = (node: React.ReactNode) =>
+  render(
+    React.createElement(ChakraProvider, {
+      value: defaultSystem,
+      children: node
+    })
+  ).container;
 
 describe('getArrayLabel', () => {
   it('should return a label with a number suffix for string labels', () => {
@@ -11,7 +27,7 @@ describe('getArrayLabel', () => {
       num: 10, // 1-based index
       formatted: expect.anything()
     });
-    expect(result?.formatted).toMatchSnapshot();
+    expect(renderFormatted(result?.formatted)).toMatchSnapshot();
   });
 
   it('should cycle through array labels based on index', () => {
@@ -35,6 +51,6 @@ describe('getArrayLabel', () => {
       num: 1,
       formatted: expect.anything()
     });
-    expect(result?.formatted).toMatchSnapshot();
+    expect(renderFormatted(result?.formatted)).toMatchSnapshot();
   });
 });

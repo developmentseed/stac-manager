@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
 
 import { WidgetRenderer } from './widget-renderer';
 import { usePluginConfig } from '../context/plugin-config';
@@ -59,7 +59,7 @@ describe('WidgetRenderer', () => {
   it('renders an error box when widget is not found', () => {
     const field: SchemaField = { type: 'string', 'ui:widget': 'custom' };
     render(
-      <ChakraProvider>
+      <ChakraProvider value={defaultSystem}>
         <WidgetRenderer pointer='test.pointer' field={field} />
       </ChakraProvider>
     );
@@ -74,7 +74,7 @@ describe('WidgetRenderer', () => {
 
     const field: SchemaField = { type: 'string', 'ui:widget': 'broken' };
     render(
-      <ChakraProvider>
+      <ChakraProvider value={defaultSystem}>
         <WidgetRenderer pointer='test.pointer' field={field} />
       </ChakraProvider>
     );
