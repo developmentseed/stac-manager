@@ -106,7 +106,6 @@ function useNotificationsToast(notifications: AppNotification[]) {
     } else {
       toaster.dismiss('notifications');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notifications]);
 
   return {

@@ -18,3 +18,4 @@ export const ErrorBox = forwardRef<HTMLDivElement, FlexProps>((props, ref) => (
     {...props}
   />
 ));
+ErrorBox.displayName = 'ErrorBox';

@@ -72,11 +72,7 @@ function ItemDetail() {
             </Button> */}
             <Menu.Root positioning={{ placement: 'bottom-end' }}>
               <Menu.Trigger asChild>
-                <IconButton
-                  aria-label='Options'
-                  variant='outline'
-                  size='md'
-                >
+                <IconButton aria-label='Options' variant='outline' size='md'>
                   <CollecticonEllipsisVertical />
                 </IconButton>
               </Menu.Trigger>

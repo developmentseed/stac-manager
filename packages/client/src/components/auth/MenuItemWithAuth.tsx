@@ -13,3 +13,4 @@ export const MenuItemWithAuth = forwardRef<HTMLDivElement, MenuItemProps>(
     return isAuthenticated && <Menu.Item ref={ref} {...props} />;
   }
 );
+MenuItemWithAuth.displayName = 'MenuItemWithAuth';

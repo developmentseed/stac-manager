@@ -39,46 +39,47 @@ export const InnerPageHeaderSticky = forwardRef<
   HTMLDivElement,
   InnerPageHeaderProps
 >((props, ref) => {
-    const [isAtTop, setIsAtTop] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(false);
 
-    const localRef = useRef<HTMLDivElement | null>(null);
+  const localRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-      const el = localRef.current;
-      if (!el) return;
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          setIsAtTop(entry.intersectionRatio < 1);
-        },
-        { threshold: [1] }
-      );
-
-      observer.observe(el);
-
-      return () => {
-        observer.unobserve(el);
-      };
-    }, []);
-
-    const headerRef: React.RefCallback<HTMLDivElement> = (v) => {
-      localRef.current = v;
-      if (typeof ref === 'function') {
-        ref(v);
-      } else if (ref != null) {
-        (ref as React.MutableRefObject<any>).current = v;
-      }
-    };
-
-    return (
-      <InnerPageHeader
-        ref={headerRef}
-        position='sticky'
-        top='-1px'
-        boxShadow={isAtTop ? 'md' : 'none'}
-        zIndex={100}
-        {...props}
-      />
+  useEffect(() => {
+    const el = localRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsAtTop(entry.intersectionRatio < 1);
+      },
+      { threshold: [1] }
     );
-  }
-);
 
+    observer.observe(el);
+
+    return () => {
+      observer.unobserve(el);
+    };
+  }, []);
+
+  const headerRef: React.RefCallback<HTMLDivElement> = (v) => {
+    localRef.current = v;
+    if (typeof ref === 'function') {
+      ref(v);
+    } else if (ref != null) {
+      (ref as React.MutableRefObject<any>).current = v;
+    }
+  };
+
+  return (
+    <InnerPageHeader
+      ref={headerRef}
+      position='sticky'
+      top='-1px'
+      boxShadow={isAtTop ? 'md' : 'none'}
+      zIndex={100}
+      {...props}
+    />
+  );
+});
+
+InnerPageHeader.displayName = 'InnerPageHeader';
+InnerPageHeaderSticky.displayName = 'InnerPageHeaderSticky';

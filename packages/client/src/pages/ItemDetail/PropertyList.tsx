@@ -30,7 +30,6 @@ function PropertyList({ properties, headerLevel = 'h2' }: PropertyListProps) {
                   <Table.Header>
                     <Table.Row>
                       {val.itemOrder.map((item) => (
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         <Table.ColumnHeader key={item}>
                           {val.items![item].label}
                         </Table.ColumnHeader>

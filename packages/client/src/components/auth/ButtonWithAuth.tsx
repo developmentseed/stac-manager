@@ -15,3 +15,4 @@ export const ButtonWithAuth = forwardRef<
 
   return isAuthenticated && <Button ref={ref} as={SmartLink} {...props} />;
 });
+ButtonWithAuth.displayName = 'ButtonWithAuth';

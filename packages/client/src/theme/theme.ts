@@ -18,7 +18,9 @@ const base = setSaturation(0.32, setLightness(0.16, adjustHue(48, primary)));
  * token shape `{ 50: { value: '#hex' }, ... }` without modifying the
  * `createColorPalette` helper (which is also consumed standalone).
  */
-function toTokens(palette: Record<string, string>): Record<string, { value: string }> {
+function toTokens(
+  palette: Record<string, string>
+): Record<string, { value: string }> {
   return Object.fromEntries(
     Object.entries(palette).map(([k, v]) => [k, { value: v }])
   );

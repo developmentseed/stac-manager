@@ -69,7 +69,12 @@ function ArrayItem(props: ArrayItemProps) {
           removeDisabled={removeDisabled}
         >
           {fields.length ? (
-            <List.Root display='flex' flexDirection='column' gap={4} listStyle='none'>
+            <List.Root
+              display='flex'
+              flexDirection='column'
+              gap={4}
+              listStyle='none'
+            >
               {fields.map((_, index) => (
                 <List.Item
                   key={index /* eslint-disable-line react/no-array-index-key */}

@@ -4,7 +4,9 @@ import { CollecticonTrashBin } from '@devseed-ui/collecticons-chakra';
 
 import { MenuItemWithAuth } from './auth/MenuItemWithAuth';
 
-export function DeleteMenuItem(props: Omit<MenuItemProps, 'value'> & { value?: string }) {
+export function DeleteMenuItem(
+  props: Omit<MenuItemProps, 'value'> & { value?: string }
+) {
   const { value = 'delete', ...rest } = props;
   return (
     <MenuItemWithAuth

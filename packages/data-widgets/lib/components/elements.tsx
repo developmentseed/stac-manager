@@ -97,6 +97,14 @@ export const FieldsetDeleteBtn = forwardRef<HTMLButtonElement, IconButtonProps>(
   }
 );
 
+Fieldset.displayName = 'Fieldset';
+FieldsetHeader.displayName = 'FieldsetHeader';
+FieldsetBody.displayName = 'FieldsetBody';
+FieldsetFooter.displayName = 'FieldsetFooter';
+FieldLabel.displayName = 'FieldLabel';
+FieldIconBtn.displayName = 'FieldIconBtn';
+FieldsetDeleteBtn.displayName = 'FieldsetDeleteBtn';
+
 interface ArrayFieldsetProps {
   label?: React.ReactNode;
   isRequired?: boolean;

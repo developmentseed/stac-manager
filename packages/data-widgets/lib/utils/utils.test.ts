@@ -9,13 +9,13 @@ import { SchemaField } from '@stac-manager/data-core';
 // ReactElement plugin no longer recognizes Symbol(react.transitional.element)
 // and falls back to printing the raw element internals). Render the formatted
 // node to DOM and snapshot the resulting markup instead.
-const renderFormatted = (node: React.ReactNode) =>
-  render(
-    React.createElement(ChakraProvider, {
-      value: defaultSystem,
-      children: node
-    })
-  ).container;
+const renderFormatted = (node: React.ReactNode) => {
+  const props: React.ComponentProps<typeof ChakraProvider> = {
+    value: defaultSystem,
+    children: node
+  };
+  return render(React.createElement(ChakraProvider, props)).container;
+};
 
 describe('getArrayLabel', () => {
   it('should return a label with a number suffix for string labels', () => {

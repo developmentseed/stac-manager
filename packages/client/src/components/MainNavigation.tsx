@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  List,
-  Button,
-  ButtonProps,
-  Flex,
-  Separator
-} from '@chakra-ui/react';
+import { List, Button, ButtonProps, Flex, Separator } from '@chakra-ui/react';
 import {
   CollecticonFolder,
   CollecticonPlusSmall

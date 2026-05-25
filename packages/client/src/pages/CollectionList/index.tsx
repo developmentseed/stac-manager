@@ -51,6 +51,9 @@ function CollectionList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [keyword, setKeyword] = useState('');
 
+  const handleKeywordChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
+    setKeyword(e.target.value);
+
   const keywords = useMemo<string[]>(() => {
     if (!collections) return [];
     const k = collections.collections.reduce(
@@ -131,9 +134,7 @@ function CollectionList() {
               <NativeSelect.Root size='md' width='12rem'>
                 <NativeSelect.Field
                   placeholder='All keywords'
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setKeyword(e.target.value)
-                  }
+                  onChange={handleKeywordChange}
                 >
                   {keywords.map((k) => (
                     <option key={k} value={k}>

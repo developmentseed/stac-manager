@@ -51,7 +51,7 @@ function CollectionDetail() {
   const { collectionId } = useParams();
   usePageTitle(`Collection ${collectionId}`);
 
-  const { collection, isLoading } = useCollection(collectionId!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+  const { collection, isLoading } = useCollection(collectionId!);
 
   const {
     results,
@@ -165,9 +165,7 @@ function CollectionDetail() {
               <Portal>
                 <Menu.Positioner>
                   <Menu.Content>
-                    <StacBrowserMenuItem
-                      resourcePath={`/collections/${id}`}
-                    />
+                    <StacBrowserMenuItem resourcePath={`/collections/${id}`} />
                     <DeleteMenuItem />
                   </Menu.Content>
                 </Menu.Positioner>
@@ -230,11 +228,7 @@ function CollectionDetail() {
                   </Heading>
                   <HStack gap={2}>
                     {keywords.map((keyword) => (
-                      <Tag.Root
-                        key={keyword}
-                        size='md'
-                        colorPalette='primary'
-                      >
+                      <Tag.Root key={keyword} size='md' colorPalette='primary'>
                         <Tag.Label>{keyword}</Tag.Label>
                       </Tag.Root>
                     ))}
@@ -333,7 +327,10 @@ function CollectionDetail() {
                           </Menu.Positioner>
                         </Portal>
                       </Menu.Root>
-                      <Popover.Root positioning={{ placement: 'top' }} lazyMount>
+                      <Popover.Root
+                        positioning={{ placement: 'top' }}
+                        lazyMount
+                      >
                         <Popover.Trigger asChild>
                           <IconButton
                             aria-label='Preview'
