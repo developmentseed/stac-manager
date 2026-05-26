@@ -31,7 +31,7 @@ function MainNavigation() {
 
   return (
     <Flex as='nav' aria-label='Main' gap={4} alignItems='center'>
-      <List.Root display='flex' gap={2} listStyle='none'>
+      <List.Root flexDirection='row' gap={2} listStyle='none'>
         <NavItem to='/collections/'>
           Browse
           <CollecticonFolder />

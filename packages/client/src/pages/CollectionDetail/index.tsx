@@ -79,12 +79,21 @@ function CollectionDetail() {
     [nextPage, previousPage]
   );
 
-  // Initialize the search with the current collection ID
+  // Initialize the search with the current collection ID.
+  //
+  // We depend on `collections` so this effect re-runs and re-applies the value
+  // if useStacSearch's internal state-reset (M() in stac-react v1, fires when
+  // its StacApi instance changes — e.g. token-driven rebuild during initial
+  // OIDC load) wipes it back to undefined. Without this, direct page loads
+  // that hit a token-load remount never restore `collections`, leaving the
+  // query disabled (v stays null) and no /search request goes out.
   useEffect(() => {
-    if (collectionId) setCollections([collectionId]);
-  }, [collectionId, setCollections]);
+    if (collectionId && collections?.[0] !== collectionId) {
+      setCollections([collectionId]);
+    }
+  }, [collectionId, collections, setCollections]);
 
-  // Automatically submit whenever the collection ID changes
+  // Automatically submit once collections is set (or re-set after a reset).
   useEffect(() => {
     if (!collections) return;
     submit();
