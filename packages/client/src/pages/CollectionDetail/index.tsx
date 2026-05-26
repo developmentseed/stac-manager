@@ -199,7 +199,7 @@ function CollectionDetail() {
                   <Heading size='sm' as='h3'>
                     Description
                   </Heading>
-                  <Text fontSize='md'>{description}</Text>
+                  <Text>{description}</Text>
                 </Flex>
               )}
 
@@ -208,7 +208,7 @@ function CollectionDetail() {
                   <Heading size='sm' as='h3'>
                     Temporal extent
                   </Heading>
-                  <Text fontSize='md'>{dateLabel}</Text>
+                  <Text>{dateLabel}</Text>
                 </Flex>
               )}
 
@@ -217,7 +217,7 @@ function CollectionDetail() {
                   <Heading size='sm' as='h3'>
                     License
                   </Heading>
-                  <Text fontSize='md'>{license}</Text>
+                  <Text>{license}</Text>
                 </Flex>
               )}
 

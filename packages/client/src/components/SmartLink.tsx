@@ -8,16 +8,18 @@ export interface SmartLinkProps extends LinkProps {
 
 export default React.forwardRef<HTMLAnchorElement, SmartLinkProps>(
   function SmartLink(props, ref) {
-    const { to, ...rest } = props;
+    const { to, children, ...rest } = props;
 
     const isExternal =
       to.match(/^(https?:)?\/\//) || to.match(/^(mailto|tel):/);
 
     return isExternal ? (
-      <ChLink ref={ref} href={to} {...rest} />
+      <ChLink ref={ref} href={to} {...rest}>
+        {children}
+      </ChLink>
     ) : (
       <ChLink ref={ref} {...rest} asChild>
-        <Link to={to} />
+        <Link to={to}>{children}</Link>
       </ChLink>
     );
   }

@@ -123,14 +123,14 @@ function ItemDetail() {
                 <Heading size='sm' as='h3'>
                   Collection
                 </Heading>
-                <Text fontSize='md'>{item.collection}</Text>
+                <Text>{item.collection}</Text>
               </Flex>
               {description && (
                 <Flex direction='column' gap='2'>
                   <Heading size='sm' as='h3'>
                     Description
                   </Heading>
-                  <Text fontSize='md'>{description} </Text>
+                  <Text>{description} </Text>
                 </Flex>
               )}
               {properties.datetime && (
@@ -138,7 +138,7 @@ function ItemDetail() {
                   <Heading size='sm' as='h3'>
                     Date
                   </Heading>
-                  <Text fontSize='md'>
+                  <Text>
                     {new Date(properties.datetime).toLocaleString(
                       'en-GB',
                       dateFormat
