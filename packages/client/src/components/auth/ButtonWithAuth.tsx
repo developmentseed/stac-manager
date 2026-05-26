@@ -1,18 +1,14 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { Button, ButtonProps } from '@chakra-ui/react';
 import SmartLink, { SmartLinkProps } from '../SmartLink';
 import { useAuth } from 'src/auth/Context';
 
-export const ButtonWithAuth = forwardRef<
-  HTMLButtonElement,
-  ButtonProps & SmartLinkProps
->((props, ref) => {
+export function ButtonWithAuth(props: ButtonProps & SmartLinkProps) {
   const { isEnabled, isAuthenticated } = useAuth();
 
   if (!isEnabled) {
-    return <Button ref={ref} as={SmartLink} {...props} />;
+    return <Button as={SmartLink} {...props} />;
   }
 
-  return isAuthenticated && <Button ref={ref} as={SmartLink} {...props} />;
-});
-ButtonWithAuth.displayName = 'ButtonWithAuth';
+  return isAuthenticated && <Button as={SmartLink} {...props} />;
+}

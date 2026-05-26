@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import {
   Box,
   Flex,
@@ -15,10 +15,9 @@ import {
   CollecticonPlusSmall
 } from '@devseed-ui/collecticons-chakra';
 
-export const Fieldset = forwardRef<HTMLDivElement, FlexProps>((props, ref) => {
+export function Fieldset(props: FlexProps) {
   return (
     <Flex
-      ref={ref}
       as='fieldset'
       flexDirection='column'
       gap={8}
@@ -28,82 +27,60 @@ export const Fieldset = forwardRef<HTMLDivElement, FlexProps>((props, ref) => {
       {...props}
     />
   );
-});
+}
 
-export const FieldsetHeader = forwardRef<HTMLDivElement, FlexProps>(
-  (props, ref) => {
-    return <Flex ref={ref} justifyContent='space-between' gap={4} {...props} />;
-  }
-);
+export function FieldsetHeader(props: FlexProps) {
+  return <Flex justifyContent='space-between' gap={4} {...props} />;
+}
 
-export const FieldsetBody = forwardRef<HTMLDivElement, FlexProps>(
-  (props, ref) => {
-    return <Flex ref={ref} flexDirection='column' gap={4} {...props} />;
-  }
-);
+export function FieldsetBody(props: FlexProps) {
+  return <Flex flexDirection='column' gap={4} {...props} />;
+}
 
-export const FieldsetFooter = forwardRef<HTMLDivElement, FlexProps>(
-  (props, ref) => {
-    return <Flex ref={ref} gap={4} {...props} />;
-  }
-);
+export function FieldsetFooter(props: FlexProps) {
+  return <Flex gap={4} {...props} />;
+}
 
-export const FieldLabel = forwardRef<HTMLHeadingElement, HeadingProps>(
-  (props, ref) => {
-    return (
-      <Heading
-        ref={ref}
-        as='span'
-        size='sm'
-        display='inline-flex'
-        alignItems='center'
-        gap={2}
-        {...props}
-        css={{
-          '& small': {
-            borderRadius: 'sm',
-            bg: 'base.400a',
-            color: 'surface.500',
-            px: '0.5rem',
-            fontSize: 'xs'
-          }
-        }}
-      />
-    );
-  }
-);
+export function FieldLabel(props: HeadingProps) {
+  return (
+    <Heading
+      as='span'
+      size='sm'
+      display='inline-flex'
+      alignItems='center'
+      gap={2}
+      {...props}
+      css={{
+        '& small': {
+          borderRadius: 'sm',
+          bg: 'base.400a',
+          color: 'surface.500',
+          px: '0.5rem',
+          fontSize: 'xs'
+        }
+      }}
+    />
+  );
+}
 
-export const FieldIconBtn = forwardRef<HTMLButtonElement, IconButtonProps>(
-  (props, ref) => {
-    return (
-      <IconButton
-        ref={ref}
-        colorPalette='base'
-        variant={'soft-outline' as 'outline'}
-        size='xs'
-        {...props}
-      />
-    );
-  }
-);
+export function FieldIconBtn(props: IconButtonProps) {
+  return (
+    <IconButton
+      colorPalette='base'
+      variant={'soft-outline' as 'outline'}
+      size='xs'
+      {...props}
+    />
+  );
+}
 
-export const FieldsetDeleteBtn = forwardRef<HTMLButtonElement, IconButtonProps>(
-  (props, ref) => {
-    return (
-      <FieldIconBtn ref={ref} size='sm' aria-label='Delete' {...props}>
-        <CollecticonTrashBin />
-      </FieldIconBtn>
-    );
-  }
-);
-
-Fieldset.displayName = 'Fieldset';
-FieldsetHeader.displayName = 'FieldsetHeader';
-FieldsetBody.displayName = 'FieldsetBody';
-FieldsetFooter.displayName = 'FieldsetFooter';
-FieldLabel.displayName = 'FieldLabel';
-FieldIconBtn.displayName = 'FieldIconBtn';
-FieldsetDeleteBtn.displayName = 'FieldsetDeleteBtn';
+export function FieldsetDeleteBtn(props: IconButtonProps) {
+  return (
+    <FieldIconBtn size='sm' aria-label='Delete' {...props}>
+      <CollecticonTrashBin />
+    </FieldIconBtn>
+  );
+}
 
 interface ArrayFieldsetProps {
   label?: React.ReactNode;

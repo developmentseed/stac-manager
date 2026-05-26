@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Flex, Heading, Text, FlexProps } from '@chakra-ui/react';
 
 interface InnerPageHeaderProps extends FlexProps {
@@ -7,44 +7,44 @@ interface InnerPageHeaderProps extends FlexProps {
   actions?: React.ReactNode;
 }
 
-export const InnerPageHeader = forwardRef<HTMLDivElement, InnerPageHeaderProps>(
-  ({ title, overline, actions, ...rest }, ref) => {
-    return (
-      <Flex
-        ref={ref}
-        bg='base.50'
-        borderRadius='md'
-        p={8}
-        direction='column'
-        gap={2}
-        {...rest}
-      >
-        {overline && (
-          <Text as='p' color='base.400'>
-            {overline}
-          </Text>
-        )}
-        <Flex gap={4} justifyContent='space-between' alignItems='center'>
-          <Heading size='lg' lineClamp={1} as='h1'>
-            {title}
-          </Heading>
-          {actions && <Flex gap={2}>{actions}</Flex>}
-        </Flex>
+export function InnerPageHeader({
+  title,
+  overline,
+  actions,
+  ref,
+  ...rest
+}: InnerPageHeaderProps & { ref?: React.Ref<HTMLDivElement> }) {
+  return (
+    <Flex
+      ref={ref}
+      bg='base.50'
+      borderRadius='md'
+      p={8}
+      direction='column'
+      gap={2}
+      {...rest}
+    >
+      {overline && (
+        <Text as='p' color='base.400'>
+          {overline}
+        </Text>
+      )}
+      <Flex gap={4} justifyContent='space-between' alignItems='center'>
+        <Heading size='lg' lineClamp={1} as='h1'>
+          {title}
+        </Heading>
+        {actions && <Flex gap={2}>{actions}</Flex>}
       </Flex>
-    );
-  }
-);
+    </Flex>
+  );
+}
 
-export const InnerPageHeaderSticky = forwardRef<
-  HTMLDivElement,
-  InnerPageHeaderProps
->((props, ref) => {
+export function InnerPageHeaderSticky(props: InnerPageHeaderProps) {
   const [isAtTop, setIsAtTop] = useState(false);
-
-  const localRef = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const el = localRef.current;
+    const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -60,18 +60,9 @@ export const InnerPageHeaderSticky = forwardRef<
     };
   }, []);
 
-  const headerRef: React.RefCallback<HTMLDivElement> = (v) => {
-    localRef.current = v;
-    if (typeof ref === 'function') {
-      ref(v);
-    } else if (ref != null) {
-      (ref as React.MutableRefObject<any>).current = v;
-    }
-  };
-
   return (
     <InnerPageHeader
-      ref={headerRef}
+      ref={ref}
       position='sticky'
       top='-1px'
       boxShadow={isAtTop ? 'md' : 'none'}
@@ -79,7 +70,4 @@ export const InnerPageHeaderSticky = forwardRef<
       {...props}
     />
   );
-});
-
-InnerPageHeader.displayName = 'InnerPageHeader';
-InnerPageHeaderSticky.displayName = 'InnerPageHeaderSticky';
+}
