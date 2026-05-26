@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Map, { Source, Layer, MapRef } from 'react-map-gl/maplibre';
-import { StacAsset } from 'stac-ts';
+import { StacItem } from 'stac-ts';
 import getBbox from '@turf/bbox';
 
 import { BackgroundTiles } from '$components/Map';
@@ -21,7 +21,7 @@ const cogMediaTypes = [
 ];
 
 export function ItemMap(
-  props: { item: any } & React.ComponentProps<typeof Map>
+  props: { item: StacItem } & React.ComponentProps<typeof Map>
 ) {
   const { item, ...rest } = props;
 
@@ -30,7 +30,7 @@ export function ItemMap(
 
   // Fit the map view around the current results bbox
   useEffect(() => {
-    const bounds = item && getBbox(item);
+    const bounds = item && getBbox(item as GeoJSON.Feature);
 
     if (map && bounds) {
       const [x1, y1, x2, y2] = bounds;
@@ -42,7 +42,7 @@ export function ItemMap(
     if (!item) return;
 
     return Object.values(item.assets).reduce((preview, asset) => {
-      const { type, href, roles } = asset as StacAsset;
+      const { type, href, roles } = asset;
       if (cogMediaTypes.includes(type || '')) {
         if (!preview) {
           return href;
@@ -53,7 +53,7 @@ export function ItemMap(
         }
       }
       return preview;
-    }, undefined);
+    }, {});
   }, [item]);
 
   return (
