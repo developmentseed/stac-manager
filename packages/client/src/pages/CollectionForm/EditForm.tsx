@@ -102,6 +102,7 @@ export function EditForm(props: {
                     <Button
                       aria-label='Edit Form'
                       onClick={() => {
+                        if (view === 'fields') return;
                         setView('fields');
                         setStacData(values.jsonData);
                       }}
@@ -113,6 +114,7 @@ export function EditForm(props: {
                     <Button
                       aria-label='Edit JSON'
                       onClick={() => {
+                        if (view === 'json') return;
                         setView('json');
                         setStacData(toOutData(values));
                       }}
