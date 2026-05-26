@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Button } from '@chakra-ui/react';
+import { Avatar, Button, Flex } from '@chakra-ui/react';
 import {
   CollecticonLogin,
   CollecticonLogout
@@ -54,33 +54,31 @@ export function UserInfo() {
     `${profile.firstName} ${profile.lastName}`.trim() || profile.username;
 
   return (
-    <Button
-      variant='outline'
-      pl='2px'
-      onClick={() => {
-        if (!isLoading) {
-          logout({
-            redirectUri: window.location.href
-          });
-        }
-      }}
-    >
+    <Flex alignItems='center' gap={2} aria-label={username}>
       <Avatar.Root
-        asChild
         size='sm'
         bg='secondary.500'
         color='white'
         borderRadius='4px'
       >
-        <span>
-          <Avatar.Image
-            src={`https://www.gravatar.com/avatar/${userEmailHash}?d=404`}
-          />
-          <Avatar.Fallback name={username} />
-        </span>
+        <Avatar.Image
+          src={`https://www.gravatar.com/avatar/${userEmailHash}?d=404`}
+        />
+        <Avatar.Fallback name={username} />
       </Avatar.Root>
-      Logout
-      <CollecticonLogout />
-    </Button>
+      <Button
+        variant='outline'
+        onClick={() => {
+          if (!isLoading) {
+            logout({
+              redirectUri: window.location.href
+            });
+          }
+        }}
+      >
+        Logout
+        <CollecticonLogout />
+      </Button>
+    </Flex>
   );
 }
