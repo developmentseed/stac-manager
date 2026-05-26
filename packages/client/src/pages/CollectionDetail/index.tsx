@@ -59,7 +59,8 @@ function CollectionDetail() {
     setCollections,
     submit,
     nextPage,
-    previousPage
+    previousPage,
+    limit
   } = useStacSearch();
 
   // The stac search pagination is token based and has no pages, but we can fake
@@ -148,6 +149,10 @@ function CollectionDetail() {
   const numberMatched = (results as { numberMatched?: number } | undefined)
     ?.numberMatched;
   const pageItemsCount = results?.features?.length ?? 0;
+  const totalPages =
+    numberMatched !== undefined && limit > 0
+      ? Math.ceil(numberMatched / limit)
+      : undefined;
   const shouldPaginate =
     (results?.links?.length ?? 0) > 1 && (!!nextPage || !!previousPage);
 
@@ -279,7 +284,9 @@ function CollectionDetail() {
             </Heading>
             {pageItemsCount > 0 && (
               <Text fontSize='sm' color='base.400'>
-                Showing page {page}
+                {totalPages
+                  ? `Showing page ${page} of ${totalPages}`
+                  : `Showing page ${page}`}
               </Text>
             )}
           </Box>
