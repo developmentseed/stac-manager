@@ -68,7 +68,7 @@ export function WidgetInput(props: WidgetInputProps) {
             bg='surface.500'
             borderColor='base.200'
             borderRadius='md'
-            value={value === null ? '' : value}
+            value={value ?? ''}
             onBlur={onBlur}
             onChange={(e) => {
               setFieldValue(pointer, transformValue(e.target.value));
