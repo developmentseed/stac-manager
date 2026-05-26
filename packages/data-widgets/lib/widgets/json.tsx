@@ -1,6 +1,6 @@
-import React, { Suspense, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { SchemaFieldJson, WidgetProps } from '@stac-manager/data-core';
-import { Field, Flex, ProgressCircle } from '@chakra-ui/react';
+import { Field, Flex } from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import {
   CollecticonArrowSemiSpinCcw,
@@ -12,8 +12,7 @@ import type JSONEditor from 'jsoneditor';
 
 import { FieldIconBtn, FieldLabel } from '../components/elements';
 import { CollecticonIndent } from '../components/icons/indent';
-
-const JsonEditor = React.lazy(() => import('../components/json-jsoneditor'));
+import JsonEditor from '../components/json-jsoneditor';
 
 // Extend to have access to internal methods provided by the textmode.
 interface JSONEditorCodeMode extends JSONEditor {
@@ -40,33 +39,17 @@ export function WidgetJSON(props: WidgetProps) {
         {isLoaded && <ControlBar editor={editorRef.current!} />}
       </Flex>
 
-      <Suspense fallback={<Loading />}>
-        <FastField name={props.pointer}>
-          {({ field: { value }, form: { setFieldValue } }: FastFieldProps) => (
-            <JsonEditor
-              value={value}
-              onChange={(v) => setFieldValue(props.pointer, v)}
-              editorRef={editorRef}
-              onLoad={() => setIsLoaded(true)}
-            />
-          )}
-        </FastField>
-      </Suspense>
+      <FastField name={props.pointer}>
+        {({ field: { value }, form: { setFieldValue } }: FastFieldProps) => (
+          <JsonEditor
+            value={value}
+            onChange={(v) => setFieldValue(props.pointer, v)}
+            editorRef={editorRef}
+            onLoad={() => setIsLoaded(true)}
+          />
+        )}
+      </FastField>
     </Field.Root>
-  );
-}
-
-function Loading() {
-  return (
-    <Flex alignItems='center' gap={2} justifyContent='center'>
-      <ProgressCircle.Root value={null} colorPalette='primary' size='sm'>
-        <ProgressCircle.Circle>
-          <ProgressCircle.Track />
-          <ProgressCircle.Range />
-        </ProgressCircle.Circle>
-      </ProgressCircle.Root>{' '}
-      Loading json editor...
-    </Flex>
   );
 }
 
