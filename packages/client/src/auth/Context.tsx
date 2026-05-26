@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useMemo } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo
+} from 'react';
 import {
   AuthProvider as OidcAuthProvider,
   useAuth as useOidcAuth
@@ -29,7 +35,8 @@ export type AuthContextValue = {
   /**
    * Force a silent refresh and return the new access token. Used by the API
    * layer to self-heal a 401 caused by a stale token. Resolves to undefined
-   * if auth is disabled, the user isn't signed in, or the refresh fails.
+   * if auth is disabled, the user isn't signed in, or the refresh fails;
+   * a failed refresh also clears the local session.
    */
   refreshAuth: () => Promise<string | undefined>;
 };
@@ -56,6 +63,32 @@ const config: { authority: string; clientId: string } | undefined =
 function EnabledAuthBridge(props: { children: React.ReactNode }) {
   const oidc = useOidcAuth();
 
+  // Single failure policy for any refresh path: log and drop local user
+  // state so the app re-renders as logged-out. We use removeUser (not
+  // signoutRedirect) so this still works when the IdP is the thing that's
+  // unreachable.
+  const handleRefreshFailure = useCallback(
+    (err: unknown) => {
+      // eslint-disable-next-line no-console
+      console.warn('Silent token refresh failed:', err);
+      oidc.removeUser();
+    },
+    [oidc]
+  );
+
+  // Shared wrapper around signinSilent that funnels every failure through
+  // handleRefreshFailure. Used by both the visibility-change top-up and the
+  // API-layer's 401 self-heal.
+  const silentRefresh = useCallback(async (): Promise<string | undefined> => {
+    try {
+      const user = await oidc.signinSilent();
+      return user?.access_token;
+    } catch (err) {
+      handleRefreshFailure(err);
+      return undefined;
+    }
+  }, [oidc, handleRefreshFailure]);
+
   // Top up the access token whenever the tab comes back from hibernation.
   // automaticSilentRenew uses setTimeout, which browsers can throttle or
   // skip entirely while the tab is hidden — so a token that "should" have
@@ -69,18 +102,41 @@ function EnabledAuthBridge(props: { children: React.ReactNode }) {
       if (!expiresAt) return;
       const now = Math.floor(Date.now() / 1000);
       if (expiresAt - now > REFRESH_THRESHOLD_SECONDS) return;
-      // Token is expired or expiring soon — refresh now.
-      oidc.signinSilent().catch((err) => {
-        // eslint-disable-next-line no-console
-        console.warn('Silent token refresh on visibility change failed:', err);
-      });
+      silentRefresh();
     };
 
     document.addEventListener('visibilitychange', maybeRefresh);
     return () => {
       document.removeEventListener('visibilitychange', maybeRefresh);
     };
-  }, [oidc]);
+  }, [oidc, silentRefresh]);
+
+  // Background automaticSilentRenew failures don't surface as a thrown error
+  // here — oidc-client-ts emits them via UserManagerEvents, so we hook the
+  // same failure policy onto that event.
+  useEffect(() => {
+    oidc.events.addSilentRenewError(handleRefreshFailure);
+    return () => {
+      oidc.events.removeSilentRenewError(handleRefreshFailure);
+    };
+  }, [oidc, handleRefreshFailure]);
+
+  // Backstop for the case where automaticSilentRenew never even attempts a
+  // refresh (scheduling glitch, no refresh_token, throttled background tab).
+  // Without this, the token can sit in oidc.user past its expiry and every
+  // request through stac-react — which has no 401-retry — fails with 401.
+  // On success the new token propagates via context; on failure
+  // handleRefreshFailure clears the user so the bridge stops attaching the
+  // dead bearer.
+  useEffect(() => {
+    const onExpired = () => {
+      silentRefresh();
+    };
+    oidc.events.addAccessTokenExpired(onExpired);
+    return () => {
+      oidc.events.removeAccessTokenExpired(onExpired);
+    };
+  }, [oidc, silentRefresh]);
 
   const value = useMemo<AuthContextValue>(() => {
     const p = oidc.user?.profile;
@@ -108,18 +164,9 @@ function EnabledAuthBridge(props: { children: React.ReactNode }) {
         oidc.signoutRedirect({
           post_logout_redirect_uri: opts?.redirectUri ?? window.location.href
         }),
-      refreshAuth: async () => {
-        try {
-          const user = await oidc.signinSilent();
-          return user?.access_token;
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.warn('Silent token refresh failed:', err);
-          return undefined;
-        }
-      }
+      refreshAuth: silentRefresh
     };
-  }, [oidc]);
+  }, [oidc, silentRefresh]);
 
   return (
     <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>
