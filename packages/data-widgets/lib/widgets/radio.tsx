@@ -13,7 +13,7 @@ export function WidgetRadio(props: WidgetProps) {
 
   if (field.allowOther) {
     throw new Error(
-      "WidgetCheckbox: allowOther is not supported. Use widget 'tagger' instead"
+      "WidgetRadio: allowOther is not supported. Use widget 'tagger' instead"
     );
   }
 

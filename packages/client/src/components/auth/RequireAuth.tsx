@@ -31,7 +31,7 @@ export function RequireAuth(
         <Button
           alignSelf='flex-start'
           variant='solid'
-          colorScheme='primary'
+          colorPalette='primary'
           onClick={() => auth.login({ redirectUri: window.location.href })}
         >
           Login
