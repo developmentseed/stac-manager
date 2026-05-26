@@ -26,6 +26,7 @@ import ItemDetail from '$pages/ItemDetail';
 import NotFound from '$pages/NotFound';
 import CollectionDetail from '$pages/CollectionDetail';
 import Sandbox from '$pages/Sandbox';
+import TestJsonEditor from '$pages/TestJsonEditor';
 
 import { useAuth } from './auth/Context';
 import SmartLink from '$components/SmartLink';
@@ -138,6 +139,7 @@ export function App() {
                 element={<ItemDetail />}
               />
               <Route path='/sandbox' element={<Sandbox />} />
+              <Route path='/test-jsoneditor' element={<TestJsonEditor />} />
               <Route path='*' element={<NotFound />} />
             </Routes>
           </Box>

@@ -79,6 +79,7 @@ export default function JsonEditor(props: {
   return (
     <Box
       ref={element}
+      w='100%'
       h='20rem'
       css={{
         '& .jsoneditor': {
