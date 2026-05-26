@@ -5,8 +5,16 @@ export class PluginCore extends Plugin {
   name = 'CollectionsCore';
 
   isNew: boolean = false;
+  private hasInitialized: boolean = false;
 
   async init(data: any) {
+    // `init` is invoked every time the form's data changes (e.g. when toggling
+    // between the form and JSON views), so we can't unconditionally derive
+    // `isNew` from the current data — once the user has typed an id, the data
+    // will have one even on a "new" collection, which would otherwise hide the
+    // id field on the next render. Lock it in on the first call.
+    if (this.hasInitialized) return;
+    this.hasInitialized = true;
     this.isNew = !data?.id;
   }
 
