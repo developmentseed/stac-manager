@@ -37,9 +37,12 @@ if (publicUrl) {
 // the app can still mount and read from ApiContext; stac-react hooks defer
 // their requests until the provider appears.
 function StacApiAuthBridge({ children }: { children: React.ReactNode }) {
-  const { token, isLoading } = useAuth();
+  const { token, isLoading, refreshAuth } = useAuth();
 
-  const api = useMemo(() => new Api(token), [token]);
+  const api = useMemo(
+    () => new Api(token, undefined, refreshAuth),
+    [token, refreshAuth]
+  );
   const options = useMemo(
     () =>
       token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
