@@ -225,7 +225,9 @@ describe('usePaginate', () => {
   it('should throw an error when currentPage is out of bounds', () => {
     expect.assertions(1);
     try {
-      usePaginate({ numPages: 10, currentPage: 11, onPageChange: jest.fn() });
+      renderHook(() =>
+        usePaginate({ numPages: 10, currentPage: 11, onPageChange: jest.fn() })
+      );
     } catch (error) {
       expect((error as Error).message).toEqual(
         'current page is out of bounds. [1, numPages]'
@@ -236,12 +238,14 @@ describe('usePaginate', () => {
   it('should throw an error when page range is less than 1', () => {
     expect.assertions(1);
     try {
-      usePaginate({
-        numPages: 10,
-        currentPage: 1,
-        onPageChange: jest.fn(),
-        pageRange: 0
-      });
+      renderHook(() =>
+        usePaginate({
+          numPages: 10,
+          currentPage: 1,
+          onPageChange: jest.fn(),
+          pageRange: 0
+        })
+      );
     } catch (error) {
       expect((error as Error).message).toEqual('pageRange must be at least 1');
     }
@@ -250,12 +254,14 @@ describe('usePaginate', () => {
   it('should throw an error when marginRange is negative', () => {
     expect.assertions(1);
     try {
-      usePaginate({
-        numPages: 10,
-        currentPage: 1,
-        onPageChange: jest.fn(),
-        marginsRange: -1
-      });
+      renderHook(() =>
+        usePaginate({
+          numPages: 10,
+          currentPage: 1,
+          onPageChange: jest.fn(),
+          marginsRange: -1
+        })
+      );
     } catch (error) {
       expect((error as Error).message).toEqual(
         'marginsRange cannot be negative'

@@ -18,8 +18,7 @@ interface Option {
 }
 
 export function WidgetSelect(props: WidgetProps) {
-  const { pointer, isRequired, field } = props;
-
+  const { field } = props;
   const isMulti = field.type === 'array';
 
   if (
@@ -39,6 +38,14 @@ export function WidgetSelect(props: WidgetProps) {
       "WidgetSelect: allowOther is not supported. Use widget 'tagger' instead"
     );
   }
+
+  return <WidgetSelectInner {...props} />;
+}
+
+function WidgetSelectInner(props: WidgetProps) {
+  const { pointer, isRequired, field } = props;
+
+  const isMulti = field.type === 'array';
 
   const key = useRenderKey([pointer, isRequired, isMulti, field]);
 

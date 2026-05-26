@@ -20,6 +20,34 @@ export function usePaginate({
   const pageRangeHalf = Math.floor(pageRange / 2);
   const marginsRangeAndEllipsis = marginsRange ? marginsRange + 2 : 0;
 
+  const hasNext = currentPage < numPages;
+  const hasPrevious = currentPage > 1;
+
+  const goNext = useCallback(() => {
+    if (hasNext) {
+      onPageChange((v) => v + 1);
+    }
+  }, [hasNext, onPageChange]);
+  const goPrevious = useCallback(() => {
+    if (hasPrevious) {
+      onPageChange((v) => v - 1);
+    }
+  }, [hasPrevious, onPageChange]);
+  const goFirst = useCallback(() => {
+    onPageChange(1);
+  }, [onPageChange]);
+  const goLast = useCallback(() => {
+    onPageChange(numPages);
+  }, [numPages, onPageChange]);
+  const goToPage = useCallback(
+    (page: number) => {
+      if (page > 0 && page <= numPages) {
+        onPageChange(page);
+      }
+    },
+    [numPages, onPageChange]
+  );
+
   if (pageRange < 1) {
     throw new Error('pageRange must be at least 1');
   }
@@ -71,39 +99,17 @@ export function usePaginate({
     }
   }
 
-  const hasNext = currentPage < numPages;
-  const hasPrevious = currentPage > 1;
-
   return {
     pages,
     left,
     right,
     hasLeftBreak: !!left.length,
     hasRightBreak: !!right.length,
-    goNext: useCallback(() => {
-      if (hasNext) {
-        onPageChange((v) => v + 1);
-      }
-    }, [hasNext, onPageChange]),
-    goPrevious: useCallback(() => {
-      if (hasPrevious) {
-        onPageChange((v) => v - 1);
-      }
-    }, [hasPrevious, onPageChange]),
-    goFirst: useCallback(() => {
-      onPageChange(1);
-    }, [onPageChange]),
-    goLast: useCallback(() => {
-      onPageChange(numPages);
-    }, [numPages, onPageChange]),
-    goToPage: useCallback(
-      (page: number) => {
-        if (page > 0 && page <= numPages) {
-          onPageChange(page);
-        }
-      },
-      [numPages, onPageChange]
-    ),
+    goNext,
+    goPrevious,
+    goFirst,
+    goLast,
+    goToPage,
     hasNext,
     hasPrevious
   };
