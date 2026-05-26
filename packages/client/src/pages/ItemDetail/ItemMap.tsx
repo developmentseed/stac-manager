@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import Map, { Source, Layer, MapRef } from 'react-map-gl/maplibre';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import Map, { Source, Layer, MapRef, ErrorEvent } from 'react-map-gl/maplibre';
 import { StacItem } from 'stac-ts';
 import getBbox from '@turf/bbox';
 
@@ -46,8 +46,34 @@ export function ItemMap(
     return (cogs.find((a) => a.roles?.includes('visual')) ?? cogs[0])?.href;
   }, [item]);
 
+  // STAC bbox can be 4 (2D) or 6 (3D: minx,miny,minz,maxx,maxy,maxz) values;
+  // maplibre's Source.bounds wants the 2D corners only. Constraining tile
+  // requests to the item extent stops rdnt.io from being asked for tiles
+  // outside the COG, which return 204 and surface as a maplibre decode error.
+  const previewBounds = useMemo<
+    [number, number, number, number] | undefined
+  >(() => {
+    const bbox = item?.bbox;
+    if (!bbox) return undefined;
+    if (bbox.length === 4) return [bbox[0], bbox[1], bbox[2], bbox[3]];
+    if (bbox.length === 6) return [bbox[0], bbox[1], bbox[3], bbox[4]];
+    return undefined;
+  }, [item]);
+
+  // rdnt.io returns 204 for COG tiles outside the imagery extent (even within
+  // the declared bbox, since COGs can be irregularly shaped). maplibre then
+  // logs a generic "could not be decoded" console.error per empty tile, which
+  // Parcel's dev overlay surfaces as a runtime error. Swallow those — they're
+  // benign for sparse-coverage previews — while letting real map errors
+  // through.
+  const handleMapError = useCallback((e: ErrorEvent) => {
+    if (e.error?.message?.includes('could not be decoded')) return;
+    // eslint-disable-next-line no-console
+    console.error(e.error);
+  }, []);
+
   return (
-    <Map ref={setMapRef} {...rest}>
+    <Map ref={setMapRef} {...rest} onError={handleMapError}>
       <BackgroundTiles />
       {previewAsset && (
         <Source
@@ -57,6 +83,7 @@ export function ItemMap(
             `http://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=${previewAsset}`
           ]}
           tileSize={256}
+          bounds={previewBounds}
           attribution="Background tiles: © <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap contributors</a>"
         >
           <Layer id='preview-tiles' type='raster' />

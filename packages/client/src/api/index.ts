@@ -77,6 +77,10 @@ class Api {
     }
 
     if (response.ok) {
+      // 204 No Content has no body; calling .json() on it would throw a
+      // parse error. Return undefined for empty-body responses so callers
+      // that issue PUT/DELETE against STAC APIs don't have to unwrap.
+      if (response.status === 204) return undefined;
       return response.json();
     }
 
