@@ -60,6 +60,13 @@ export function Toaster() {
 
         return (
           <Toast.Root>
+            {/*
+             * v3 no longer auto-renders an icon for `type: 'loading' |
+             * 'success' | 'error' | 'warning' | 'info'`. <Toast.Indicator />
+             * picks the correct indicator off the toast type, so include it
+             * before the text content.
+             */}
+            <Toast.Indicator />
             {toast.title && <Toast.Title>{toast.title}</Toast.Title>}
             {toast.description && (
               <Toast.Description>{toast.description}</Toast.Description>

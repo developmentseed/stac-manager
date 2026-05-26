@@ -5,6 +5,11 @@ import {
   defineRecipe,
   defineSlotRecipe
 } from '@chakra-ui/react';
+import {
+  fieldAnatomy,
+  menuAnatomy,
+  selectAnatomy
+} from '@chakra-ui/react/anatomy';
 import { adjustHue, setLightness, setSaturation } from 'polished';
 
 import { createColorPalette } from './color-palette';
@@ -51,6 +56,42 @@ const config = defineConfig({
     }
   },
   theme: {
+    semanticTokens: {
+      colors: Object.fromEntries(
+        Object.keys(palettes).map((name) => {
+          // Neutral palettes follow Chakra's gray pattern (border/solid use
+          // lighter/darker shades than the chromatic palettes). Our `base`,
+          // `gray`, and `surface` are neutrals; the rest are chromatic.
+          const isNeutral =
+            name === 'gray' || name === 'base' || name === 'surface';
+          return [
+            name,
+            {
+              contrast: { value: 'white' },
+              fg: { value: `{colors.${name}.800}` },
+              subtle: { value: `{colors.${name}.100}` },
+              muted: { value: `{colors.${name}.200}` },
+              emphasized: { value: `{colors.${name}.300}` },
+              solid: {
+                value: isNeutral
+                  ? `{colors.${name}.900}`
+                  : `{colors.${name}.500}`
+              },
+              focusRing: {
+                value: isNeutral
+                  ? `{colors.${name}.400}`
+                  : `{colors.${name}.500}`
+              },
+              border: {
+                value: isNeutral
+                  ? `{colors.${name}.200}`
+                  : `{colors.${name}.500}`
+              }
+            }
+          ];
+        })
+      )
+    },
     tokens: {
       colors: palettes,
       fonts: {
@@ -82,6 +123,21 @@ const config = defineConfig({
       heading: defineRecipe({
         base: {
           fontWeight: '700'
+        },
+        // v2's Heading sizes were shifted vs v3's 1:1 mapping
+        // (v2 size='sm' → fontSize='md', etc.). Re-map to preserve
+        // visual hierarchy without touching call sites.
+        variants: {
+          size: {
+            xs: { fontSize: 'sm' },
+            sm: { fontSize: 'md' },
+            md: { fontSize: 'lg' },
+            lg: { fontSize: 'xl' },
+            xl: { fontSize: '2xl' },
+            '2xl': { fontSize: '3xl' },
+            '3xl': { fontSize: '4xl' },
+            '4xl': { fontSize: '5xl' }
+          }
         }
       }),
       link: defineRecipe({
@@ -106,22 +162,33 @@ const config = defineConfig({
             lg: { fontSize: 'sm' }
           },
           variant: {
+            // Use individual border-* properties (not the `border` shorthand)
+            // so we override width only and Chakra v3's default
+            // `borderColor: colorPalette.border` (mapped to colorPalette.500 in
+            // our semantic tokens) is preserved.
             outline: {
-              border: '2px solid',
-              '.chakra-button__group[data-attached][data-orientation=horizontal] > &:not(:last-of-type)':
+              borderWidth: '2px',
+              borderStyle: 'solid',
+              // v3's ButtonGroup is implemented via <Group>, which exposes
+              // `data-attached` + `data-orientation` on the parent (no more
+              // `.chakra-button__group` class). Group's own attached rules use
+              // `marginEnd: -1px` for 1px borders; override with -2px so our
+              // 2px-bordered outline buttons overlap cleanly.
+              '[data-attached][data-orientation=horizontal] > &:not(:last-of-type)':
                 { marginEnd: '-2px' },
-              '.chakra-button__group[data-attached][data-orientation=vertical] > &:not(:last-of-type)':
+              '[data-attached][data-orientation=vertical] > &:not(:last-of-type)':
                 { marginBottom: '-2px' }
             },
             // v3 doesn't support function variants. Use `colorPalette.*` token
             // references so `colorPalette={...}` (the v3 replacement for
             // colorScheme) drives the palette lookup.
             'soft-outline': {
-              border: '2px solid',
+              borderWidth: '2px',
+              borderStyle: 'solid',
               borderColor: 'colorPalette.200',
-              '.chakra-button__group[data-attached][data-orientation=horizontal] > &:not(:last-of-type)':
+              '[data-attached][data-orientation=horizontal] > &:not(:last-of-type)':
                 { marginEnd: '-2px' },
-              '.chakra-button__group[data-attached][data-orientation=vertical] > &:not(:last-of-type)':
+              '[data-attached][data-orientation=vertical] > &:not(:last-of-type)':
                 { marginBottom: '-2px' },
               _hover: {
                 bg: 'colorPalette.50a'
@@ -136,16 +203,22 @@ const config = defineConfig({
       input: defineRecipe({
         variants: {
           variant: {
+            // Use individual border-* properties so Chakra v3's default
+            // `borderColor: 'border'` (resolves to our gray.200) is preserved.
             outline: {
-              border: '2px solid'
+              borderWidth: '2px',
+              borderStyle: 'solid'
             }
           }
         }
       })
     },
     slotRecipes: {
+      // Declare the full v3 anatomy slot list. Omitting slots silently strips
+      // styling from the default recipe for any slot not listed (same trap
+      // we hit with `card`); always pass the complete anatomy keys.
       menu: defineSlotRecipe({
-        slots: ['item'],
+        slots: menuAnatomy.keys(),
         base: {
           item: {
             _hover: { textDecoration: 'none !important' }
@@ -153,8 +226,20 @@ const config = defineConfig({
         }
       }),
       card: defineSlotRecipe({
-        slots: ['root'],
+        slots: ['root', 'header', 'body', 'footer', 'title', 'description'],
+        // v2 used 20px (spacing.5) padding; v3 defaults to 24px (spacing.6).
+        // v2's header/footer also had uniform padding on all sides — v3
+        // omits paddingBottom on header / paddingTop on footer assuming a
+        // body fills the gap. Restore symmetric padding so ItemCards
+        // without a body slot still look correct.
+        base: {
+          header: { paddingBottom: 'var(--card-padding)' },
+          footer: { paddingTop: 'var(--card-padding)' }
+        },
         variants: {
+          size: {
+            md: { root: { '--card-padding': 'spacing.5' } }
+          },
           variant: {
             filled: {
               root: {
@@ -165,12 +250,13 @@ const config = defineConfig({
         }
       }),
       select: defineSlotRecipe({
-        slots: ['trigger'],
+        slots: selectAnatomy.keys(),
         variants: {
           variant: {
             outline: {
               trigger: {
-                border: '2px solid'
+                borderWidth: '2px',
+                borderStyle: 'solid'
               }
             }
           }
@@ -179,7 +265,7 @@ const config = defineConfig({
       // v3 has no standalone FormLabel — labels live inside the `field` slot
       // recipe as the `label` slot.
       field: defineSlotRecipe({
-        slots: ['label'],
+        slots: fieldAnatomy.keys(),
         base: {
           label: {
             fontSize: 'sm'
