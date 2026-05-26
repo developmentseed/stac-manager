@@ -283,17 +283,6 @@ function CollectionDetail() {
               </Text>
             )}
           </Box>
-          {/* <Flex direction='row' gap='4'>
-            <Button
-              as={SmartLink}
-              to='/item/new'
-              colorScheme='primary'
-              size='md'
-              leftIcon={<CollecticonPlusSmall />}
-            >
-              Add new
-            </Button>
-          </Flex> */}
         </Flex>
         <SimpleGrid
           gap={8}

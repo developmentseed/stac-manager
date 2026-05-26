@@ -4,12 +4,7 @@ import { Box, Text } from '@chakra-ui/react';
 import { usePluginConfig } from '../context/plugin-config';
 import { ErrorBox } from './error-box';
 import { SchemaField } from '../schema/types';
-
-interface WidgetProps {
-  pointer: string;
-  field: SchemaField;
-  isRequired?: boolean;
-}
+import { WidgetProps } from './types';
 
 /**
  * Renders the widget for a field.

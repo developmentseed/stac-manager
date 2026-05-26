@@ -61,15 +61,6 @@ function ItemDetail() {
         title={title || item.id}
         actions={
           <>
-            {/* <Button
-              as={SmartLink}
-              to={`/collections/${properties.collection}/items/${properties.id}/edit`}
-              colorScheme='primary'
-              size='sm'
-              leftIcon={<CollecticonPencil />}
-            >
-              Edit
-            </Button> */}
             <Menu.Root positioning={{ placement: 'bottom-end' }}>
               <Menu.Trigger asChild>
                 <IconButton aria-label='Options' variant='outline' size='md'>

@@ -166,8 +166,9 @@ export function NotificationBox(props: NotificationBoxProps) {
     >
       <Flex
         p={4}
-        borderBottom='1px solid'
-        borderColor='base.100'
+        borderBottomWidth='1px'
+        borderBottomStyle='solid'
+        borderBottomColor='base.100'
         boxShadow='0 1px 0 0 rgba(0, 0, 0, 0.08)'
         position='relative'
         alignItems='center'

@@ -33,16 +33,6 @@ import { useCollections } from './useCollections';
 function CollectionList() {
   usePageTitle('Collections');
 
-  // const [urlParams, setUrlParams] = useSearchParams({ page: '1' });
-  // const page = parseInt(urlParams.get('page') || '1', 10);
-  // const setPage = useCallback(
-  //   (v: number | ((v: number) => number)) => {
-  //     const newVal = typeof v === 'function' ? v(page) : v;
-  //     setUrlParams({ page: newVal.toString() });
-  //   },
-  //   [page]
-  // );
-
   const { collections, state } = useCollections({
     limit: 1000
   });
@@ -85,9 +75,6 @@ function CollectionList() {
   }, [collections, searchTerm, keyword]);
 
   const collectionsCount = collections?.numberMatched || 0;
-  // const collectionsReturned = collections?.numberReturned || 0;
-  // const numPages = Math.ceil(collectionsCount / pageSize);
-  // const shouldPaginate = collectionsCount > collectionsReturned;
 
   return (
     <Flex direction='column' gap={8}>
@@ -204,15 +191,6 @@ function CollectionList() {
             ))
           )}
         </SimpleGrid>
-        {/* {shouldPaginate && (
-          <Flex direction='column' alignItems='center'>
-            <Pagination
-              numPages={numPages}
-              page={page}
-              onPageChange={setPage}
-            />
-          </Flex>
-        )} */}
       </Flex>
     </Flex>
   );
