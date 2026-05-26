@@ -39,21 +39,11 @@ export function ItemMap(
   }, [item, map]);
 
   const previewAsset = useMemo(() => {
-    if (!item) return;
-
-    return Object.values(item.assets).reduce((preview, asset) => {
-      const { type, href, roles } = asset;
-      if (cogMediaTypes.includes(type || '')) {
-        if (!preview) {
-          return href;
-        } else {
-          if (roles && roles.includes('visual')) {
-            return href;
-          }
-        }
-      }
-      return preview;
-    }, {});
+    if (!item) return undefined;
+    const cogs = Object.values(item.assets).filter((a) =>
+      cogMediaTypes.includes(a.type || '')
+    );
+    return (cogs.find((a) => a.roles?.includes('visual')) ?? cogs[0])?.href;
   }, [item]);
 
   return (
