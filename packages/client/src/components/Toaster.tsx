@@ -48,8 +48,19 @@ export function Toaster() {
     <ChakraToaster toaster={toaster}>
       {(toast) => {
         if (isNotificationsMeta(toast.meta)) {
+          // The toast group is `position: fixed` with no width and its roots
+          // are absolutely positioned, so the group collapses to 0 width and
+          // the recipe's `width: full` resolves to 0. Give the root an explicit
+          // width (Chakra's docs do the same) and drop the recipe padding/bg so
+          // NotificationBox — which brings its own surface — fills it edge to
+          // edge.
           return (
-            <Toast.Root>
+            <Toast.Root
+              width={{ base: 'calc(100vw - 2rem)', md: 'md' }}
+              p={0}
+              bg='transparent'
+              boxShadow='none'
+            >
               <NotificationBox
                 notifications={toast.meta.notifications}
                 onCloseClick={() => toaster.dismiss(toast.id)}
@@ -59,7 +70,7 @@ export function Toaster() {
         }
 
         return (
-          <Toast.Root>
+          <Toast.Root width={{ base: 'calc(100vw - 2rem)', md: 'sm' }}>
             {/*
              * v3 no longer auto-renders an icon for `type: 'loading' |
              * 'success' | 'error' | 'warning' | 'info'`. <Toast.Indicator />

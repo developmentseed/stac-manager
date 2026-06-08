@@ -13,15 +13,16 @@ import {
   CollecticonCircleExclamation,
   CollecticonXmarkSmall
 } from '@devseed-ui/collecticons-chakra';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 interface DetailResponse {
   status: number;
   statusText: string;
-  detail: {
-    detail: { loc: string[]; msg: string }[];
-    body: any;
-  };
+  // The shape depends on the server: FastAPI validation errors give us
+  // { detail: { loc, msg }[], body }; an IdP can return a string or
+  // { error_description }; STAC implementations vary. Kept loose so
+  // extractErrorMessage can branch on it.
+  detail?: unknown;
 }
 
 export type AppNotification =
@@ -39,9 +40,32 @@ export type AppNotification =
       message: string;
     };
 
+// Pull a human-readable message out of whatever shape the server returned.
+// Covers the common ones: plain string body, OAuth/IdP { error_description },
+// FastAPI/STAC { detail: 'string' } / { message } / { description }. Returns
+// undefined when nothing usable is there so callers can fall back to a
+// canned message instead of rendering an empty toast.
+function extractErrorMessage(detail: unknown): string | undefined {
+  if (typeof detail === 'string') return detail || undefined;
+  if (detail && typeof detail === 'object') {
+    const d = detail as Record<string, unknown>;
+    if (typeof d.error_description === 'string') return d.error_description;
+    if (typeof d.message === 'string') return d.message;
+    if (typeof d.detail === 'string') return d.detail;
+    if (typeof d.description === 'string') return d.description;
+  }
+  return undefined;
+}
+
 export function parseResponseForNotifications(response: DetailResponse) {
-  if (response.status === 400 && response.detail.detail) {
-    const notifications = response.detail.detail.reduce((acc, error, i) => {
+  const detailObj = (
+    response.detail && typeof response.detail === 'object'
+      ? response.detail
+      : {}
+  ) as { detail?: { loc: string[]; msg: string }[] };
+
+  if (response.status === 400 && Array.isArray(detailObj.detail)) {
+    const notifications = detailObj.detail.reduce((acc, error, i) => {
       let p: string[] = error.loc.slice(1);
       const last = error.loc[error.loc.length - 1];
 
@@ -62,13 +86,18 @@ export function parseResponseForNotifications(response: DetailResponse) {
     }, new Map<string, AppNotification>());
 
     return Array.from(notifications.values());
-  } else if (response.status === 403) {
+  }
+
+  const serverMessage = extractErrorMessage(response.detail);
+
+  if (response.status === 403) {
     return [
       {
         id: 0,
         type: 'error',
         title: 'Forbidden',
-        message: 'You do not have permission to perform this action.'
+        message:
+          serverMessage ?? 'You do not have permission to perform this action.'
       } as AppNotification
     ];
   }
@@ -77,7 +106,7 @@ export function parseResponseForNotifications(response: DetailResponse) {
       id: 0,
       type: 'error',
       title: `Error ${response.status}`,
-      message: 'An error occurred: ' + response.statusText
+      message: serverMessage ?? `An error occurred: ${response.statusText}`
     } as AppNotification
   ];
 }
@@ -86,48 +115,40 @@ interface NotificationButtonProps {
   notifications: AppNotification[];
 }
 
-function useNotificationsToast(notifications: AppNotification[]) {
-  const show = () => {
-    const meta = { kind: 'notifications' as const, notifications };
-    if (toaster.isVisible('notifications')) {
-      toaster.update('notifications', { meta });
-    } else {
-      toaster.create({
-        id: 'notifications',
-        duration: Number.POSITIVE_INFINITY,
-        meta
-      });
-    }
-  };
+// Imperative helpers. Callers fire these from event handlers / catch blocks
+// so we never trigger Chakra's flushSync-based toaster from inside a React
+// commit phase. Notification state still lives in the parent (for the bell
+// badge); these just keep the toast in sync with whatever the caller just
+// decided.
+export function showNotificationsToast(notifications: AppNotification[]) {
+  if (notifications.length === 0) {
+    toaster.dismiss('notifications');
+    return;
+  }
+  const meta = { kind: 'notifications' as const, notifications };
+  if (toaster.isVisible('notifications')) {
+    toaster.update('notifications', { meta });
+  } else {
+    toaster.create({
+      id: 'notifications',
+      duration: Number.POSITIVE_INFINITY,
+      meta
+    });
+  }
+}
 
-  useEffect(() => {
-    if (notifications.length !== 0) {
-      show();
-    } else {
-      toaster.dismiss('notifications');
-    }
-  }, [notifications]);
-
-  return {
-    show,
-    hide: () => {
-      toaster.dismiss('notifications');
-    }
-  };
+export function hideNotificationsToast() {
+  toaster.dismiss('notifications');
 }
 
 export function NotificationButton(props: NotificationButtonProps) {
   const { notifications } = props;
 
-  const toast = useNotificationsToast(notifications);
-
   return (
     <Button
       aria-label='Notifications'
       variant='outline'
-      onClick={() => {
-        toast.show();
-      }}
+      onClick={() => showNotificationsToast(notifications)}
     >
       <CollecticonBell />
       {!!notifications.length && (
@@ -161,7 +182,7 @@ export function NotificationBox(props: NotificationBoxProps) {
       shadow='md'
       borderRadius='md'
       bg='surface.500'
-      w={80}
+      w='100%'
       overflow='hidden'
     >
       <Flex

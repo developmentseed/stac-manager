@@ -11,7 +11,8 @@ import { EditForm } from './EditForm';
 import usePageTitle from '$hooks/usePageTitle';
 import {
   AppNotification,
-  parseResponseForNotifications
+  parseResponseForNotifications,
+  showNotificationsToast
 } from '$components/Notifications';
 
 export function CollectionForm() {
@@ -56,7 +57,9 @@ export function CollectionFormNew() {
       navigate(`/collections/${data.id}`);
     } catch (error: any) {
       toaster.dismiss('collection-submit');
-      setNotifications(parseResponseForNotifications(error));
+      const next = parseResponseForNotifications(error);
+      setNotifications(next);
+      showNotificationsToast(next);
     }
     formikHelpers.setSubmitting(false);
   };
@@ -120,7 +123,9 @@ export function CollectionFormEdit(props: { id: string }) {
       navigate(`/collections/${data.id}`);
     } catch (error: any) {
       toaster.dismiss('collection-submit');
-      setNotifications(parseResponseForNotifications(error));
+      const next = parseResponseForNotifications(error);
+      setNotifications(next);
+      showNotificationsToast(next);
     }
     formikHelpers.setSubmitting(false);
   };
