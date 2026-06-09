@@ -238,9 +238,8 @@ function ErrorNotification(props: AppNotification) {
       </Flex>
       <Box p={4}>
         <Text fontWeight='bold' mb={2}>
-          {title || props.type === 'validation-error'
-            ? 'Validation error'
-            : 'Error'}
+          {title ||
+            (props.type === 'validation-error' ? 'Validation error' : 'Error')}
         </Text>
         {props.type === 'validation-error' && (
           <>
