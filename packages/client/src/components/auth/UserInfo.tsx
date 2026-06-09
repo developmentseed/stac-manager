@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Button, Flex } from '@chakra-ui/react';
+import { Avatar, Button } from '@chakra-ui/react';
 import {
   CollecticonLogin,
   CollecticonLogout

@@ -54,8 +54,9 @@ export default function JsonEditor(props: {
       };
     }
     // The initial `value` is captured intentionally for the editor's initial
-    // contents; subsequent updates flow through the effect below.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // contents; subsequent updates flow through the effect below. (No
+    // react-hooks/exhaustive-deps suppression needed — that plugin isn't
+    // configured in this repo's eslint setup.)
   }, []);
 
   useEffect(() => {
