@@ -42,7 +42,9 @@ export function WidgetRadio(props: WidgetProps) {
             size='sm'
             gap={4}
             display='flex'
-            value={value}
+            // Formik leaves an untouched field undefined; coerce to null so the
+            // group mounts controlled and doesn't warn/flip on first change.
+            value={value ?? null}
             onValueChange={(details: { value: string | null }) => {
               setFieldValue(pointer, details.value);
               setFieldTouched(pointer, true);

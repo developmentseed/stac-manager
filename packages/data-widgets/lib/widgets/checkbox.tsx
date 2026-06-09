@@ -44,7 +44,9 @@ export function WidgetCheckbox(props: WidgetProps) {
           )}
           <Flex gap={4}>
             <CheckboxGroup
-              value={value}
+              // Formik leaves an untouched field undefined; coerce to [] so the
+              // group mounts controlled and doesn't warn/flip on first change.
+              value={value ?? []}
               onValueChange={(v: string[]) => {
                 setFieldValue(pointer, v);
                 setFieldTouched(pointer, true);
