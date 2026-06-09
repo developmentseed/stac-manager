@@ -146,7 +146,7 @@ const config: Config = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: 'jsdom'
+  testEnvironment: 'jsdom',
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -161,9 +161,20 @@ const config: Config = {
   // ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
-  // testPathIgnorePatterns: [
-  //   "/node_modules/"
-  // ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    // Playwright specs run via `npm run e2e`, not jest — jest can't execute
+    // them and errors trying.
+    '/e2e/',
+    // Local git worktrees (gitignored) are full repo copies; skip so they
+    // don't get run twice.
+    '/.worktrees/'
+  ],
+
+  // Local git worktrees duplicate every module, which collides jest's
+  // haste-map (duplicate manual mocks / module names). Exclude them from
+  // module resolution too.
+  modulePathIgnorePatterns: ['<rootDir>/.worktrees/'],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
   // testRegex: [],
