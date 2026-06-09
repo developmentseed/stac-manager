@@ -35,7 +35,7 @@ export function EditForm(props: {
 
   const editorData = useMemo(
     () => (view === 'json' ? { jsonData: stacData } : formData),
-    [view, formData]
+    [view, formData, stacData]
   );
 
   return (
