@@ -2,6 +2,7 @@ import globals from 'globals';
 import pluginJs from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import pluginReact from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default [
@@ -13,6 +14,7 @@ export default [
   eslintPluginPrettierRecommended,
   {
     name: 'Custom Rules ',
+    plugins: { 'react-hooks': reactHooks },
     rules: {
       'no-console': 2,
       'prefer-promise-reject-errors': 0,
@@ -44,8 +46,8 @@ export default [
         2,
         { namedComponents: ['function-declaration', 'arrow-function'] }
       ],
-      // 'react-hooks/rules-of-hooks': 2, // Checks rules of Hooks
-      // 'react-hooks/exhaustive-deps': 1, // Checks effect dependencies
+      'react-hooks/rules-of-hooks': 2, // Checks rules of Hooks
+      'react-hooks/exhaustive-deps': 1, // Checks effect dependencies
       // 'fp/no-mutating-methods': 1,
       '@typescript-eslint/no-explicit-any': 'warn'
     }
