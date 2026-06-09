@@ -177,7 +177,14 @@ const config = defineConfig({
               '[data-attached][data-orientation=horizontal] > &:not(:last-of-type)':
                 { marginEnd: '-2px' },
               '[data-attached][data-orientation=vertical] > &:not(:last-of-type)':
-                { marginBottom: '-2px' }
+                { marginBottom: '-2px' },
+              // v3's outline recipe has no selected/active style. Components
+              // that mark a persistent active state via `data-active` (e.g. the
+              // Form/JSON view toggle) would otherwise be indistinguishable from
+              // their inactive siblings.
+              '&[data-active]': {
+                bg: 'colorPalette.subtle'
+              }
             },
             // v3 doesn't support function variants. Use `colorPalette.*` token
             // references so `colorPalette={...}` (the v3 replacement for
