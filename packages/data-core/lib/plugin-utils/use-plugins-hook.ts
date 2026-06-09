@@ -37,14 +37,23 @@ const usePlugins = (plugins: PluginConfigItem[], data: any): UsePluginsHook => {
   const initialDataRef = useRef(data);
 
   useEffect(() => {
+    // Guard against out-of-order resolution: if `plugins` changes (or the
+    // component unmounts, including StrictMode's double-invoke) while a
+    // previous `load()` is still awaiting `init`, the stale resolve must not
+    // overwrite the newer plugins or set state after unmount.
+    let cancelled = false;
     async function load() {
       const resolvedPlugins = resolvePlugins(plugins, initialDataRef.current);
       await Promise.all(
         resolvedPlugins.map((pl) => pl.init(initialDataRef.current))
       );
+      if (cancelled) return;
       setReadyPlugins(resolvedPlugins);
     }
     load();
+    return () => {
+      cancelled = true;
+    };
   }, [plugins]);
 
   const formData = useMemo(() => {
