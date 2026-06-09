@@ -4,7 +4,7 @@ import { Flex, FlexProps } from '@chakra-ui/react';
 export function ErrorBox(props: FlexProps) {
   return (
     <Flex
-      maxW='container.md'
+      maxW='3xl'
       alignItems='center'
       direction='column'
       gap={4}

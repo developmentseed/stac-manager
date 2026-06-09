@@ -85,7 +85,7 @@ export function App() {
       </AnimatePresence>
       {!isLoading && (
         <Container
-          maxW='container.xl'
+          maxW='7xl'
           minH='100vh'
           display='flex'
           flexDirection='column'
