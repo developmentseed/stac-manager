@@ -2,7 +2,7 @@
 
 exports[`PluginBox renders ErrorBox when editSchema is null 1`] = `
 <div
-  class="css-7al7hk"
+  class="css-1ag73ug"
   data-testid="plugin-box-error"
 >
   Plugin 
