@@ -47,6 +47,7 @@ export function WidgetInput(props: WidgetInputProps) {
             {fieldLabel && (
               <Field.Label>
                 <FieldLabel size='xs'>{fieldLabel}</FieldLabel>
+                <Field.RequiredIndicator />
               </Field.Label>
             )}
             <Flex ml='auto' gap={2}>

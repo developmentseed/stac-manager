@@ -112,6 +112,7 @@ function WidgetTaggerNoOptions(props: WidgetProps) {
           {field.label && (
             <Field.Label>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
+              <Field.RequiredIndicator />
             </Field.Label>
           )}
           <WidgetTaggerNoOptionsSelect
@@ -213,6 +214,7 @@ function WidgetTaggerWithOptions(props: WidgetProps & { isMulti?: boolean }) {
           {field.label && (
             <Field.Label>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
+              <Field.RequiredIndicator />
             </Field.Label>
           )}
 

@@ -35,6 +35,7 @@ export function WidgetRadio(props: WidgetProps) {
           {field.label && (
             <Field.Label>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
+              <Field.RequiredIndicator />
             </Field.Label>
           )}
           <RadioGroup.Root

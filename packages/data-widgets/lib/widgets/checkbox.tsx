@@ -39,6 +39,7 @@ export function WidgetCheckbox(props: WidgetProps) {
           {field.label && (
             <Field.Label>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
+              <Field.RequiredIndicator />
             </Field.Label>
           )}
           <Flex gap={4}>
