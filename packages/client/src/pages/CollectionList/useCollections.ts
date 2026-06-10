@@ -10,7 +10,7 @@
  * from useAuth().token — the two paths are then guaranteed to stay in sync.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { StacCollection, StacLink } from 'stac-ts';
 
 import { useApi, STAC_API_URL } from '../../api';
@@ -57,9 +57,21 @@ export function useCollections(opts?: {
   const [hasNext, setHasNext] = useState(false);
   const [hasPrev, setHasPrev] = useState(false);
 
+  // One controller for whichever request is currently in flight — whether it
+  // came from the effect below or from reload(). Starting a new request
+  // aborts the previous one, so a slow response can never clobber a newer
+  // one, and unmount cleanup aborts reloads too.
+  const abortRef = useRef<AbortController | null>(null);
+
   const getCollections = useCallback(
-    async (offset: number, limit: number, signal?: AbortSignal) => {
+    async (offset: number, limit: number) => {
       if (!STAC_API_URL) return;
+
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+      const { signal } = controller;
+
       setState('LOADING');
 
       try {
@@ -96,9 +108,8 @@ export function useCollections(opts?: {
   }, [offset, limit]);
 
   useEffect(() => {
-    const controller = new AbortController();
-    getCollections(offset, limit, controller.signal);
-    return () => controller.abort();
+    getCollections(offset, limit);
+    return () => abortRef.current?.abort();
   }, [getCollections, offset, limit]);
 
   return {
