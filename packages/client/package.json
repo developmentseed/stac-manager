@@ -56,7 +56,6 @@
     "@developmentseed/stac-react": "^1.0.0-alpha.3",
     "@devseed-ui/collecticons-chakra": "^4.0.0",
     "@emotion/react": "^11.11.3",
-    "@emotion/styled": "^11.11.0",
     "@floating-ui/react": "^0.26.25",
     "@mapbox/mapbox-gl-draw": "^1.4.3",
     "@mapbox/mapbox-gl-draw-static-mode": "^1.0.1",

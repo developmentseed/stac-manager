@@ -27,10 +27,8 @@
     "@chakra-ui/react": "^3.8.1",
     "@devseed-ui/collecticons-chakra": "^4.0.0",
     "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
     "@stac-manager/data-core": "*",
     "formik": "^2.4.6",
-    "framer-motion": "^12.0.0",
     "jsoneditor": "^10.1.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -47,10 +45,8 @@
   "peerDependencies": {
     "@chakra-ui/react": "^3.8.1",
     "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
     "@stac-manager/data-core": "*",
     "formik": "^2.4.6",
-    "framer-motion": "^12.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   }
