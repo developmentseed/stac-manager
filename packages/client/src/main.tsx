@@ -34,8 +34,11 @@ if (publicUrl) {
 // its StacApi with fresh headers.
 //
 // During OIDC load we render children without StacApiProvider so the rest of
-// the app can still mount and read from ApiContext; stac-react hooks defer
-// their requests until the provider appears.
+// the app can still mount and read from ApiContext. NOTE: a stac-react hook
+// rendered without the provider throws (the only QueryClientProvider lives
+// inside StacApiProvider) — this is safe solely because App.tsx swaps all
+// routes for a spinner behind the same auth isLoading flag, so no hook
+// consumer mounts while the provider is absent. Keep those two gates in sync.
 function StacApiAuthBridge({ children }: { children: React.ReactNode }) {
   const { token, isLoading, refreshAuth } = useAuth();
 
