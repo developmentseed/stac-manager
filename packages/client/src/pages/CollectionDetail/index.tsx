@@ -91,6 +91,11 @@ function CollectionDetail() {
   useEffect(() => {
     if (collectionId && collections?.[0] !== collectionId) {
       setCollections([collectionId]);
+      // A (re-)applied filter means the auto-resubmit below lands on results
+      // page 1, so the faked page counter must follow it — otherwise a
+      // token-driven reset mid-pagination leaves "Showing page 3" over
+      // page-1 results.
+      setPage(1);
     }
   }, [collectionId, collections, setCollections]);
 
