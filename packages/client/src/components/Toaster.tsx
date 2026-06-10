@@ -82,7 +82,14 @@ export function Toaster() {
             {toast.description && (
               <Toast.Description>{toast.description}</Toast.Description>
             )}
-            {toast.closable !== false && <Toast.CloseTrigger />}
+            {/*
+             * Opt-in close button (v2 `isClosable` semantics). Don't render
+             * it by default: the infinite-duration loading toasts are updated
+             * in place on completion, and dismissing one mid-flight would
+             * make that update target a removed toast — the success
+             * confirmation would never appear.
+             */}
+            {toast.closable && <Toast.CloseTrigger />}
           </Toast.Root>
         );
       }}
