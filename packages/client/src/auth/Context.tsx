@@ -3,7 +3,8 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo
+  useMemo,
+  useRef
 } from 'react';
 import {
   AuthProvider as OidcAuthProvider,
@@ -92,15 +93,28 @@ function EnabledAuthBridge(props: { children: React.ReactNode }) {
 
   // Shared wrapper around signinSilent that funnels every failure through
   // handleRefreshFailure. Used by both the visibility-change top-up and the
-  // API-layer's 401 self-heal.
-  const silentRefresh = useCallback(async (): Promise<string | undefined> => {
-    try {
-      const user = await oidc.signinSilent();
-      return user?.access_token;
-    } catch (err) {
-      handleRefreshFailure(err);
-      return undefined;
-    }
+  // API-layer's 401 self-heal. Concurrent callers — e.g. several requests
+  // 401ing at once, or a 401 retry overlapping the visibility/expired
+  // handlers — share one in-flight refresh: under IdP refresh-token rotation
+  // with reuse detection, racing two refresh_token grants can revoke the
+  // whole session.
+  const inflightRefresh = useRef<Promise<string | undefined> | null>(null);
+  const silentRefresh = useCallback((): Promise<string | undefined> => {
+    if (inflightRefresh.current) return inflightRefresh.current;
+
+    inflightRefresh.current = (async () => {
+      try {
+        const user = await oidc.signinSilent();
+        return user?.access_token;
+      } catch (err) {
+        handleRefreshFailure(err);
+        return undefined;
+      } finally {
+        inflightRefresh.current = null;
+      }
+    })();
+
+    return inflightRefresh.current;
   }, [oidc, handleRefreshFailure]);
 
   // Top up the access token whenever the tab comes back from hibernation.
