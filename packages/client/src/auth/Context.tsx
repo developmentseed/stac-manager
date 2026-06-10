@@ -9,7 +9,7 @@ import {
   AuthProvider as OidcAuthProvider,
   useAuth as useOidcAuth
 } from 'react-oidc-context';
-import { WebStorageStateStore } from 'oidc-client-ts';
+import { ErrorResponse, WebStorageStateStore } from 'oidc-client-ts';
 
 // Trigger a silent renewal this many seconds before the access token expires.
 // Matches oidc-client-ts's default; restated here so the visibility-change
@@ -43,7 +43,8 @@ export type AuthContextValue = {
    * Force a silent refresh and return the new access token. Used by the API
    * layer to self-heal a 401 caused by a stale token. Resolves to undefined
    * if auth is disabled, the user isn't signed in, or the refresh fails;
-   * a failed refresh also clears the local session.
+   * a refresh the IdP definitively rejects also clears the local session,
+   * while transient (network) failures leave it intact.
    */
   refreshAuth: () => Promise<string | undefined>;
 };
@@ -70,15 +71,21 @@ const config: { authority: string; clientId: string } | undefined =
 function EnabledAuthBridge(props: { children: React.ReactNode }) {
   const oidc = useOidcAuth();
 
-  // Single failure policy for any refresh path: log and drop local user
-  // state so the app re-renders as logged-out. We use removeUser (not
-  // signoutRedirect) so this still works when the IdP is the thing that's
-  // unreachable.
+  // Single failure policy for any refresh path. Only a definitive answer
+  // from the IdP — an OAuth error response such as invalid_grant — means the
+  // session is dead, so only then drop local user state (removeUser, not
+  // signoutRedirect, so no IdP round-trip is needed). Anything else is
+  // transient: the visibility top-up fires the instant a hibernated tab
+  // becomes visible, typically before Wi-Fi has reconnected after laptop
+  // wake, and a plain network error there must not destroy a session whose
+  // refresh token is still valid.
   const handleRefreshFailure = useCallback(
     (err: unknown) => {
       // eslint-disable-next-line no-console
       console.warn('Silent token refresh failed:', err);
-      oidc.removeUser();
+      if (err instanceof ErrorResponse) {
+        oidc.removeUser();
+      }
     },
     [oidc]
   );
