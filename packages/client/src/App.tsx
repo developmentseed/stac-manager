@@ -139,7 +139,10 @@ export function App() {
                 element={<ItemDetail />}
               />
               <Route path='/sandbox' element={<Sandbox />} />
-              <Route path='/test-jsoneditor' element={<TestJsonEditor />} />
+              {/* Playwright harness — dev server only, not in production. */}
+              {process.env.NODE_ENV !== 'production' && (
+                <Route path='/test-jsoneditor' element={<TestJsonEditor />} />
+              )}
               <Route path='*' element={<NotFound />} />
             </Routes>
           </Box>
