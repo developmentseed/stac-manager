@@ -1,5 +1,5 @@
 import React from 'react';
-import { Checkbox, CheckboxGroup, Field, Flex } from '@chakra-ui/react';
+import { Checkbox, CheckboxGroup, Fieldset, Flex, Span } from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import {
   SchemaFieldArray,
@@ -32,15 +32,20 @@ export function WidgetCheckbox(props: WidgetProps) {
         meta,
         form: { setFieldValue, setFieldTouched }
       }: FastFieldProps) => (
-        <Field.Root
-          required={isRequired}
-          invalid={!!(meta.touched && meta.error)}
-        >
+        // Fieldset (not Field.Root) on purpose: Ark checkboxes consume the
+        // surrounding Field context, so a group under one Field.Root would
+        // share the Field's ids (duplicate DOM ids, every label toggling the
+        // first input) and inherit its `required` onto every hidden input.
+        <Fieldset.Root invalid={!!(meta.touched && meta.error)}>
           {field.label && (
-            <Field.Label>
+            <Fieldset.Legend>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
-              <Field.RequiredIndicator />
-            </Field.Label>
+              {isRequired && (
+                <Span color='fg.error' lineHeight='1' ms='1' aria-hidden='true'>
+                  *
+                </Span>
+              )}
+            </Fieldset.Legend>
           )}
           <Flex gap={4}>
             <CheckboxGroup
@@ -61,8 +66,8 @@ export function WidgetCheckbox(props: WidgetProps) {
               ))}
             </CheckboxGroup>
           </Flex>
-          <Field.ErrorText>{meta.error}</Field.ErrorText>
-        </Field.Root>
+          <Fieldset.ErrorText>{meta.error}</Fieldset.ErrorText>
+        </Fieldset.Root>
       )}
     </FastField>
   );
