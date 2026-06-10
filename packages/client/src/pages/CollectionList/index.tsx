@@ -160,7 +160,7 @@ function CollectionList() {
                     <Menu.Trigger asChild>
                       <IconButton
                         aria-label='Options'
-                        variant={'soft-outline' as 'outline'}
+                        variant='soft-outline'
                         colorPalette='base'
                         size='sm'
                       >

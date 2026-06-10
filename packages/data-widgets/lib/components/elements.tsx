@@ -67,7 +67,7 @@ export function FieldIconBtn(props: IconButtonProps) {
   return (
     <IconButton
       colorPalette='base'
-      variant={'soft-outline' as 'outline'}
+      variant='soft-outline'
       size='xs'
       {...props}
     />

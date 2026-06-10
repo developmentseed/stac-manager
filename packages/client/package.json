@@ -25,7 +25,8 @@
     "ts-check": "yarn tsc --noEmit --skipLibCheck",
     "test": "jest",
     "e2e": "playwright test",
-    "e2e:headed": "playwright test --headed"
+    "e2e:headed": "playwright test --headed",
+    "postinstall": "chakra typegen src/theme/theme.ts"
   },
   "engines": {
     "node": "20.x"
@@ -33,6 +34,7 @@
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "devDependencies": {
     "@babel/core": "^7.26.0",
+    "@chakra-ui/cli": "^3.35.0",
     "@parcel/reporter-bundle-analyzer": "^2.12.0",
     "@parcel/reporter-bundle-buddy": "^2.12.0",
     "@playwright/test": "^1.60.0",

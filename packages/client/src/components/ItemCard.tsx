@@ -50,7 +50,7 @@ export function ItemCard({
   const shouldUsePlaceholder = showPlaceholder && !imageSrc;
 
   return (
-    <Card.Root as='article' variant={'filled' as 'subtle'}>
+    <Card.Root as='article' variant='filled'>
       {imageSrc &&
         renderLink(
           <Image
@@ -104,7 +104,7 @@ export function ItemCard({
 
 export function ItemCardLoading(props: { mini?: boolean }) {
   return (
-    <Card.Root as='article' variant={'filled' as 'subtle'} p={8}>
+    <Card.Root as='article' variant='filled' p={8}>
       <Flex direction='column' gap={2}>
         <Skeleton h={6} width='40%' />
         <Skeleton h={4} width='30%' />
