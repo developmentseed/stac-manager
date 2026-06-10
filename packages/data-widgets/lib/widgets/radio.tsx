@@ -1,5 +1,5 @@
 import React from 'react';
-import { Field, RadioGroup } from '@chakra-ui/react';
+import { Fieldset, RadioGroup, Span } from '@chakra-ui/react';
 import { SchemaFieldString, WidgetProps } from '@stac-manager/data-core';
 import { FastField, FastFieldProps } from 'formik';
 
@@ -28,15 +28,19 @@ export function WidgetRadio(props: WidgetProps) {
         meta,
         form: { setFieldValue, setFieldTouched }
       }: FastFieldProps) => (
-        <Field.Root
-          required={isRequired}
-          invalid={!!(meta.touched && meta.error)}
-        >
+        // Fieldset (not Field.Root): a radio group is a set of controls, so a
+        // single <label> has nothing valid to point at — Field.Label's
+        // htmlFor would dangle. A legend labels the group as a whole.
+        <Fieldset.Root invalid={!!(meta.touched && meta.error)}>
           {field.label && (
-            <Field.Label>
+            <Fieldset.Legend>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
-              <Field.RequiredIndicator />
-            </Field.Label>
+              {isRequired && (
+                <Span color='fg.error' lineHeight='1' ms='1' aria-hidden='true'>
+                  *
+                </Span>
+              )}
+            </Fieldset.Legend>
           )}
           <RadioGroup.Root
             size='sm'
@@ -58,8 +62,8 @@ export function WidgetRadio(props: WidgetProps) {
               </RadioGroup.Item>
             ))}
           </RadioGroup.Root>
-          <Field.ErrorText>{meta.error}</Field.ErrorText>
-        </Field.Root>
+          <Fieldset.ErrorText>{meta.error}</Fieldset.ErrorText>
+        </Fieldset.Root>
       )}
     </FastField>
   );

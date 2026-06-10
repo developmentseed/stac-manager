@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useId, useMemo } from 'react';
 import { Field } from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import ReactSelect from 'react-select';
@@ -49,6 +49,10 @@ function WidgetSelectInner(props: WidgetProps) {
 
   const key = useRenderKey([pointer, isRequired, isMulti, field]);
 
+  // Shared between Field.Root (whose label htmlFor points at the field id)
+  // and react-select's input, so clicking the label focuses the control.
+  const inputId = useId();
+
   const options = useMemo(() => {
     const enums = isMulti
       ? (field as SchemaFieldArray<SchemaFieldString>).items?.enum
@@ -73,6 +77,7 @@ function WidgetSelectInner(props: WidgetProps) {
 
         return (
           <Field.Root
+            id={inputId}
             required={isRequired}
             invalid={!!(meta.touched && meta.error)}
           >
@@ -83,6 +88,7 @@ function WidgetSelectInner(props: WidgetProps) {
               </Field.Label>
             )}
             <ReactSelect
+              inputId={inputId}
               name={name}
               options={options}
               isMulti={isMulti}

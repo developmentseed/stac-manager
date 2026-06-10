@@ -1,6 +1,7 @@
 import React, {
   KeyboardEvent,
   KeyboardEventHandler,
+  useId,
   useMemo,
   useState
 } from 'react';
@@ -98,6 +99,10 @@ function WidgetTaggerNoOptions(props: WidgetProps) {
 
   const key = useRenderKey([pointer, isRequired, field]);
 
+  // Shared between Field.Root (whose label htmlFor points at the field id)
+  // and react-select's input, so clicking the label focuses the control.
+  const inputId = useId();
+
   return (
     <FastField name={pointer} key={key}>
       {({
@@ -106,6 +111,7 @@ function WidgetTaggerNoOptions(props: WidgetProps) {
         form: { setFieldValue }
       }: FastFieldProps) => (
         <Field.Root
+          id={inputId}
           required={isRequired}
           invalid={!!(meta.touched && meta.error)}
         >
@@ -117,6 +123,7 @@ function WidgetTaggerNoOptions(props: WidgetProps) {
           )}
           <WidgetTaggerNoOptionsSelect
             pointer={pointer}
+            inputId={inputId}
             value={value}
             onChange={(v: string | string[]) => setFieldValue(name, v)}
           />
@@ -133,12 +140,13 @@ const components = {
 
 interface WidgetTaggerNoOptionsSelectProps {
   pointer: string;
+  inputId?: string;
   value: string[];
   onChange: (value: string[]) => void;
 }
 
 function WidgetTaggerNoOptionsSelect(props: WidgetTaggerNoOptionsSelectProps) {
-  const { value, onChange, pointer } = props;
+  const { value, onChange, pointer, inputId } = props;
 
   const [inputValue, setInputValue] = useState('');
   const selectedValues = Array.isArray(value) ? value.map(createOption) : [];
@@ -154,6 +162,7 @@ function WidgetTaggerNoOptionsSelect(props: WidgetTaggerNoOptionsSelectProps) {
 
   return (
     <CreatableSelect
+      inputId={inputId}
       name={pointer}
       components={components}
       inputValue={inputValue}
@@ -189,6 +198,10 @@ function WidgetTaggerWithOptions(props: WidgetProps & { isMulti?: boolean }) {
 
   const key = useRenderKey([pointer, isRequired, isMulti, field]);
 
+  // Shared between Field.Root (whose label htmlFor points at the field id)
+  // and react-select's input, so clicking the label focuses the control.
+  const inputId = useId();
+
   const options = useMemo(() => {
     const enums = isMulti
       ? (field as SchemaFieldArray<SchemaFieldString>).items.enum
@@ -208,6 +221,7 @@ function WidgetTaggerWithOptions(props: WidgetProps & { isMulti?: boolean }) {
         form: { setFieldValue }
       }: FastFieldProps) => (
         <Field.Root
+          id={inputId}
           required={isRequired}
           invalid={!!(meta.touched && meta.error)}
         >
@@ -220,6 +234,7 @@ function WidgetTaggerWithOptions(props: WidgetProps & { isMulti?: boolean }) {
 
           <WidgetTaggerWithOptionsSelect
             pointer={pointer}
+            inputId={inputId}
             isMulti={!!isMulti}
             value={value}
             onChange={(v: string | string[]) => setFieldValue(name, v)}
@@ -234,6 +249,7 @@ function WidgetTaggerWithOptions(props: WidgetProps & { isMulti?: boolean }) {
 
 interface WidgetTaggerWithOptionsSelectProps {
   pointer: string;
+  inputId?: string;
   isMulti: boolean;
   onChange: (value: string | string[]) => void;
   value: string | string[];
@@ -243,7 +259,7 @@ interface WidgetTaggerWithOptionsSelectProps {
 function WidgetTaggerWithOptionsSelect(
   props: WidgetTaggerWithOptionsSelectProps
 ) {
-  const { isMulti, onChange, value, options, pointer } = props;
+  const { isMulti, onChange, value, options, pointer, inputId } = props;
   const [inputValue, setInputValue] = useState('');
 
   const selectedValues = value
@@ -264,6 +280,7 @@ function WidgetTaggerWithOptionsSelect(
 
   return (
     <CreatableSelect
+      inputId={inputId}
       name={pointer}
       inputValue={inputValue}
       isClearable
