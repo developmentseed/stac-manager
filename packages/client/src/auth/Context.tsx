@@ -26,6 +26,13 @@ export type AuthProfile = {
 
 export type AuthContextValue = {
   isEnabled: boolean;
+  /**
+   * True only while the initial session is being resolved (or an explicit
+   * redirect sign-in/out is navigating away) — not during mid-session silent
+   * token renews. App.tsx and main.tsx unmount the whole tree behind this
+   * flag, so flipping it for a background refresh would wipe in-progress
+   * form state.
+   */
   isLoading: boolean;
   isAuthenticated: boolean;
   profile?: AuthProfile;
@@ -152,7 +159,12 @@ function EnabledAuthBridge(props: { children: React.ReactNode }) {
 
     return {
       isEnabled: true,
-      isLoading: oidc.isLoading,
+      // react-oidc-context flips isLoading for the whole duration of a
+      // wrapped signinSilent call (visibility top-up, accessTokenExpired
+      // backstop, 401 self-heal). Surfacing that would swap the app for the
+      // loading spinner mid-session — a full unmount/remount that loses
+      // form state — so silent renews are exempted here.
+      isLoading: oidc.isLoading && oidc.activeNavigator !== 'signinSilent',
       isAuthenticated: !!oidc.isAuthenticated,
       profile,
       token: oidc.user?.access_token,
