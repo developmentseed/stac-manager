@@ -1,5 +1,11 @@
 import React from 'react';
-import { Checkbox, CheckboxGroup, Fieldset, Flex, Span } from '@chakra-ui/react';
+import {
+  Checkbox,
+  CheckboxGroup,
+  Fieldset,
+  Flex,
+  Span
+} from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import {
   SchemaFieldArray,
