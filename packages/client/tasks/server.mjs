@@ -30,7 +30,7 @@ const readPackage = () =>
   JSON.parse(fs.readFileSync(`${__dirname}/../package.json`));
 
 // Set the version in an env variable.
-process.env.APP_VERSION = readPackage().version;
+process.env.APP_VERSION = process.env.APP_VERSION || readPackage().version;
 process.env.APP_BUILD_TIME = Date.now();
 
 async function findPort() {

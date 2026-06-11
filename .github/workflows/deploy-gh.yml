@@ -6,6 +6,7 @@ on:
     - 'main'
 
 env:
+  APP_VERSION: ${{ github.ref_name }}
   PUBLIC_URL: ${{ vars.PUBLIC_URL }}
   REACT_APP_STAC_API: ${{ vars.REACT_APP_STAC_API }}
   REACT_APP_STAC_BROWSER: ${{ vars.REACT_APP_STAC_BROWSER }}

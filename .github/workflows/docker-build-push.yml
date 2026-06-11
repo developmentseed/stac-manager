@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - main
-    paths:
-      - Dockerfile
-      - .github/workflows/docker-build-push.yml
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -41,7 +40,6 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,format=short
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
@@ -50,3 +48,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP_VERSION=${{ steps.meta.outputs.version }}

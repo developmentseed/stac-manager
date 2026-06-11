@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "stac-manager",
+      "include-component-in-tag": false,
+      "initial-version": "1.0.0",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "packages/client/package.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    }
+  }
+}
