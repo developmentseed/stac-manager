@@ -91,7 +91,7 @@ export function App() {
           >
             <Flex gap={4} alignItems='center'>
               <Image
-                src={`${process.env.PUBLIC_URL || ''}/meta/icon-512.png`}
+                src={`${(process.env.PUBLIC_URL || '').replace(/\/+$/, '')}/meta/icon-512.png`}
                 width={8}
                 aspectRatio={1}
                 borderRadius='md'
