@@ -42,5 +42,41 @@ npm run all:build
 ```
 This bundles the app in production mode, optimizing the build for performance. The build is minified, and filenames include hashes.
 
+## Releases & Deployment
+
+### Releases
+
+Releases are automated with [release-please](https://github.com/googleapis/release-please) ([`.github/workflows/release-please.yml`](.github/workflows/release-please.yml)), driven by [Conventional Commits](https://www.conventionalcommits.org/) on `main`:
+
+1. Every push to `main` updates a rolling **release PR** that accumulates pending `feat:` (minor bump) and `fix:` (patch bump) commits, along with a generated `CHANGELOG.md` entry. The workflow authenticates as the **DS Release Bot** GitHub App (org-level `DS_RELEASE_BOT_CLIENT_ID` variable and `DS_RELEASE_BOT_PRIVATE_KEY` secret) so the tags it creates can trigger downstream workflows.
+2. Merging the release PR bumps the version in the root and client `package.json` files (see [`release-please-config.json`](release-please-config.json)), tags the commit `vX.Y.Z`, and publishes a GitHub release.
+
+Note: tags of the form `stac-manager-X.Y.Z` belong to the Helm chart, which is released separately by chart-releaser ([`.github/workflows/release-helm-chart.yml`](.github/workflows/release-helm-chart.yml)).
+
+### Docker images
+
+[`.github/workflows/docker-build-push.yml`](.github/workflows/docker-build-push.yml) publishes images to `ghcr.io/developmentseed/stac-manager`:
+
+- **Pushes to `main`** build the `:main` and `:sha-*` tags (the development tip).
+- **Release tags (`v*`)** build the `:X.Y.Z`, `:X.Y`, and `:latest` tags — so `latest` always points at the most recent release, not the latest commit.
+
+### GitHub Pages
+
+[`.github/workflows/deploy-gh.yml`](.github/workflows/deploy-gh.yml) builds the client on every push to `main` and deploys it to the `gh-pages` branch.
+
+### Cloudflare Pages
+
+Cloudflare Pages deployments are configured through the Cloudflare dashboard (git integration), not through a workflow in this repository. Cloudflare builds the app itself on each push: preview deployments for branches, and a production deployment for `main`.
+
+### App version stamping
+
+The version shown in the app (`process.env.APP_VERSION`) is resolved at build time, in order of precedence:
+
+1. An explicit `APP_VERSION` environment variable — set by the Docker build (branch name for branch builds, `X.Y.Z` for releases) and the GitHub Pages deploy (branch name).
+2. `CF_PAGES_BRANCH` on Cloudflare Pages preview builds (the branch name).
+3. The client `package.json` version — used by local builds and Cloudflare production builds; release-please keeps it current.
+
+Docker images built without the `APP_VERSION` build-arg retain a `%APP_VERSION%` placeholder that [`docker-entrypoint.sh`](docker-entrypoint.sh) substitutes from the container environment at startup (defaulting to `dev`).
+
 ## Contributing
 Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
