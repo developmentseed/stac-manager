@@ -80,7 +80,7 @@ export function ItemMap(
           id='preview'
           type='raster'
           tiles={[
-            `http://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=${previewAsset}`
+            `https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=${previewAsset}`
           ]}
           tileSize={256}
           bounds={previewBounds}
