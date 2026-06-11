@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/developmentseed/stac-manager/compare/v1.0.0...v1.0.1) (2026-06-11)
+
+
+### Bug Fixes
+
+* compute 0 path segments for root-domain GitHub Pages deploys ([#93](https://github.com/developmentseed/stac-manager/issues/93)) ([495c04a](https://github.com/developmentseed/stac-manager/commit/495c04a5045229e7e9a4434ba8b0d5e0410a453f))
+
 ## [1.0.0](https://github.com/developmentseed/stac-manager/compare/v0.0.13...v1.0.0) (2026-06-11)
 
 
