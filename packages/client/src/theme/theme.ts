@@ -14,8 +14,18 @@ import { adjustHue, setLightness, setSaturation } from 'polished';
 
 import { createColorPalette } from './color-palette';
 
-const primary = process.env.REACT_APP_THEME_PRIMARY_COLOR || '#6A5ACD';
-const secondary = process.env.REACT_APP_THEME_SECONDARY_COLOR || '#048A81';
+// `chakra typegen` may evaluate this file in a vm sandbox without a `process`
+// global. Keep the `process.env.*` member expressions intact (Parcel replaces
+// them statically) and fall back to the defaults when `process` is missing —
+// the generated types are identical regardless of color values.
+let primary = '#6A5ACD';
+let secondary = '#048A81';
+try {
+  primary = process.env.REACT_APP_THEME_PRIMARY_COLOR || primary;
+  secondary = process.env.REACT_APP_THEME_SECONDARY_COLOR || secondary;
+} catch {
+  /* not running under Node */
+}
 const base = setSaturation(0.32, setLightness(0.16, adjustHue(48, primary)));
 
 /**
