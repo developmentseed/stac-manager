@@ -33,7 +33,7 @@ async function main() {
   let segments = 0;
   if (baseUrl) {
     try {
-      segments = new URL(baseUrl).pathname.split('/').length - 1;
+      segments = new URL(baseUrl).pathname.split('/').filter(Boolean).length;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // no-op
