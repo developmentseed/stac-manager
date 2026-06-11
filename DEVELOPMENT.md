@@ -60,21 +60,21 @@ Note: tags of the form `stac-manager-X.Y.Z` belong to the Helm chart, which is r
 - **Pushes to `main`** build the `:main` and `:sha-*` tags (the development tip).
 - **Release tags (`v*`)** build the `:X.Y.Z`, `:X.Y`, and `:latest` tags — so `latest` always points at the most recent release, not the latest commit.
 
-### GitHub Pages
+### GitHub Pages (releases)
 
-[`.github/workflows/deploy-gh.yml`](.github/workflows/deploy-gh.yml) builds the client on every push to `main` and deploys it to the `gh-pages` branch.
+[`.github/workflows/deploy-gh.yml`](.github/workflows/deploy-gh.yml) deploys the client to the `gh-pages` branch on every release tag (`v*`), so the GitHub Pages site always reflects the **latest release**. It can also be run manually via `workflow_dispatch`.
 
-### Cloudflare Pages
+### Cloudflare Pages (dev previews)
 
-Cloudflare Pages deployments are configured through the Cloudflare dashboard (git integration), not through a workflow in this repository. Cloudflare builds the app itself on each push: preview deployments for branches, and a production deployment for `main`.
+Cloudflare Pages deployments are configured through the Cloudflare dashboard (git integration), not through a workflow in this repository. Cloudflare builds the app itself on each push and serves **dev previews**: one per branch, with `main` acting as the development tip.
 
 ### App version stamping
 
 The version shown in the app (`process.env.APP_VERSION`) is resolved at build time, in order of precedence:
 
-1. An explicit `APP_VERSION` environment variable — set by the Docker build (branch name for branch builds, `X.Y.Z` for releases) and the GitHub Pages deploy (branch name).
-2. `CF_PAGES_BRANCH` on Cloudflare Pages preview builds (the branch name).
-3. The client `package.json` version — used by local builds and Cloudflare production builds; release-please keeps it current.
+1. An explicit `APP_VERSION` environment variable — set by the Docker build (branch name for branch builds, `X.Y.Z` for releases) and the GitHub Pages deploy (the release version).
+2. `CF_PAGES_BRANCH` on Cloudflare Pages builds (the branch name, e.g. `main` for the dev preview).
+3. The client `package.json` version — used by local builds; release-please keeps it current.
 
 Docker images built without the `APP_VERSION` build-arg retain a `%APP_VERSION%` placeholder that [`docker-entrypoint.sh`](docker-entrypoint.sh) substitutes from the container environment at startup (defaulting to `dev`).
 

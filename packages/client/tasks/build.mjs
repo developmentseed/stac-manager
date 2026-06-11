@@ -26,14 +26,12 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 const readPackage = () =>
   JSON.parse(fs.readFileSync(`${__dirname}/../package.json`));
 
-// Set the version in an env variable. Cloudflare Pages preview builds are
-// stamped with their branch name; production builds use the released version.
-const cfPagesBranch = process.env.CF_PAGES_BRANCH;
+// Set the version in an env variable. Cloudflare Pages dev previews are
+// stamped with their branch name; release builds receive APP_VERSION from CI.
 process.env.APP_VERSION =
   process.env.APP_VERSION ||
-  (cfPagesBranch && cfPagesBranch !== 'main'
-    ? cfPagesBranch
-    : readPackage().version);
+  process.env.CF_PAGES_BRANCH ||
+  readPackage().version;
 process.env.APP_BUILD_TIME = Date.now();
 
 // Simple task to copy the static files to the dist directory. The static
