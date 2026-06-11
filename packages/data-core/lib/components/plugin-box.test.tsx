@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { Formik } from 'formik';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
 
 import { PluginBox } from './plugin-box';
 import { Plugin } from '../plugin-utils/plugin';
@@ -19,7 +19,7 @@ const renderWithProviders = (
   // You can wrap the component with any context providers here
   return render(ui, {
     wrapper: ({ children }) => (
-      <ChakraProvider>
+      <ChakraProvider value={defaultSystem}>
         <Formik initialValues={{}} onSubmit={() => {}}>
           {children}
         </Formik>

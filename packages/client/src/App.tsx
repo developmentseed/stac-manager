@@ -6,10 +6,10 @@ import {
   Heading,
   Text,
   Badge,
-  Divider,
-  Fade,
+  Separator,
   Image
 } from '@chakra-ui/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { keyframes } from '@emotion/react';
 import { Route, Routes } from 'react-router-dom';
 import {
@@ -26,6 +26,7 @@ import ItemDetail from '$pages/ItemDetail';
 import NotFound from '$pages/NotFound';
 import CollectionDetail from '$pages/CollectionDetail';
 import Sandbox from '$pages/Sandbox';
+import TestJsonEditor from '$pages/TestJsonEditor';
 
 import { useAuth } from './auth/Context';
 import SmartLink from '$components/SmartLink';
@@ -53,30 +54,38 @@ export function App() {
 
   return (
     <>
-      <Fade in={isLoading} unmountOnExit>
-        <Flex
-          minW='100vw'
-          minH='100vh'
-          bg='white'
-          align='center'
-          justify='center'
-        >
-          <CollecticonCog
-            size='5em'
-            color='base.300'
-            animation={`${rotate} 4s linear infinite`}
-          />
-          <CollecticonCog
-            ml={-2}
-            size='5em'
-            color='base.300'
-            animation={`${rotate2} 4s linear infinite reverse`}
-          />
-        </Flex>
-      </Fade>
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Flex
+              minW='100vw'
+              minH='100vh'
+              bg='white'
+              align='center'
+              justify='center'
+            >
+              <CollecticonCog
+                boxSize='5em'
+                color='base.300'
+                animation={`${rotate} 4s linear infinite`}
+              />
+              <CollecticonCog
+                ml={-2}
+                boxSize='5em'
+                color='base.300'
+                animation={`${rotate2} 4s linear infinite reverse`}
+              />
+            </Flex>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {!isLoading && (
         <Container
-          maxW='container.xl'
+          maxW='7xl'
           minH='100vh'
           display='flex'
           flexDirection='column'
@@ -91,12 +100,12 @@ export function App() {
           >
             <Flex gap={4} alignItems='center'>
               <Image
-                src={`${process.env.PUBLIC_URL || ''}/meta/icon-512.png`}
+                src={`${(process.env.PUBLIC_URL || '').replace(/\/+$/, '')}/meta/icon-512.png`}
                 width={8}
                 aspectRatio={1}
                 borderRadius='md'
               />
-              <Divider
+              <Separator
                 orientation='vertical'
                 borderColor='base.200a'
                 h='1rem'
@@ -130,6 +139,10 @@ export function App() {
                 element={<ItemDetail />}
               />
               <Route path='/sandbox' element={<Sandbox />} />
+              {/* Playwright harness — dev server only, not in production. */}
+              {process.env.NODE_ENV !== 'production' && (
+                <Route path='/test-jsoneditor' element={<TestJsonEditor />} />
+              )}
               <Route path='*' element={<NotFound />} />
             </Routes>
           </Box>
@@ -160,7 +173,7 @@ function AppFooter() {
             </Badge>
           </strong>{' '}
         </Text>
-        <Divider orientation='vertical' borderColor='base.200a' h='1em' />
+        <Separator orientation='vertical' borderColor='base.200a' h='1em' />
         {new Date().getFullYear()}
         <Text as='span' ml='auto'>
           Made with <CollecticonHeart meaningful title='love' /> by{' '}

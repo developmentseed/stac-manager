@@ -12,13 +12,11 @@ import {
 } from './elements';
 import {
   Box,
+  Field,
   Flex,
-  FormControl,
-  FormErrorMessage,
   Input,
   InputGroup,
-  InputLeftElement,
-  Select
+  NativeSelect
 } from '@chakra-ui/react';
 import { CollecticonTag } from '@devseed-ui/collecticons-chakra';
 import { useFormikContext } from 'formik';
@@ -203,12 +201,16 @@ export function ObjectProperty(props: ObjectPropertyProps) {
     <Fieldset>
       <FieldsetHeader>
         <Box>
-          <FormControl isInvalid={!!keyError}>
-            <InputGroup size='sm' bg='surface.500' borderColor='base.200'>
-              <InputLeftElement pointerEvents='none'>
+          <Field.Root invalid={!!keyError}>
+            <InputGroup
+              startElement={
                 <CollecticonTag title='Value for the object property' />
-              </InputLeftElement>
+              }
+            >
               <Input
+                size='sm'
+                bg='surface.500'
+                borderColor='base.200'
                 type='text'
                 placeholder='Property name'
                 value={keyFieldValue}
@@ -224,33 +226,37 @@ export function ObjectProperty(props: ObjectPropertyProps) {
                 onBlur={onFieldKeyBlur}
               />
             </InputGroup>
-            <FormErrorMessage>{keyError}</FormErrorMessage>
-          </FormControl>
+            <Field.ErrorText>{keyError}</Field.ErrorText>
+          </Field.Root>
         </Box>
         <Flex gap={4}>
-          <Select
+          <NativeSelect.Root
             size='sm'
             bg='surface.500'
             borderColor='base.200'
             borderRadius='md'
-            value={fieldType}
-            onChange={(e) => {
-              const type = e.target.value as FieldTypes;
-              setFieldType(type);
-
-              const schema = getFieldSchema(type);
-              if (schema) {
-                const valuesForSchema = schemaToFormDataStructure(schema);
-                ctx.setFieldValue(pointer, valuesForSchema);
-              }
-            }}
           >
-            {fieldTypes.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </Select>
+            <NativeSelect.Field
+              value={fieldType}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                const type = e.target.value as FieldTypes;
+                setFieldType(type);
+
+                const schema = getFieldSchema(type);
+                if (schema) {
+                  const valuesForSchema = schemaToFormDataStructure(schema);
+                  ctx.setFieldValue(pointer, valuesForSchema);
+                }
+              }}
+            >
+              {fieldTypes.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </NativeSelect.Field>
+            <NativeSelect.Indicator />
+          </NativeSelect.Root>
           <FieldsetDeleteBtn
             aria-label='Remove item'
             onClick={() => removeProperty(pointer)}

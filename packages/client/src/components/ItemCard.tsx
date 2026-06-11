@@ -1,9 +1,6 @@
 import React from 'react';
 import {
   Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
   Flex,
   Image,
   Text,
@@ -53,7 +50,7 @@ export function ItemCard({
   const shouldUsePlaceholder = showPlaceholder && !imageSrc;
 
   return (
-    <Card as='article' variant='filled'>
+    <Card.Root as='article' variant='filled'>
       {imageSrc &&
         renderLink(
           <Image
@@ -66,7 +63,7 @@ export function ItemCard({
           />
         )}
       {shouldUsePlaceholder && renderLink(<ItemCardThumbPlaceholder />)}
-      <CardHeader as='header'>
+      <Card.Header as='header'>
         <Flex direction='row' gap={4}>
           {(title || subtitle) && (
             <Box flexBasis='100%'>
@@ -84,31 +81,30 @@ export function ItemCard({
           )}
           {renderMenu && <Box>{renderMenu()}</Box>}
         </Flex>
-      </CardHeader>
+      </Card.Header>
       {description && (
-        <CardBody>
-          <Text size='md'>{description}</Text>
-        </CardBody>
+        <Card.Body>
+          <Text>{description}</Text>
+        </Card.Body>
       )}
       {tags && tags.length > 0 && (
-        <CardFooter as='footer'>
-          <HStack spacing={2} wrap='wrap'>
+        <Card.Footer as='footer'>
+          <HStack gap={2} wrap='wrap'>
             {tags.map((tag) => (
-              // <Tag key={tag} size='sm' colorScheme='primary' as='a' href='#'>
-              <Tag key={tag} size='sm' colorScheme='primary'>
-                {tag}
-              </Tag>
+              <Tag.Root key={tag} size='sm' colorPalette='primary'>
+                <Tag.Label>{tag}</Tag.Label>
+              </Tag.Root>
             ))}
           </HStack>
-        </CardFooter>
+        </Card.Footer>
       )}
-    </Card>
+    </Card.Root>
   );
 }
 
 export function ItemCardLoading(props: { mini?: boolean }) {
   return (
-    <Card as='article' variant='filled' p={8}>
+    <Card.Root as='article' variant='filled' p={8}>
       <Flex direction='column' gap={2}>
         <Skeleton h={6} width='40%' />
         <Skeleton h={4} width='30%' />
@@ -116,7 +112,7 @@ export function ItemCardLoading(props: { mini?: boolean }) {
 
       {!props.mini && (
         <>
-          <SkeletonText mt={8} noOfLines={4} spacing='4' skeletonHeight='2' />
+          <SkeletonText mt={8} noOfLines={4} />
           <Flex gap={2} mt={12}>
             <Skeleton h={4} width={12} />
             <Skeleton h={4} width={12} />
@@ -124,6 +120,6 @@ export function ItemCardLoading(props: { mini?: boolean }) {
           </Flex>
         </>
       )}
-    </Card>
+    </Card.Root>
   );
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { defaultsDeep } from 'lodash-es';
 
 import { Plugin, PluginConfigItem } from './plugin';
@@ -27,16 +27,34 @@ type FormDataStructureObject = {
 const usePlugins = (plugins: PluginConfigItem[], data: any): UsePluginsHook => {
   const [readyPlugins, setReadyPlugins] = useState<Plugin[]>();
 
-  useEffect(() => {
-    async function load() {
-      // if (!data) return;
+  // `resolvePlugins` deep-clones each plugin (so hook composition doesn't
+  // mutate the originals), which means any state a plugin sets in `init` only
+  // lives on that one clone. If we re-resolve on every data change, a plugin
+  // like PluginCore that derives `isNew` from data on `init` flips back and
+  // forth as the user toggles between the Form and JSON views (the form's
+  // `id` field then disappears mid-session). Pin init to the data captured at
+  // mount; subsequent data updates flow through `enterData` -> `formData`.
+  const initialDataRef = useRef(data);
 
-      const resolvedPlugins = resolvePlugins(plugins, data);
-      await Promise.all(resolvedPlugins.map((pl) => pl.init(data)));
+  useEffect(() => {
+    // Guard against out-of-order resolution: if `plugins` changes (or the
+    // component unmounts, including StrictMode's double-invoke) while a
+    // previous `load()` is still awaiting `init`, the stale resolve must not
+    // overwrite the newer plugins or set state after unmount.
+    let cancelled = false;
+    async function load() {
+      const resolvedPlugins = resolvePlugins(plugins, initialDataRef.current);
+      await Promise.all(
+        resolvedPlugins.map((pl) => pl.init(initialDataRef.current))
+      );
+      if (cancelled) return;
       setReadyPlugins(resolvedPlugins);
     }
     load();
-  }, [plugins, data]);
+    return () => {
+      cancelled = true;
+    };
+  }, [plugins]);
 
   const formData = useMemo(() => {
     if (!readyPlugins) return;
@@ -58,7 +76,7 @@ const usePlugins = (plugins: PluginConfigItem[], data: any): UsePluginsHook => {
       (acc: any, pl: Plugin) => defaultsDeep(pl.enterData(data), acc),
       emptyStructure
     );
-  }, [readyPlugins]);
+  }, [readyPlugins, data]);
 
   const toOutData = useCallback(
     (formData: any) =>

@@ -1,15 +1,16 @@
 import React, { useEffect, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
+import { ChakraProvider } from '@chakra-ui/react';
 import { StacApiProvider } from '@developmentseed/stac-react';
 import { PluginConfigProvider } from '@stac-manager/data-core';
 
 import { App } from './App';
-import theme from './theme/theme';
+import system from './theme/theme';
 import { config } from './plugin-system/config';
 import { AuthProvider, useAuth } from './auth/Context';
 import Api, { ApiContext } from './api';
+import { Toaster } from './components/Toaster';
 
 const publicUrl = process.env.PUBLIC_URL || '';
 const stacApiUrl = process.env.REACT_APP_STAC_API!;
@@ -33,12 +34,18 @@ if (publicUrl) {
 // its StacApi with fresh headers.
 //
 // During OIDC load we render children without StacApiProvider so the rest of
-// the app can still mount and read from ApiContext; stac-react hooks defer
-// their requests until the provider appears.
+// the app can still mount and read from ApiContext. NOTE: a stac-react hook
+// rendered without the provider throws (the only QueryClientProvider lives
+// inside StacApiProvider) — this is safe solely because App.tsx swaps all
+// routes for a spinner behind the same auth isLoading flag, so no hook
+// consumer mounts while the provider is absent. Keep those two gates in sync.
 function StacApiAuthBridge({ children }: { children: React.ReactNode }) {
-  const { token, isLoading } = useAuth();
+  const { token, isLoading, refreshAuth } = useAuth();
 
-  const api = useMemo(() => new Api(token), [token]);
+  const api = useMemo(
+    () => new Api(token, undefined, refreshAuth),
+    [token, refreshAuth]
+  );
   const options = useMemo(
     () =>
       token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
@@ -70,8 +77,8 @@ function Root() {
 
   return (
     <React.StrictMode>
-      <ColorModeScript />
-      <ChakraProvider theme={theme}>
+      <ChakraProvider value={system}>
+        <Toaster />
         <Router basename={basename}>
           <AuthProvider>
             <StacApiAuthBridge>

@@ -6,14 +6,11 @@ import {
   SimpleGrid,
   InputGroup,
   Input,
-  InputRightElement,
-  Select,
+  NativeSelect,
   Badge,
   Menu,
-  MenuButton,
   IconButton,
-  MenuList,
-  MenuItem
+  Portal
 } from '@chakra-ui/react';
 import {
   CollecticonEllipsisVertical,
@@ -36,16 +33,6 @@ import { useCollections } from './useCollections';
 function CollectionList() {
   usePageTitle('Collections');
 
-  // const [urlParams, setUrlParams] = useSearchParams({ page: '1' });
-  // const page = parseInt(urlParams.get('page') || '1', 10);
-  // const setPage = useCallback(
-  //   (v: number | ((v: number) => number)) => {
-  //     const newVal = typeof v === 'function' ? v(page) : v;
-  //     setUrlParams({ page: newVal.toString() });
-  //   },
-  //   [page]
-  // );
-
   const { collections, state } = useCollections({
     limit: 1000
   });
@@ -53,6 +40,9 @@ function CollectionList() {
   // Quick search system.
   const [searchTerm, setSearchTerm] = useState('');
   const [keyword, setKeyword] = useState('');
+
+  const handleKeywordChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
+    setKeyword(e.target.value);
 
   const keywords = useMemo<string[]>(() => {
     if (!collections) return [];
@@ -85,9 +75,6 @@ function CollectionList() {
   }, [collections, searchTerm, keyword]);
 
   const collectionsCount = collections?.numberMatched || 0;
-  // const collectionsReturned = collections?.numberReturned || 0;
-  // const numPages = Math.ceil(collectionsCount / pageSize);
-  // const shouldPaginate = collectionsCount > collectionsReturned;
 
   return (
     <Flex direction='column' gap={8}>
@@ -95,11 +82,8 @@ function CollectionList() {
         title='Catalog'
         overline='Browsing'
         actions={
-          <ButtonWithAuth
-            colorScheme='primary'
-            to='/collections/new'
-            leftIcon={<CollecticonPlusSmall />}
-          >
+          <ButtonWithAuth colorPalette='primary' to='/collections/new'>
+            <CollecticonPlusSmall />
             Create
           </ButtonWithAuth>
         }
@@ -119,33 +103,34 @@ function CollectionList() {
               <Heading size='xs' as='h3'>
                 Search
               </Heading>
-              <InputGroup width='16rem'>
+              <InputGroup
+                width='16rem'
+                endElement={<CollecticonMagnifierRight />}
+              >
                 <Input
                   type='search'
                   placeholder='Title or description'
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <InputRightElement pointerEvents='none'>
-                  <CollecticonMagnifierRight />
-                </InputRightElement>
               </InputGroup>
             </Flex>
             <Flex direction='row' gap='2' alignItems='center'>
               <Heading size='xs' as='h3'>
                 Filter
               </Heading>
-              <Select
-                placeholder='All keywords'
-                size='md'
-                width='12rem'
-                onChange={(e) => setKeyword(e.target.value)}
-              >
-                {keywords.map((k) => (
-                  <option key={k} value={k}>
-                    {k}
-                  </option>
-                ))}
-              </Select>
+              <NativeSelect.Root size='md' width='12rem'>
+                <NativeSelect.Field
+                  placeholder='All keywords'
+                  onChange={handleKeywordChange}
+                >
+                  {keywords.map((k) => (
+                    <option key={k} value={k}>
+                      {k}
+                    </option>
+                  ))}
+                </NativeSelect.Field>
+                <NativeSelect.Indicator />
+              </NativeSelect.Root>
             </Flex>
           </Flex>
         </Flex>
@@ -171,46 +156,41 @@ function CollectionList() {
                 tags={col.keywords}
                 to={`/collections/${col.id}/`}
                 renderMenu={() => (
-                  <Menu placement='bottom-end'>
-                    <MenuButton
-                      as={IconButton}
-                      aria-label='Options'
-                      icon={<CollecticonEllipsisVertical />}
-                      variant='soft-outline'
-                      colorScheme='base'
-                      size='sm'
-                    />
-                    <MenuList>
-                      <MenuItem
-                        as={SmartLink}
-                        to={`/collections/${col.id}/`}
-                        icon={<CollecticonTextBlock />}
+                  <Menu.Root positioning={{ placement: 'bottom-end' }}>
+                    <Menu.Trigger asChild>
+                      <IconButton
+                        aria-label='Options'
+                        variant='soft-outline'
+                        colorPalette='base'
+                        size='sm'
                       >
-                        View
-                      </MenuItem>
-                      <MenuItemWithAuth
-                        as={SmartLink}
-                        to={`/collections/${col.id}/edit`}
-                        icon={<CollecticonPencil />}
-                      >
-                        Edit
-                      </MenuItemWithAuth>
-                    </MenuList>
-                  </Menu>
+                        <CollecticonEllipsisVertical />
+                      </IconButton>
+                    </Menu.Trigger>
+                    <Portal>
+                      <Menu.Positioner>
+                        <Menu.Content>
+                          <Menu.Item value='view' asChild>
+                            <SmartLink to={`/collections/${col.id}/`}>
+                              <CollecticonTextBlock />
+                              View
+                            </SmartLink>
+                          </Menu.Item>
+                          <MenuItemWithAuth value='edit' asChild>
+                            <SmartLink to={`/collections/${col.id}/edit`}>
+                              <CollecticonPencil />
+                              Edit
+                            </SmartLink>
+                          </MenuItemWithAuth>
+                        </Menu.Content>
+                      </Menu.Positioner>
+                    </Portal>
+                  </Menu.Root>
                 )}
               />
             ))
           )}
         </SimpleGrid>
-        {/* {shouldPaginate && (
-          <Flex direction='column' alignItems='center'>
-            <Pagination
-              numPages={numPages}
-              page={page}
-              onPageChange={setPage}
-            />
-          </Flex>
-        )} */}
       </Flex>
     </Flex>
   );

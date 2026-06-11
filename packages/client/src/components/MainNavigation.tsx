@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  List,
-  ListItem,
-  Button,
-  ButtonProps,
-  Flex,
-  Divider
-} from '@chakra-ui/react';
+import { List, Button, ButtonProps, Flex, Separator } from '@chakra-ui/react';
 import {
   CollecticonFolder,
   CollecticonPlusSmall
@@ -18,18 +11,18 @@ import { useAuth } from 'src/auth/Context';
 
 function NavItem(props: ButtonProps & SmartLinkProps) {
   return (
-    <ListItem>
+    <List.Item>
       <Button
         as={SmartLink}
         variant='ghost'
-        sx={{
+        css={{
           '&:hover': {
             textDecoration: 'none'
           }
         }}
         {...props}
       />
-    </ListItem>
+    </List.Item>
   );
 }
 
@@ -38,19 +31,21 @@ function MainNavigation() {
 
   return (
     <Flex as='nav' aria-label='Main' gap={4} alignItems='center'>
-      <List display='flex' gap={2}>
-        <NavItem to='/collections/' rightIcon={<CollecticonFolder />}>
+      <List.Root flexDirection='row' gap={2} listStyle='none'>
+        <NavItem to='/collections/'>
           Browse
+          <CollecticonFolder />
         </NavItem>
         {isAuthenticated && (
-          <NavItem to='/collections/new' rightIcon={<CollecticonPlusSmall />}>
+          <NavItem to='/collections/new'>
             Create
+            <CollecticonPlusSmall />
           </NavItem>
         )}
-      </List>
+      </List.Root>
       {isEnabled && (
         <>
-          <Divider
+          <Separator
             orientation='vertical'
             borderLeftWidth='2px'
             borderColor='base.200'

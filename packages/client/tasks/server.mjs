@@ -34,11 +34,21 @@ process.env.APP_VERSION = process.env.APP_VERSION || readPackage().version;
 process.env.APP_BUILD_TIME = Date.now();
 
 async function findPort() {
-  return new Promise((resolve, reject) => {
+  // An explicit PORT (e.g. from Playwright's webServer) pins the server to
+  // the port the caller is polling instead of scanning for a free one.
+  if (process.env.PORT) return Number(process.env.PORT);
+
+  const port = await new Promise((resolve, reject) => {
     portscanner.findAPortNotInUse(9000, 9999, function (error, port) {
       return error ? reject(error) : resolve(port);
     });
   });
+
+  if (port !== 9000) {
+    log.warn(`  Port 9000 is busy. Using port ${port} instead.`);
+  }
+
+  return port;
 }
 
 // Simple task to copy the static files to the dist directory. The static
@@ -65,10 +75,6 @@ async function copyFiles() {
 // Parcel development server
 async function parcelServe() {
   const port = await findPort();
-
-  if (port !== 9000) {
-    log.warn(`  Port 9000 is busy. Using port ${port} instead.`);
-  }
 
   const bundler = new Parcel({
     entries: `${__appRoot}/src/index.html`,

@@ -7,9 +7,6 @@ import {
   Flex,
   IconButton,
   Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   SimpleGrid,
   Heading,
   Badge,
@@ -20,12 +17,9 @@ import {
   Skeleton,
   SkeletonText,
   Popover,
-  PopoverTrigger,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
   ButtonGroup,
-  Button
+  Button,
+  Portal
 } from '@chakra-ui/react';
 import { useCollection, useStacSearch } from '@developmentseed/stac-react';
 import {
@@ -57,7 +51,7 @@ function CollectionDetail() {
   const { collectionId } = useParams();
   usePageTitle(`Collection ${collectionId}`);
 
-  const { collection, state } = useCollection(collectionId!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+  const { collection, isLoading } = useCollection(collectionId!);
 
   const {
     results,
@@ -65,7 +59,8 @@ function CollectionDetail() {
     setCollections,
     submit,
     nextPage,
-    previousPage
+    previousPage,
+    limit
   } = useStacSearch();
 
   // The stac search pagination is token based and has no pages, but we can fake
@@ -85,12 +80,26 @@ function CollectionDetail() {
     [nextPage, previousPage]
   );
 
-  // Initialize the search with the current collection ID
+  // Initialize the search with the current collection ID.
+  //
+  // We depend on `collections` so this effect re-runs and re-applies the value
+  // if useStacSearch's internal state-reset (M() in stac-react v1, fires when
+  // its StacApi instance changes — e.g. token-driven rebuild during initial
+  // OIDC load) wipes it back to undefined. Without this, direct page loads
+  // that hit a token-load remount never restore `collections`, leaving the
+  // query disabled (v stays null) and no /search request goes out.
   useEffect(() => {
-    setCollections([collectionId]);
-  }, [collectionId, setCollections]);
+    if (collectionId && collections?.[0] !== collectionId) {
+      setCollections([collectionId]);
+      // A (re-)applied filter means the auto-resubmit below lands on results
+      // page 1, so the faked page counter must follow it — otherwise a
+      // token-driven reset mid-pagination leaves "Showing page 3" over
+      // page-1 results.
+      setPage(1);
+    }
+  }, [collectionId, collections, setCollections]);
 
-  // Automatically submit whenever the collection ID changes
+  // Automatically submit once collections is set (or re-set after a reset).
   useEffect(() => {
     if (!collections) return;
     submit();
@@ -122,7 +131,7 @@ function CollectionDetail() {
     return '—';
   }, [collection]);
 
-  if (!collection || state === 'LOADING') {
+  if (!collection || isLoading) {
     return (
       <Box p={8}>
         <Flex direction='column' gap={4}>
@@ -130,13 +139,7 @@ function CollectionDetail() {
           <Skeleton h={12} maxW='30rem' />
         </Flex>
 
-        <SkeletonText
-          mt={8}
-          noOfLines={4}
-          spacing='4'
-          skeletonHeight='2'
-          maxW='50rem'
-        />
+        <SkeletonText mt={8} noOfLines={4} maxW='50rem' />
       </Box>
     );
   }
@@ -144,9 +147,19 @@ function CollectionDetail() {
   const { id, title, description, keywords, license } =
     collection as StacCollection;
 
-  const resultCount = results?.numberMatched || 0;
+  // STAC APIs commonly include `numberMatched` (OAFeat / OGC Features
+  // convention), but stac-react v1 dropped it from the typed SearchResponse.
+  // Read it off the raw response when present; otherwise hide the badge to
+  // avoid showing a misleading page-size count.
+  const numberMatched = (results as { numberMatched?: number } | undefined)
+    ?.numberMatched;
+  const pageItemsCount = results?.features?.length ?? 0;
+  const totalPages =
+    numberMatched !== undefined && limit > 0
+      ? Math.ceil(numberMatched / limit)
+      : undefined;
   const shouldPaginate =
-    results?.links?.length > 1 && resultCount > results?.numberReturned;
+    (results?.links?.length ?? 0) > 1 && (!!nextPage || !!previousPage);
 
   return (
     <Flex direction='column' gap={8}>
@@ -156,25 +169,27 @@ function CollectionDetail() {
         actions={
           <>
             <ButtonWithAuth
-              colorScheme='primary'
+              colorPalette='primary'
               to={`/collections/${id}/edit`}
-              leftIcon={<CollecticonPencil />}
             >
+              <CollecticonPencil />
               Edit
             </ButtonWithAuth>
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                aria-label='Options'
-                icon={<CollecticonEllipsisVertical />}
-                variant='outline'
-                size='md'
-              />
-              <MenuList>
-                <StacBrowserMenuItem resourcePath={`/collections/${id}`} />
-                <DeleteMenuItem />
-              </MenuList>
-            </Menu>
+            <Menu.Root>
+              <Menu.Trigger asChild>
+                <IconButton aria-label='Options' variant='outline' size='md'>
+                  <CollecticonEllipsisVertical />
+                </IconButton>
+              </Menu.Trigger>
+              <Portal>
+                <Menu.Positioner>
+                  <Menu.Content>
+                    <StacBrowserMenuItem resourcePath={`/collections/${id}`} />
+                    <DeleteMenuItem />
+                  </Menu.Content>
+                </Menu.Positioner>
+              </Portal>
+            </Menu.Root>
           </>
         }
       />
@@ -203,7 +218,7 @@ function CollectionDetail() {
                   <Heading size='sm' as='h3'>
                     Description
                   </Heading>
-                  <Text size='md'>{description}</Text>
+                  <Text>{description}</Text>
                 </Flex>
               )}
 
@@ -212,7 +227,7 @@ function CollectionDetail() {
                   <Heading size='sm' as='h3'>
                     Temporal extent
                   </Heading>
-                  <Text size='md'>{dateLabel}</Text>
+                  <Text>{dateLabel}</Text>
                 </Flex>
               )}
 
@@ -221,7 +236,7 @@ function CollectionDetail() {
                   <Heading size='sm' as='h3'>
                     License
                   </Heading>
-                  <Text size='md'>{license}</Text>
+                  <Text>{license}</Text>
                 </Flex>
               )}
 
@@ -230,11 +245,11 @@ function CollectionDetail() {
                   <Heading size='sm' as='h3'>
                     Keywords
                   </Heading>
-                  <HStack spacing={2}>
+                  <HStack gap={2}>
                     {keywords.map((keyword) => (
-                      <Tag key={keyword} size='md' colorScheme='primary'>
-                        {keyword}
-                      </Tag>
+                      <Tag.Root key={keyword} size='md' colorPalette='primary'>
+                        <Tag.Label>{keyword}</Tag.Label>
+                      </Tag.Root>
                     ))}
                   </HStack>
                 </Flex>
@@ -268,26 +283,18 @@ function CollectionDetail() {
           <Box flexBasis='100%'>
             <Heading size='md' as='h2'>
               Items{' '}
-              {results && <Badge variant='solid'>{zeroPad(resultCount)}</Badge>}
+              {numberMatched !== undefined && (
+                <Badge variant='solid'>{zeroPad(numberMatched)}</Badge>
+              )}
             </Heading>
-            {!!resultCount && (
-              <Text size='sm' color='base.400'>
-                Showing page {page} of{' '}
-                {Math.ceil(resultCount / results.numberReturned)}
+            {pageItemsCount > 0 && (
+              <Text fontSize='sm' color='base.400'>
+                {totalPages
+                  ? `Showing page ${page} of ${totalPages}`
+                  : `Showing page ${page}`}
               </Text>
             )}
           </Box>
-          {/* <Flex direction='row' gap='4'>
-            <Button
-              as={SmartLink}
-              to='/item/new'
-              colorScheme='primary'
-              size='md'
-              leftIcon={<CollecticonPlusSmall />}
-            >
-              Add new
-            </Button>
-          </Flex> */}
         </Flex>
         <SimpleGrid
           gap={8}
@@ -302,46 +309,58 @@ function CollectionDetail() {
                 renderMenu={() => {
                   return (
                     <Flex gap={2}>
-                      <Menu placement='bottom-end'>
-                        <MenuButton
-                          as={IconButton}
-                          aria-label='Options'
-                          icon={<CollecticonEllipsisVertical />}
-                          variant='outline'
-                          size='sm'
-                        />
-                        <MenuList>
-                          <StacBrowserMenuItem
-                            resourcePath={`/collections/${id}/items/${item.id}`}
-                          />
-                          <MenuItem
-                            as={SmartLink}
-                            to={`/collections/${id}/items/${item.id}`}
-                            icon={<CollecticonTextBlock />}
+                      <Menu.Root positioning={{ placement: 'bottom-end' }}>
+                        <Menu.Trigger asChild>
+                          <IconButton
+                            aria-label='Options'
+                            variant='outline'
+                            size='sm'
                           >
-                            View
-                          </MenuItem>
-                        </MenuList>
-                      </Menu>
-                      <Popover placement='top' isLazy>
-                        {({ isOpen }) => (
-                          <>
-                            <PopoverTrigger>
-                              <IconButton
-                                aria-label='Preview'
-                                icon={<CollecticonEye />}
-                                variant='outline'
-                                size='sm'
-                                isActive={isOpen}
+                            <CollecticonEllipsisVertical />
+                          </IconButton>
+                        </Menu.Trigger>
+                        <Portal>
+                          <Menu.Positioner>
+                            <Menu.Content>
+                              <StacBrowserMenuItem
+                                resourcePath={`/collections/${id}/items/${item.id}`}
                               />
-                            </PopoverTrigger>
-                            <PopoverContent
+                              <Menu.Item value='view' asChild>
+                                <SmartLink
+                                  to={`/collections/${id}/items/${item.id}`}
+                                >
+                                  <CollecticonTextBlock />
+                                  View
+                                </SmartLink>
+                              </Menu.Item>
+                            </Menu.Content>
+                          </Menu.Positioner>
+                        </Portal>
+                      </Menu.Root>
+                      <Popover.Root
+                        positioning={{ placement: 'top' }}
+                        lazyMount
+                      >
+                        <Popover.Trigger asChild>
+                          <IconButton
+                            aria-label='Preview'
+                            variant='outline'
+                            size='sm'
+                          >
+                            <CollecticonEye />
+                          </IconButton>
+                        </Popover.Trigger>
+                        <Portal>
+                          <Popover.Positioner>
+                            <Popover.Content
                               boxShadow='sm'
                               borderColor='base.200'
                               borderWidth='2px'
                             >
-                              <PopoverArrow bg='base.200' />
-                              <PopoverBody
+                              <Popover.Arrow>
+                                <Popover.ArrowTip />
+                              </Popover.Arrow>
+                              <Popover.Body
                                 p={0}
                                 overflow='hidden'
                                 borderRadius='md'
@@ -349,11 +368,11 @@ function CollectionDetail() {
                                 <Box h='15rem'>
                                   <ItemMap item={item} reuseMaps />
                                 </Box>
-                              </PopoverBody>
-                            </PopoverContent>
-                          </>
-                        )}
-                      </Popover>
+                              </Popover.Body>
+                            </Popover.Content>
+                          </Popover.Positioner>
+                        </Portal>
+                      </Popover.Root>
                     </Flex>
                   );
                 }}
@@ -369,7 +388,7 @@ function CollectionDetail() {
         </SimpleGrid>
         {shouldPaginate && (
           <Flex direction='column' alignItems='center'>
-            <ButtonGroup size='sm' variant='outline' isAttached>
+            <ButtonGroup size='sm' variant='outline' attached>
               <Button
                 disabled={!previousPage}
                 onClick={() => onPageNavigate('previous')}

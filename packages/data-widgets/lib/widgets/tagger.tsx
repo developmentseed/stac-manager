@@ -1,15 +1,11 @@
 import React, {
   KeyboardEvent,
   KeyboardEventHandler,
+  useId,
   useMemo,
   useState
 } from 'react';
-import {
-  Kbd,
-  FormControl,
-  FormLabel,
-  FormErrorMessage
-} from '@chakra-ui/react';
+import { Field, Kbd } from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import CreatableSelect from 'react-select/creatable';
 import {
@@ -103,6 +99,10 @@ function WidgetTaggerNoOptions(props: WidgetProps) {
 
   const key = useRenderKey([pointer, isRequired, field]);
 
+  // Shared between Field.Root (whose label htmlFor points at the field id)
+  // and react-select's input, so clicking the label focuses the control.
+  const inputId = useId();
+
   return (
     <FastField name={pointer} key={key}>
       {({
@@ -110,22 +110,25 @@ function WidgetTaggerNoOptions(props: WidgetProps) {
         meta,
         form: { setFieldValue }
       }: FastFieldProps) => (
-        <FormControl
-          isRequired={isRequired}
-          isInvalid={!!(meta.touched && meta.error)}
+        <Field.Root
+          id={inputId}
+          required={isRequired}
+          invalid={!!(meta.touched && meta.error)}
         >
           {field.label && (
-            <FormLabel>
+            <Field.Label>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
-            </FormLabel>
+              <Field.RequiredIndicator />
+            </Field.Label>
           )}
           <WidgetTaggerNoOptionsSelect
             pointer={pointer}
+            inputId={inputId}
             value={value}
             onChange={(v: string | string[]) => setFieldValue(name, v)}
           />
-          <FormErrorMessage>{meta.error}</FormErrorMessage>
-        </FormControl>
+          <Field.ErrorText>{meta.error}</Field.ErrorText>
+        </Field.Root>
       )}
     </FastField>
   );
@@ -137,12 +140,13 @@ const components = {
 
 interface WidgetTaggerNoOptionsSelectProps {
   pointer: string;
+  inputId?: string;
   value: string[];
   onChange: (value: string[]) => void;
 }
 
 function WidgetTaggerNoOptionsSelect(props: WidgetTaggerNoOptionsSelectProps) {
-  const { value, onChange, pointer } = props;
+  const { value, onChange, pointer, inputId } = props;
 
   const [inputValue, setInputValue] = useState('');
   const selectedValues = Array.isArray(value) ? value.map(createOption) : [];
@@ -158,6 +162,7 @@ function WidgetTaggerNoOptionsSelect(props: WidgetTaggerNoOptionsSelectProps) {
 
   return (
     <CreatableSelect
+      inputId={inputId}
       name={pointer}
       components={components}
       inputValue={inputValue}
@@ -193,6 +198,10 @@ function WidgetTaggerWithOptions(props: WidgetProps & { isMulti?: boolean }) {
 
   const key = useRenderKey([pointer, isRequired, isMulti, field]);
 
+  // Shared between Field.Root (whose label htmlFor points at the field id)
+  // and react-select's input, so clicking the label focuses the control.
+  const inputId = useId();
+
   const options = useMemo(() => {
     const enums = isMulti
       ? (field as SchemaFieldArray<SchemaFieldString>).items.enum
@@ -211,25 +220,28 @@ function WidgetTaggerWithOptions(props: WidgetProps & { isMulti?: boolean }) {
         meta,
         form: { setFieldValue }
       }: FastFieldProps) => (
-        <FormControl
-          isRequired={isRequired}
-          isInvalid={!!(meta.touched && meta.error)}
+        <Field.Root
+          id={inputId}
+          required={isRequired}
+          invalid={!!(meta.touched && meta.error)}
         >
           {field.label && (
-            <FormLabel>
+            <Field.Label>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
-            </FormLabel>
+              <Field.RequiredIndicator />
+            </Field.Label>
           )}
 
           <WidgetTaggerWithOptionsSelect
             pointer={pointer}
+            inputId={inputId}
             isMulti={!!isMulti}
             value={value}
             onChange={(v: string | string[]) => setFieldValue(name, v)}
             options={options}
           />
-          <FormErrorMessage>{meta.error}</FormErrorMessage>
-        </FormControl>
+          <Field.ErrorText>{meta.error}</Field.ErrorText>
+        </Field.Root>
       )}
     </FastField>
   );
@@ -237,6 +249,7 @@ function WidgetTaggerWithOptions(props: WidgetProps & { isMulti?: boolean }) {
 
 interface WidgetTaggerWithOptionsSelectProps {
   pointer: string;
+  inputId?: string;
   isMulti: boolean;
   onChange: (value: string | string[]) => void;
   value: string | string[];
@@ -246,7 +259,7 @@ interface WidgetTaggerWithOptionsSelectProps {
 function WidgetTaggerWithOptionsSelect(
   props: WidgetTaggerWithOptionsSelectProps
 ) {
-  const { isMulti, onChange, value, options, pointer } = props;
+  const { isMulti, onChange, value, options, pointer, inputId } = props;
   const [inputValue, setInputValue] = useState('');
 
   const selectedValues = value
@@ -267,6 +280,7 @@ function WidgetTaggerWithOptionsSelect(
 
   return (
     <CreatableSelect
+      inputId={inputId}
       name={pointer}
       inputValue={inputValue}
       isClearable

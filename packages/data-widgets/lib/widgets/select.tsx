@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/react';
+import React, { useId, useMemo } from 'react';
+import { Field } from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import ReactSelect from 'react-select';
 import {
@@ -18,8 +18,7 @@ interface Option {
 }
 
 export function WidgetSelect(props: WidgetProps) {
-  const { pointer, isRequired, field } = props;
-
+  const { field } = props;
   const isMulti = field.type === 'array';
 
   if (
@@ -40,7 +39,19 @@ export function WidgetSelect(props: WidgetProps) {
     );
   }
 
+  return <WidgetSelectInner {...props} />;
+}
+
+function WidgetSelectInner(props: WidgetProps) {
+  const { pointer, isRequired, field } = props;
+
+  const isMulti = field.type === 'array';
+
   const key = useRenderKey([pointer, isRequired, isMulti, field]);
+
+  // Shared between Field.Root (whose label htmlFor points at the field id)
+  // and react-select's input, so clicking the label focuses the control.
+  const inputId = useId();
 
   const options = useMemo(() => {
     const enums = isMulti
@@ -65,16 +76,19 @@ export function WidgetSelect(props: WidgetProps) {
         );
 
         return (
-          <FormControl
-            isRequired={isRequired}
-            isInvalid={!!(meta.touched && meta.error)}
+          <Field.Root
+            id={inputId}
+            required={isRequired}
+            invalid={!!(meta.touched && meta.error)}
           >
             {field.label && (
-              <FormLabel>
+              <Field.Label>
                 <FieldLabel size='xs'>{field.label}</FieldLabel>
-              </FormLabel>
+                <Field.RequiredIndicator />
+              </Field.Label>
             )}
             <ReactSelect
+              inputId={inputId}
               name={name}
               options={options}
               isMulti={isMulti}
@@ -93,8 +107,8 @@ export function WidgetSelect(props: WidgetProps) {
               }}
               value={selectedOpts}
             />
-            <FormErrorMessage>{meta.error}</FormErrorMessage>
-          </FormControl>
+            <Field.ErrorText>{meta.error}</Field.ErrorText>
+          </Field.Root>
         );
       }}
     </FastField>

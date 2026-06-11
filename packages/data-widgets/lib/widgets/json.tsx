@@ -1,11 +1,6 @@
-import React, { Suspense, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { SchemaFieldJson, WidgetProps } from '@stac-manager/data-core';
-import {
-  CircularProgress,
-  Flex,
-  FormControl,
-  FormLabel
-} from '@chakra-ui/react';
+import { Field, Flex } from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import {
   CollecticonArrowSemiSpinCcw,
@@ -17,8 +12,7 @@ import type JSONEditor from 'jsoneditor';
 
 import { FieldIconBtn, FieldLabel } from '../components/elements';
 import { CollecticonIndent } from '../components/icons/indent';
-
-const JsonEditor = React.lazy(() => import('../components/json-jsoneditor'));
+import JsonEditor from '../components/json-jsoneditor';
 
 // Extend to have access to internal methods provided by the textmode.
 interface JSONEditorCodeMode extends JSONEditor {
@@ -35,38 +29,27 @@ export function WidgetJSON(props: WidgetProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <FormControl>
+    <Field.Root>
       <Flex gap={4}>
         {field.label && (
-          <FormLabel>
+          <Field.Label>
             <FieldLabel size='xs'>{field.label}</FieldLabel>
-          </FormLabel>
+          </Field.Label>
         )}
         {isLoaded && <ControlBar editor={editorRef.current!} />}
       </Flex>
 
-      <Suspense fallback={<Loading />}>
-        <FastField name={props.pointer}>
-          {({ field: { value }, form: { setFieldValue } }: FastFieldProps) => (
-            <JsonEditor
-              value={value}
-              onChange={(v) => setFieldValue(props.pointer, v)}
-              editorRef={editorRef}
-              onLoad={() => setIsLoaded(true)}
-            />
-          )}
-        </FastField>
-      </Suspense>
-    </FormControl>
-  );
-}
-
-function Loading() {
-  return (
-    <Flex alignItems='center' gap={2} justifyContent='center'>
-      <CircularProgress isIndeterminate color='primary.500' size='1.5rem' />{' '}
-      Loading json editor...
-    </Flex>
+      <FastField name={props.pointer}>
+        {({ field: { value }, form: { setFieldValue } }: FastFieldProps) => (
+          <JsonEditor
+            value={value}
+            onChange={(v) => setFieldValue(props.pointer, v)}
+            editorRef={editorRef}
+            onLoad={() => setIsLoaded(true)}
+          />
+        )}
+      </FastField>
+    </Field.Root>
   );
 }
 
@@ -83,38 +66,43 @@ function ControlBar(props: { editor: JSONEditorCodeMode }) {
           editor.repair?.();
           editor._onChange?.();
         }}
-        icon={<CollecticonWrench size={3} />}
-      />
+      >
+        <CollecticonWrench boxSize={3} />
+      </FieldIconBtn>
       <FieldIconBtn
         aria-label='Compact'
         onClick={() => {
           editor.compact?.();
         }}
-        icon={<CollecticonTextBlock size={3} />}
-      />
+      >
+        <CollecticonTextBlock boxSize={3} />
+      </FieldIconBtn>
       <FieldIconBtn
         aria-label='Format'
         onClick={() => {
           editor.format?.();
         }}
-        icon={<CollecticonIndent size={3} />}
-      />
+      >
+        <CollecticonIndent boxSize={3} />
+      </FieldIconBtn>
       <FieldIconBtn
         aria-label='Undo'
-        isDisabled={!undoManager?.canUndo()}
+        disabled={!undoManager?.canUndo()}
         onClick={() => {
           undoManager?.undo();
         }}
-        icon={<CollecticonArrowSemiSpinCcw size={3} />}
-      />
+      >
+        <CollecticonArrowSemiSpinCcw boxSize={3} />
+      </FieldIconBtn>
       <FieldIconBtn
         aria-label='Redo'
-        isDisabled={!undoManager?.canRedo()}
+        disabled={!undoManager?.canRedo()}
         onClick={() => {
           undoManager?.redo();
         }}
-        icon={<CollecticonArrowSemiSpinCw size={3} />}
-      />
+      >
+        <CollecticonArrowSemiSpinCw boxSize={3} />
+      </FieldIconBtn>
     </Flex>
   );
 }

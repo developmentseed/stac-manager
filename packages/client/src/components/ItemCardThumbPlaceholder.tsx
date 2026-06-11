@@ -1,7 +1,7 @@
 import React from 'react';
-import { chakra, ChakraProps } from '@chakra-ui/react';
+import { chakra, HTMLChakraProps } from '@chakra-ui/react';
 
-export function ItemCardThumbPlaceholder(props: ChakraProps) {
+export function ItemCardThumbPlaceholder(props: HTMLChakraProps<'svg'>) {
   return (
     <chakra.svg
       viewBox='0 0 640 320'

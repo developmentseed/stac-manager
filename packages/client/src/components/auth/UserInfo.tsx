@@ -36,7 +36,6 @@ export function UserInfo() {
     return (
       <Button
         variant='outline'
-        rightIcon={<CollecticonLogin />}
         onClick={() => {
           if (!isLoading) {
             login({
@@ -46,6 +45,7 @@ export function UserInfo() {
         }}
       >
         Login
+        <CollecticonLogin />
       </Button>
     );
   }
@@ -56,18 +56,8 @@ export function UserInfo() {
   return (
     <Button
       variant='outline'
-      rightIcon={<CollecticonLogout />}
-      leftIcon={
-        <Avatar
-          size='sm'
-          name={username}
-          bg='secondary.500'
-          color='white'
-          borderRadius='4px'
-          src={`https://www.gravatar.com/avatar/${userEmailHash}?d=404`}
-        />
-      }
       pl='2px'
+      aria-label={username}
       onClick={() => {
         if (!isLoading) {
           logout({
@@ -76,7 +66,28 @@ export function UserInfo() {
         }
       }}
     >
+      {/*
+       * Render Avatar.Root as a <span> via asChild so it nests legally
+       * inside the <button> (phrasing content only). The Root still
+       * provides Chakra's slot-recipe context and Ark UI's image/fallback
+       * state machine — only the rendered element changes.
+       */}
+      <Avatar.Root
+        asChild
+        size='xs'
+        bg='secondary.500'
+        color='white'
+        borderRadius='4px'
+      >
+        <span>
+          <Avatar.Image
+            src={`https://www.gravatar.com/avatar/${userEmailHash}?d=404`}
+          />
+          <Avatar.Fallback name={username} />
+        </span>
+      </Avatar.Root>
       Logout
+      <CollecticonLogout />
     </Button>
   );
 }

@@ -1,9 +1,21 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef
+} from 'react';
 import {
   AuthProvider as OidcAuthProvider,
   useAuth as useOidcAuth
 } from 'react-oidc-context';
-import { WebStorageStateStore } from 'oidc-client-ts';
+import { ErrorResponse, WebStorageStateStore } from 'oidc-client-ts';
+
+// Trigger a silent renewal this many seconds before the access token expires.
+// Matches oidc-client-ts's default; restated here so the visibility-change
+// top-up uses the same threshold.
+const REFRESH_THRESHOLD_SECONDS = 60;
 
 export type AuthProfile = {
   username?: string;
@@ -15,12 +27,27 @@ export type AuthProfile = {
 
 export type AuthContextValue = {
   isEnabled: boolean;
+  /**
+   * True only while the initial session is being resolved (or an explicit
+   * redirect sign-in/out is navigating away) — not during mid-session silent
+   * token renews. App.tsx and main.tsx unmount the whole tree behind this
+   * flag, so flipping it for a background refresh would wipe in-progress
+   * form state.
+   */
   isLoading: boolean;
   isAuthenticated: boolean;
   profile?: AuthProfile;
   token?: string;
   login: (opts?: { redirectUri?: string }) => Promise<void>;
   logout: (opts?: { redirectUri?: string }) => Promise<void>;
+  /**
+   * Force a silent refresh and return the new access token. Used by the API
+   * layer to self-heal a 401 caused by a stale token. Resolves to undefined
+   * if auth is disabled, the user isn't signed in, or the refresh fails;
+   * a refresh the IdP definitively rejects also clears the local session,
+   * while transient (network) failures leave it intact.
+   */
+  refreshAuth: () => Promise<string | undefined>;
 };
 
 const DisabledContext: AuthContextValue = {
@@ -28,7 +55,8 @@ const DisabledContext: AuthContextValue = {
   isLoading: false,
   isAuthenticated: false,
   login: () => Promise.resolve(),
-  logout: () => Promise.resolve()
+  logout: () => Promise.resolve(),
+  refreshAuth: () => Promise.resolve(undefined)
 };
 
 const AuthContext = createContext<AuthContextValue>(DisabledContext);
@@ -44,6 +72,100 @@ const config: { authority: string; clientId: string } | undefined =
 function EnabledAuthBridge(props: { children: React.ReactNode }) {
   const oidc = useOidcAuth();
 
+  // Single failure policy for any refresh path. Only a definitive answer
+  // from the IdP — an OAuth error response such as invalid_grant — means the
+  // session is dead, so only then drop local user state (removeUser, not
+  // signoutRedirect, so no IdP round-trip is needed). Anything else is
+  // transient: the visibility top-up fires the instant a hibernated tab
+  // becomes visible, typically before Wi-Fi has reconnected after laptop
+  // wake, and a plain network error there must not destroy a session whose
+  // refresh token is still valid.
+  const handleRefreshFailure = useCallback(
+    (err: unknown) => {
+      // eslint-disable-next-line no-console
+      console.warn('Silent token refresh failed:', err);
+      if (err instanceof ErrorResponse) {
+        oidc.removeUser();
+      }
+    },
+    [oidc]
+  );
+
+  // Shared wrapper around signinSilent that funnels every failure through
+  // handleRefreshFailure. Used by both the visibility-change top-up and the
+  // API-layer's 401 self-heal. Concurrent callers — e.g. several requests
+  // 401ing at once, or a 401 retry overlapping the visibility/expired
+  // handlers — share one in-flight refresh: under IdP refresh-token rotation
+  // with reuse detection, racing two refresh_token grants can revoke the
+  // whole session.
+  const inflightRefresh = useRef<Promise<string | undefined> | null>(null);
+  const silentRefresh = useCallback((): Promise<string | undefined> => {
+    if (inflightRefresh.current) return inflightRefresh.current;
+
+    inflightRefresh.current = (async () => {
+      try {
+        const user = await oidc.signinSilent();
+        return user?.access_token;
+      } catch (err) {
+        handleRefreshFailure(err);
+        return undefined;
+      } finally {
+        inflightRefresh.current = null;
+      }
+    })();
+
+    return inflightRefresh.current;
+  }, [oidc, handleRefreshFailure]);
+
+  // Top up the access token whenever the tab comes back from hibernation.
+  // automaticSilentRenew uses setTimeout, which browsers can throttle or
+  // skip entirely while the tab is hidden — so a token that "should" have
+  // refreshed in the background may be expired when the user returns.
+  useEffect(() => {
+    if (!oidc.isAuthenticated) return;
+
+    const maybeRefresh = () => {
+      if (document.visibilityState !== 'visible') return;
+      const expiresAt = oidc.user?.expires_at; // seconds since epoch
+      if (!expiresAt) return;
+      const now = Math.floor(Date.now() / 1000);
+      if (expiresAt - now > REFRESH_THRESHOLD_SECONDS) return;
+      silentRefresh();
+    };
+
+    document.addEventListener('visibilitychange', maybeRefresh);
+    return () => {
+      document.removeEventListener('visibilitychange', maybeRefresh);
+    };
+  }, [oidc, silentRefresh]);
+
+  // Background automaticSilentRenew failures don't surface as a thrown error
+  // here — oidc-client-ts emits them via UserManagerEvents, so we hook the
+  // same failure policy onto that event.
+  useEffect(() => {
+    oidc.events.addSilentRenewError(handleRefreshFailure);
+    return () => {
+      oidc.events.removeSilentRenewError(handleRefreshFailure);
+    };
+  }, [oidc, handleRefreshFailure]);
+
+  // Backstop for the case where automaticSilentRenew never even attempts a
+  // refresh (scheduling glitch, no refresh_token, throttled background tab).
+  // Without this, the token can sit in oidc.user past its expiry and every
+  // request through stac-react — which has no 401-retry — fails with 401.
+  // On success the new token propagates via context; on failure
+  // handleRefreshFailure clears the user so the bridge stops attaching the
+  // dead bearer.
+  useEffect(() => {
+    const onExpired = () => {
+      silentRefresh();
+    };
+    oidc.events.addAccessTokenExpired(onExpired);
+    return () => {
+      oidc.events.removeAccessTokenExpired(onExpired);
+    };
+  }, [oidc, silentRefresh]);
+
   const value = useMemo<AuthContextValue>(() => {
     const p = oidc.user?.profile;
     const profile: AuthProfile | undefined = p
@@ -58,7 +180,12 @@ function EnabledAuthBridge(props: { children: React.ReactNode }) {
 
     return {
       isEnabled: true,
-      isLoading: oidc.isLoading,
+      // react-oidc-context flips isLoading for the whole duration of a
+      // wrapped signinSilent call (visibility top-up, accessTokenExpired
+      // backstop, 401 self-heal). Surfacing that would swap the app for the
+      // loading spinner mid-session — a full unmount/remount that loses
+      // form state — so silent renews are exempted here.
+      isLoading: oidc.isLoading && oidc.activeNavigator !== 'signinSilent',
       isAuthenticated: !!oidc.isAuthenticated,
       profile,
       token: oidc.user?.access_token,
@@ -69,9 +196,10 @@ function EnabledAuthBridge(props: { children: React.ReactNode }) {
       logout: (opts) =>
         oidc.signoutRedirect({
           post_logout_redirect_uri: opts?.redirectUri ?? window.location.href
-        })
+        }),
+      refreshAuth: silentRefresh
     };
-  }, [oidc]);
+  }, [oidc, silentRefresh]);
 
   return (
     <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>
@@ -99,6 +227,13 @@ export function AuthProvider(props: { children: React.ReactNode }) {
       post_logout_redirect_uri={
         window.location.origin + window.location.pathname
       }
+      // `offline_access` asks the IdP for a refresh token. Without it most
+      // providers issue access-token-only sessions, and oidc-client-ts falls
+      // back to iframe-based silent renewal — which is unreliable under
+      // modern third-party-cookie restrictions. With a refresh token, silent
+      // renewal uses the refresh_token grant and just works.
+      scope='openid profile email offline_access'
+      automaticSilentRenew={true}
       userStore={new WebStorageStateStore({ store: window.localStorage })}
       onSigninCallback={() => {
         // Remove code/state params from URL after successful login

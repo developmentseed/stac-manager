@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Radio,
-  RadioGroup
-} from '@chakra-ui/react';
+import { Fieldset, RadioGroup, Span } from '@chakra-ui/react';
 import { SchemaFieldString, WidgetProps } from '@stac-manager/data-core';
 import { FastField, FastFieldProps } from 'formik';
 
@@ -19,7 +13,7 @@ export function WidgetRadio(props: WidgetProps) {
 
   if (field.allowOther) {
     throw new Error(
-      "WidgetCheckbox: allowOther is not supported. Use widget 'tagger' instead"
+      "WidgetRadio: allowOther is not supported. Use widget 'tagger' instead"
     );
   }
 
@@ -34,33 +28,42 @@ export function WidgetRadio(props: WidgetProps) {
         meta,
         form: { setFieldValue, setFieldTouched }
       }: FastFieldProps) => (
-        <FormControl
-          isRequired={isRequired}
-          isInvalid={!!(meta.touched && meta.error)}
-        >
+        // Fieldset (not Field.Root): a radio group is a set of controls, so a
+        // single <label> has nothing valid to point at — Field.Label's
+        // htmlFor would dangle. A legend labels the group as a whole.
+        <Fieldset.Root invalid={!!(meta.touched && meta.error)}>
           {field.label && (
-            <FormLabel>
+            <Fieldset.Legend>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
-            </FormLabel>
+              {isRequired && (
+                <Span color='fg.error' lineHeight='1' ms='1' aria-hidden='true'>
+                  *
+                </Span>
+              )}
+            </Fieldset.Legend>
           )}
-          <RadioGroup
+          <RadioGroup.Root
             size='sm'
             gap={4}
             display='flex'
-            value={value}
-            onChange={(v) => {
-              setFieldValue(pointer, v);
+            // Formik leaves an untouched field undefined; coerce to null so the
+            // group mounts controlled and doesn't warn/flip on first change.
+            value={value ?? null}
+            onValueChange={(details: { value: string | null }) => {
+              setFieldValue(pointer, details.value);
               setFieldTouched(pointer, true);
             }}
           >
             {options.map(([radioValue, label]) => (
-              <Radio key={radioValue} size='sm' value={radioValue}>
-                {label}
-              </Radio>
+              <RadioGroup.Item key={radioValue} value={radioValue}>
+                <RadioGroup.ItemHiddenInput />
+                <RadioGroup.ItemControl />
+                <RadioGroup.ItemText>{label}</RadioGroup.ItemText>
+              </RadioGroup.Item>
             ))}
-          </RadioGroup>
-          <FormErrorMessage>{meta.error}</FormErrorMessage>
-        </FormControl>
+          </RadioGroup.Root>
+          <Fieldset.ErrorText>{meta.error}</Fieldset.ErrorText>
+        </Fieldset.Root>
       )}
     </FastField>
   );

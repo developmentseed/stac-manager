@@ -2,10 +2,9 @@ import React from 'react';
 import {
   Checkbox,
   CheckboxGroup,
+  Fieldset,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel
+  Span
 } from '@chakra-ui/react';
 import { FastField, FastFieldProps } from 'formik';
 import {
@@ -39,32 +38,42 @@ export function WidgetCheckbox(props: WidgetProps) {
         meta,
         form: { setFieldValue, setFieldTouched }
       }: FastFieldProps) => (
-        <FormControl
-          isRequired={isRequired}
-          isInvalid={!!(meta.touched && meta.error)}
-        >
+        // Fieldset (not Field.Root) on purpose: Ark checkboxes consume the
+        // surrounding Field context, so a group under one Field.Root would
+        // share the Field's ids (duplicate DOM ids, every label toggling the
+        // first input) and inherit its `required` onto every hidden input.
+        <Fieldset.Root invalid={!!(meta.touched && meta.error)}>
           {field.label && (
-            <FormLabel>
+            <Fieldset.Legend>
               <FieldLabel size='xs'>{field.label}</FieldLabel>
-            </FormLabel>
+              {isRequired && (
+                <Span color='fg.error' lineHeight='1' ms='1' aria-hidden='true'>
+                  *
+                </Span>
+              )}
+            </Fieldset.Legend>
           )}
           <Flex gap={4}>
             <CheckboxGroup
-              value={value}
-              onChange={(v) => {
+              // Formik leaves an untouched field undefined; coerce to [] so the
+              // group mounts controlled and doesn't warn/flip on first change.
+              value={value ?? []}
+              onValueChange={(v: string[]) => {
                 setFieldValue(pointer, v);
                 setFieldTouched(pointer, true);
               }}
             >
               {options.map(([checkboxVal, label]) => (
-                <Checkbox key={checkboxVal} size='sm' value={checkboxVal}>
-                  {label}
-                </Checkbox>
+                <Checkbox.Root key={checkboxVal} size='sm' value={checkboxVal}>
+                  <Checkbox.HiddenInput />
+                  <Checkbox.Control />
+                  <Checkbox.Label>{label}</Checkbox.Label>
+                </Checkbox.Root>
               ))}
             </CheckboxGroup>
           </Flex>
-          <FormErrorMessage>{meta.error}</FormErrorMessage>
-        </FormControl>
+          <Fieldset.ErrorText>{meta.error}</Fieldset.ErrorText>
+        </Fieldset.Root>
       )}
     </FastField>
   );

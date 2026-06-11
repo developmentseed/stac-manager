@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Box,
   Flex,
-  forwardRef,
   Heading,
   IconButton,
   Button,
@@ -16,10 +15,9 @@ import {
   CollecticonPlusSmall
 } from '@devseed-ui/collecticons-chakra';
 
-export const Fieldset = forwardRef<FlexProps, 'div'>((props, ref) => {
+export function Fieldset(props: FlexProps) {
   return (
     <Flex
-      ref={ref}
       as='fieldset'
       flexDirection='column'
       gap={8}
@@ -29,33 +27,31 @@ export const Fieldset = forwardRef<FlexProps, 'div'>((props, ref) => {
       {...props}
     />
   );
-});
+}
 
-export const FieldsetHeader = forwardRef<FlexProps, 'div'>((props, ref) => {
-  return <Flex ref={ref} justifyContent='space-between' gap={4} {...props} />;
-});
+export function FieldsetHeader(props: FlexProps) {
+  return <Flex justifyContent='space-between' gap={4} {...props} />;
+}
 
-export const FieldsetBody = forwardRef<FlexProps, 'div'>((props, ref) => {
-  return <Flex ref={ref} flexDirection='column' gap={4} {...props} />;
-});
+export function FieldsetBody(props: FlexProps) {
+  return <Flex flexDirection='column' gap={4} {...props} />;
+}
 
-export const FieldsetFooter = forwardRef<FlexProps, 'div'>((props, ref) => {
-  return <Flex ref={ref} gap={4} {...props} />;
-});
+export function FieldsetFooter(props: FlexProps) {
+  return <Flex gap={4} {...props} />;
+}
 
-export const FieldLabel = forwardRef<HeadingProps, 'span'>((props, ref) => {
+export function FieldLabel(props: HeadingProps) {
   return (
     <Heading
-      ref={ref}
       as='span'
       size='sm'
       display='inline-flex'
       alignItems='center'
       gap={2}
       {...props}
-      sx={{
-        ...(props?.sx ?? {}),
-        small: {
+      css={{
+        '& small': {
           borderRadius: 'sm',
           bg: 'base.400a',
           color: 'surface.500',
@@ -65,34 +61,26 @@ export const FieldLabel = forwardRef<HeadingProps, 'span'>((props, ref) => {
       }}
     />
   );
-});
+}
 
-export const FieldIconBtn = forwardRef<IconButtonProps, 'button'>(
-  (props, ref) => {
-    return (
-      <IconButton
-        ref={ref}
-        colorScheme='base'
-        variant='soft-outline'
-        size='xs'
-        {...props}
-      />
-    );
-  }
-);
+export function FieldIconBtn(props: IconButtonProps) {
+  return (
+    <IconButton
+      colorPalette='base'
+      variant='soft-outline'
+      size='xs'
+      {...props}
+    />
+  );
+}
 
-export const FieldsetDeleteBtn = forwardRef<IconButtonProps, 'button'>(
-  (props, ref) => {
-    return (
-      <FieldIconBtn
-        ref={ref}
-        size='sm'
-        icon={<CollecticonTrashBin />}
-        {...props}
-      />
-    );
-  }
-);
+export function FieldsetDeleteBtn(props: IconButtonProps) {
+  return (
+    <FieldIconBtn size='sm' aria-label='Delete' {...props}>
+      <CollecticonTrashBin />
+    </FieldIconBtn>
+  );
+}
 
 interface ArrayFieldsetProps {
   label?: React.ReactNode;
@@ -140,7 +128,7 @@ export function ArrayFieldset(props: ArrayFieldsetProps) {
             <Box>
               <FieldsetDeleteBtn
                 onClick={onRemove}
-                isDisabled={removeDisabled}
+                disabled={removeDisabled}
                 aria-label='Remove item'
               />
             </Box>
@@ -151,13 +139,13 @@ export function ArrayFieldset(props: ArrayFieldsetProps) {
       {onAdd && (
         <FieldsetFooter>
           <Button
-            colorScheme='base'
+            colorPalette='base'
             size='sm'
             onClick={onAdd}
             aria-label='Add item'
-            leftIcon={<CollecticonPlusSmall />}
-            isDisabled={addDisabled}
+            disabled={addDisabled}
           >
+            <CollecticonPlusSmall />
             Add another
           </Button>
         </FieldsetFooter>

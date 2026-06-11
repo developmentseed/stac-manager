@@ -14,13 +14,16 @@ export const STAC_API_URL: string | undefined =
 class Api {
   private token: string | undefined;
   private stacBaseUrl: string | undefined;
+  private refreshAuth?: () => Promise<string | undefined>;
 
   constructor(
     token: string | undefined,
-    stacBaseUrl: string | undefined = STAC_API_URL
+    stacBaseUrl: string | undefined = STAC_API_URL,
+    refreshAuth?: () => Promise<string | undefined>
   ) {
     this.token = token;
     this.stacBaseUrl = stacBaseUrl;
+    this.refreshAuth = refreshAuth;
   }
 
   // Scope guard: only attach Authorization for URLs under the configured STAC
@@ -32,43 +35,70 @@ class Api {
     return url === this.stacBaseUrl || url.startsWith(`${this.stacBaseUrl}/`);
   }
 
-  fetch(url: string, options: GenericObject = {}) {
+  // Build the final fetch options, injecting the Authorization header for
+  // STAC-scoped URLs. `tokenOverride` lets the 401-retry path swap in a
+  // freshly-refreshed token without rebuilding the instance.
+  private buildOptions(
+    url: string,
+    options: GenericObject,
+    tokenOverride?: string
+  ): GenericObject {
+    const t = tokenOverride ?? this.token;
     const injected =
-      this.token && this.isStacUrl(url)
-        ? { Authorization: `Bearer ${this.token}` }
-        : {};
-
+      t && this.isStacUrl(url) ? { Authorization: `Bearer ${t}` } : {};
     // Caller-provided headers win on collision, so a caller can override the
     // injected Authorization (e.g. force an explicit anonymous request).
-    const finalOptions: GenericObject = {
+    return {
       ...options,
       headers: {
         ...injected,
         ...(options.headers || {})
       }
     };
+  }
 
-    return fetch(url, finalOptions).then(async (response) => {
-      if (response.ok) {
-        return response.json();
-      }
+  async fetch(url: string, options: GenericObject = {}) {
+    let response = await fetch(url, this.buildOptions(url, options));
 
-      const { status, statusText } = response;
-      const e: ApiError = {
-        status,
-        statusText
-      };
-      // Some STAC APIs return errors as JSON others as string.
-      // Clone the response so we can read the body as text if json fails.
-      const clone = response.clone();
-      try {
-        e.detail = await response.json();
-        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      } catch (err) {
-        e.detail = await clone.text();
+    // Self-heal a single 401 on a STAC-authed request: refresh the access
+    // token via the OIDC client and retry once with the new bearer. Guards
+    // against infinite loops by only retrying when a refresh callback is
+    // wired and the original request was for a STAC URL with a token.
+    if (
+      response.status === 401 &&
+      this.refreshAuth &&
+      this.token &&
+      this.isStacUrl(url)
+    ) {
+      const fresh = await this.refreshAuth();
+      if (fresh && fresh !== this.token) {
+        response = await fetch(url, this.buildOptions(url, options, fresh));
       }
-      return Promise.reject(e);
-    });
+    }
+
+    if (response.ok) {
+      // 204 No Content has no body; calling .json() on it would throw a
+      // parse error. Return undefined for empty-body responses so callers
+      // that issue PUT/DELETE against STAC APIs don't have to unwrap.
+      if (response.status === 204) return undefined;
+      return response.json();
+    }
+
+    const { status, statusText } = response;
+    const e: ApiError = {
+      status,
+      statusText
+    };
+    // Some STAC APIs return errors as JSON others as string.
+    // Clone the response so we can read the body as text if json fails.
+    const clone = response.clone();
+    try {
+      e.detail = await response.json();
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    } catch (err) {
+      e.detail = await clone.text();
+    }
+    throw e;
   }
 }
 

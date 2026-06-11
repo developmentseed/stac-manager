@@ -42,6 +42,7 @@ export default [
       typescript({
         useTsconfigDeclarationDir: true,
         clean: true,
+        include: ['**/*.ts', '**/*.tsx', '**/*.cts', '**/*.mts'],
         exclude: ['**/*.test.ts', '**/*.test.tsx']
       }),
       css()

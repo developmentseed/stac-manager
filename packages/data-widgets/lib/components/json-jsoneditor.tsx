@@ -12,6 +12,15 @@ export default function JsonEditor(props: {
   const { value, onChange, onLoad, editorRef } = props;
   const element = useRef<HTMLDivElement>(null);
 
+  // Stash latest callback identities in refs so the mount-only effect below
+  // always invokes the freshest closure without re-creating the editor.
+  const onChangeRef = useRef(onChange);
+  const onLoadRef = useRef(onLoad);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+    onLoadRef.current = onLoad;
+  });
+
   useEffect(() => {
     if (element.current) {
       const editor = new JSONEditor(
@@ -22,7 +31,7 @@ export default function JsonEditor(props: {
           statusBar: false,
           onChange: () => {
             try {
-              onChange(editor.get());
+              onChangeRef.current(editor.get());
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
               // no-op
@@ -37,13 +46,16 @@ export default function JsonEditor(props: {
       });
 
       editorRef.current = editor;
-      onLoad?.();
+      onLoadRef.current?.();
 
       return () => {
         editor.destroy();
         editorRef.current = null;
       };
     }
+    // The initial `value` is captured intentionally for the editor's initial
+    // contents; subsequent updates flow through the effect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -62,25 +74,24 @@ export default function JsonEditor(props: {
         });
       }
     }
-  }, [value]);
+  }, [value, editorRef]);
 
   return (
     <Box
       ref={element}
+      w='100%'
       h='20rem'
-      sx={{
-        '.jsoneditor': {
+      css={{
+        '& .jsoneditor': {
           borderColor: 'base.200',
           borderWidth: '2px',
           borderRadius: 'md'
         },
-        '.ace-jsoneditor': {
-          '.ace_tooltip': {
-            minHeight: 'auto'
-          },
-          '.ace_marker-layer .ace_active-line': {
-            bg: 'primary.100a'
-          }
+        '& .ace-jsoneditor .ace_tooltip': {
+          minHeight: 'auto'
+        },
+        '& .ace-jsoneditor .ace_marker-layer .ace_active-line': {
+          bg: 'primary.100a'
         }
       }}
     />

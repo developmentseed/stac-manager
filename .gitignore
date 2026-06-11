@@ -19,6 +19,9 @@
 
 node_modules
 .worktrees
+.env
+.env.local
+.env.*.local
 
 
 ################################################
@@ -61,3 +64,6 @@ dist
 parcel-bundle-reports
 .nx
 docs/plans
+# Playwright
+test-results/
+playwright-report/

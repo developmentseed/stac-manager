@@ -6,9 +6,7 @@ import {
   Heading,
   IconButton,
   Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
+  Portal,
   SimpleGrid
 } from '@chakra-ui/react';
 import { StacAsset } from 'stac-ts';
@@ -46,33 +44,43 @@ function Asset({ asset, assetKey }: AssetProps) {
       tags={roles}
       renderMenu={() => {
         return alternate ? (
-          <Menu placement='bottom-end'>
-            <MenuButton
-              as={IconButton}
-              aria-label='Download options'
-              icon={<CollecticonEllipsisVertical />}
-              variant='outline'
-              size='sm'
-            />
-            <MenuList>
-              {Object.entries(alternate).map(
-                ([key, val]: [string, Alternate]) => (
-                  <MenuItem key={key} as={SmartLink} to={val.href}>
-                    {val.title || val.href}
-                  </MenuItem>
-                )
-              )}
-            </MenuList>
-          </Menu>
+          <Menu.Root positioning={{ placement: 'bottom-end' }}>
+            <Menu.Trigger asChild>
+              <IconButton
+                aria-label='Download options'
+                variant='outline'
+                size='sm'
+              >
+                <CollecticonEllipsisVertical />
+              </IconButton>
+            </Menu.Trigger>
+            <Portal>
+              <Menu.Positioner>
+                <Menu.Content>
+                  {Object.entries(alternate).map(
+                    ([key, val]: [string, Alternate]) => (
+                      <Menu.Item key={key} value={key} asChild>
+                        <SmartLink to={val.href}>
+                          {val.title || val.href}
+                        </SmartLink>
+                      </Menu.Item>
+                    )
+                  )}
+                </Menu.Content>
+              </Menu.Positioner>
+            </Portal>
+          </Menu.Root>
         ) : (
           <IconButton
             as={SmartLink}
+            // @ts-expect-error: forwarding `to` to SmartLink via `as` polymorphism
             to={href}
             aria-label='Download'
-            icon={<CollecticonLink />}
             variant='outline'
             size='sm'
-          />
+          >
+            <CollecticonLink />
+          </IconButton>
         );
       }}
     />

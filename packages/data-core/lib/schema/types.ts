@@ -17,8 +17,9 @@ export type SchemaFieldNumber = FieldBase<'number'>;
 
 export type SchemaFieldJson = FieldBase<'json'>;
 
-export interface SchemaFieldArray<I extends SchemaField = SchemaField>
-  extends FieldBase<'array'> {
+export interface SchemaFieldArray<
+  I extends SchemaField = SchemaField
+> extends FieldBase<'array'> {
   minItems?: number;
   maxItems?: number;
   items: I;
