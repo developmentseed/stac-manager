@@ -8,8 +8,6 @@ on:
 
 env:
   PUBLIC_URL: ${{ vars.PUBLIC_URL }}
-  REACT_APP_STAC_API: ${{ vars.REACT_APP_STAC_API }}
-  REACT_APP_STAC_BROWSER: ${{ vars.REACT_APP_STAC_BROWSER }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -37,6 +35,20 @@ jobs:
 
       - name: Create .env file
         run: mv packages/client/.env.example packages/client/.env
+
+      # Forward every repository variable prefixed with REACT_APP_ to the
+      # build environment, so new client config vars don't require workflow
+      # changes. These values end up in the public bundle; define them as
+      # variables, not secrets.
+      - name: Export REACT_APP_* vars
+        env:
+          VARS_JSON: ${{ toJSON(vars) }}
+        run: |
+          echo "$VARS_JSON" | jq -r '
+            to_entries[]
+            | select(.key | startswith("REACT_APP_"))
+            | "\(.key)<<EOF_VAR\n\(.value)\nEOF_VAR"
+          ' >> "$GITHUB_ENV"
 
       - name: Setup SPA on Github Pages
         run: node packages/client/tasks/setup-gh-pages.mjs
