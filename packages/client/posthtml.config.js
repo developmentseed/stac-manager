@@ -7,7 +7,9 @@ module.exports = {
       locals: {
         appTitle: process.env.APP_TITLE,
         appDescription: process.env.APP_DESCRIPTION,
-        baseurl: process.env.PUBLIC_URL || '/'
+        // Trailing slash stripped: the templates join with "/<path>", and a
+        // bare "/" base would otherwise yield protocol-relative "//<path>".
+        baseurl: (process.env.PUBLIC_URL || '/').replace(/\/+$/, '')
       }
     }
   }
