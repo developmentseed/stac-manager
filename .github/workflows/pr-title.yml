@@ -1,0 +1,27 @@
+# Validates that PR titles follow the Conventional Commits spec
+# (https://www.conventionalcommits.org). PRs are squash-merged, so the PR
+# title becomes the commit message on 'main' that release-please parses to
+# determine version bumps and changelog entries.
+
+name: PR Title
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+permissions:
+  pull-requests: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate PR title against Conventional Commits
+        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
