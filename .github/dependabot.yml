@@ -5,6 +5,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    commit-message:
+      prefix: "ci"
     groups:
       minor-and-patch:
         applies-to: version-updates
