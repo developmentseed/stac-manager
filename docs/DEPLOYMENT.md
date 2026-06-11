@@ -39,6 +39,8 @@ Environment variables (set for both production and preview):
 | Variable | Notes |
 |---|---|
 | `REACT_APP_STAC_API` | Required. STAC API endpoint. |
+| `APP_TITLE` | Required by the posthtml template in `index.html` (e.g. `STAC Manager`). |
+| `APP_DESCRIPTION` | Required by the posthtml template (e.g. `Plugin based STAC editor`). |
 | `REACT_APP_STAC_BROWSER` | Optional. Defaults to Radiant Earth's STAC Browser. |
 | `REACT_APP_OIDC_AUTHORITY` / `REACT_APP_OIDC_CLIENT_ID` | Optional. If set, note that preview URLs are per-branch, so the OIDC client needs a wildcard redirect URI (`https://*.stac-manager.pages.dev/*`) or auth stays disabled on previews. |
 | `PUBLIC_URL` | Required by the build script (`tasks/build.mjs`). Set to `/` for every environment — each Cloudflare deployment (preview, staging, production) serves from the root of its own subdomain. |
