@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/developmentseed/stac-manager/compare/v1.0.1...v1.0.2) (2026-06-12)
+
+
+### Bug Fixes
+
+* **charts:** included in release-please. ([84be513](https://github.com/developmentseed/stac-manager/commit/84be513959ffe3acde7c55cc4ff770f2fc8d2053))
+
 ## [1.0.1](https://github.com/developmentseed/stac-manager/compare/v1.0.0...v1.0.1) (2026-06-11)
 
 
