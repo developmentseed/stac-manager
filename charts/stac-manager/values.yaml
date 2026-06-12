@@ -1,35 +1,27 @@
 replicaCount: 1
-
 image:
   repository: ghcr.io/developmentseed/stac-manager
   pullPolicy: IfNotPresent
-  tag: "1.0.2"
-
+  tag: 1.0.3
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-
+nameOverride: ''
+fullnameOverride: ''
 serviceAccount:
   create: true
   automount: true
   annotations: {}
-  name: ""
-
+  name: ''
 podAnnotations: {}
 podLabels: {}
-
 podSecurityContext: {}
-
 securityContext: {}
-
 service:
   type: ClusterIP
   port: 80
   containerPort: 8080
-
 ingress:
   enabled: false
-  className: ""
+  className: ''
   annotations: {}
   hosts:
     - host: chart-example.local
@@ -37,9 +29,7 @@ ingress:
         - path: /
           pathType: ImplementationSpecific
   tls: []
-
 resources: {}
-
 livenessProbe:
   httpGet:
     path: /
@@ -48,7 +38,6 @@ livenessProbe:
   timeoutSeconds: 15
   periodSeconds: 10
   failureThreshold: 3
-
 readinessProbe:
   httpGet:
     path: /
@@ -57,28 +46,13 @@ readinessProbe:
   timeoutSeconds: 15
   periodSeconds: 10
   failureThreshold: 3
-
 autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
-
 volumes: []
-
 volumeMounts: []
-
 nodeSelector: {}
-
 tolerations: []
-
 affinity: {}
-
-# OIDC authentication configuration (optional).
-# When omitted, authentication is disabled.
-#
-# oidc:
-#   # The OIDC issuer/authority URL. For Keycloak this is
-#   # <keycloak-url>/realms/<realm>.
-#   authority: https://iam.example.com/realms/my-realm
-#   clientId: my-client
