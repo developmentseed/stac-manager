@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.3](https://github.com/developmentseed/stac-manager/compare/v1.0.2...v1.0.3) (2026-06-12)
+
+
+### Bug Fixes
+
+* **charts:** broken OIDC authentication configuration. ([6ee6af7](https://github.com/developmentseed/stac-manager/commit/6ee6af7acd284b720bdb2fd829bfd16dcf645aea))
+* **charts:** included container version in release-please. ([a59f973](https://github.com/developmentseed/stac-manager/commit/a59f973406dc23a8922a7aee77e9bdd52eb2ca6c))
+
 ## [1.0.2](https://github.com/developmentseed/stac-manager/compare/v1.0.1...v1.0.2) (2026-06-12)
 
 

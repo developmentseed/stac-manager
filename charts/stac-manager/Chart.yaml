@@ -6,11 +6,11 @@ name: stac-manager
 description: >-
   Helm chart deployment for web application to update collection and item meta
   data in STAC catalogs
-version: 1.0.2
+version: 1.0.3
 sources:
   - https://github.com/developmentseed/stac-manager
 type: application
-appVersion: 1.0.2
+appVersion: 1.0.3
 maintainers:
   - name: Development Seed. All Rights Reserved.
     url: https://www.developmentseed.org/
