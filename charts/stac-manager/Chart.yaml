@@ -8,12 +8,12 @@ apiVersion: v2
 
 name: stac-manager
 description: Helm chart deployment for web application to update collection and item meta data in STAC catalogs
-version: "0.0.14"
+version: "1.0.1"
 sources:
 - https://github.com/developmentseed/stac-manager
 
 type: application
-appVersion: "0.0.14"
+appVersion: "1.0.1"
 
 maintainers:
 - name: Development Seed. All Rights Reserved.

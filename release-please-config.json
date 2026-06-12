@@ -10,6 +10,16 @@
           "type": "json",
           "path": "packages/client/package.json",
           "jsonpath": "$.version"
+        },
+        {
+          "type": "yaml",
+          "path": "charts/stac-manager/Chart.yaml",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "yaml",
+          "path": "charts/stac-manager/Chart.yaml",
+          "jsonpath": "$.appVersion"
         }
       ]
     }
