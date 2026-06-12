@@ -20,6 +20,11 @@
           "type": "yaml",
           "path": "charts/stac-manager/Chart.yaml",
           "jsonpath": "$.appVersion"
+        },
+        {
+          "type": "yaml",
+          "path": "charts/stac-manager/values.yaml",
+          "jsonpath": "$.image.tag"
         }
       ]
     }
