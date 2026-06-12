@@ -8,6 +8,8 @@ on:
 
 jobs:
   build-and-push:
+    # Skip release commits — the release-please workflow handles the Docker build for those.
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore(main): release') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
