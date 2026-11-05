@@ -15,3 +15,40 @@ updates:
         update-types:
           - "minor"
           - "patch"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    commit-message:
+      # Release-please only proposes a release, and so a new image, for fix and feat commits.
+      # Development dependencies use the same prefix, because they build what the image serves.
+      prefix: "fix"
+      include: "scope"
+    groups:
+      npm:
+        update-types:
+          - "minor"
+          - "patch"
+        patterns:
+          - "*"
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # Proposes the next Node.js major for the node base image; .nvmrc and the client's engines field need the same bump.
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      # node:<major>-slim tags are re-pushed about weekly. With a cooldown, Dependabot skips them
+      # and falls back to the newest tag pushed outside the window, a frozen end-of-life one such as 25-slim.
+      exclude:
+        - "*"
+    commit-message:
+      prefix: "fix"
+      include: "scope"
