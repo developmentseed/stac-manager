@@ -34,7 +34,7 @@
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "devDependencies": {
     "@babel/core": "^7.26.0",
-    "@chakra-ui/cli": "^3.35.0",
+    "@chakra-ui/cli": "^3.38.0",
     "@parcel/reporter-bundle-analyzer": "^2.12.0",
     "@parcel/reporter-bundle-buddy": "^2.12.0",
     "@playwright/test": "^1.60.0",
@@ -79,7 +79,7 @@
     "formik": "^2.4.6",
     "framer-motion": "^12.0.0",
     "mapbox-gl-draw-rectangle-mode": "^1.0.4",
-    "maplibre-gl": "^3.6.2",
+    "maplibre-gl": "^6.4.1",
     "oidc-client-ts": "^3.0.1",
     "polished": "^4.3.1",
     "react": "^19.2.0",
@@ -89,7 +89,7 @@
     "react-icons": "^4.12.0",
     "react-map-gl": "^7.1.7",
     "react-oidc-context": "^3.1.1",
-    "react-router-dom": "^6.27.0",
+    "react-router-dom": "^7.18.5",
     "stac-ts": "^1.0.4"
   },
   "parcelIgnore": [
