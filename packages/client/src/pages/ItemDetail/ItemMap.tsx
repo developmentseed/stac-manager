@@ -89,7 +89,7 @@ export function ItemMap(
           <Layer id='preview-tiles' type='raster' />
         </Source>
       )}
-      <Source id='results' type='geojson' data={item}>
+      <Source id='results' type='geojson' data={item as GeoJSON.Feature}>
         <Layer id='results-line' type='line' paint={resultsOutline} />
         {!previewAsset && (
           <Layer id='results-fill' type='fill' paint={resultsFill} />
