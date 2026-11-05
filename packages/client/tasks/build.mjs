@@ -62,7 +62,9 @@ async function parcelBuild() {
     mode: 'production',
     defaultTargetOptions: {
       distDir: `${__dirname}/../dist`,
-      publicUrl
+      publicUrl,
+      // The client's map is over Cloudflare Pages' 25 MiB limit per file.
+      sourceMaps: false
     },
     additionalReporters: [
       {
