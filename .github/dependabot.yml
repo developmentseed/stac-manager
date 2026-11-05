@@ -3,18 +3,15 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "monthly"
     commit-message:
       prefix: "ci"
     groups:
-      minor-and-patch:
+      # Majors included, so each month's Actions updates arrive as one PR.
+      actions:
         applies-to: version-updates
         patterns:
           - "*"
-        update-types:
-          - "minor"
-          - "patch"
 
   - package-ecosystem: "npm"
     directory: "/"
@@ -27,6 +24,18 @@ updates:
       # Development dependencies use the same prefix, because they build what the image serves.
       prefix: "fix"
       include: "scope"
+    # These majors cannot pass CI until upstream moves, so a PR would only hold an open slot.
+    # Remove an entry once its blocker supports the new major:
+    # eslint-plugin-react (ESLint 10), ts-jest and typescript-eslint (TypeScript 7), Parcel (Babel 8).
+    ignore:
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@babel/core"
+        update-types: ["version-update:semver-major"]
     groups:
       npm:
         update-types:
@@ -34,16 +43,26 @@ updates:
           - "patch"
         patterns:
           - "*"
+      # Tooling majors share a PR because CI exercises them. Runtime majors stay separate
+      # because no test covers the map or the router, so each needs its own manual check.
+      npm-dev-major:
+        dependency-type: "development"
+        update-types:
+          - "major"
+        patterns:
+          - "*"
       npm-security:
         applies-to: security-updates
         patterns:
           - "*"
 
+  # Weekly, as the nginx digest carries the OS fixes.
   # Proposes the next Node.js major for the node base image; .nvmrc and the client's engines field need the same bump.
+  # No group: a Node major needs those hand edits, and an open group would hold back the nginx updates.
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     cooldown:
       # node:<major>-slim tags are re-pushed about weekly. With a cooldown, Dependabot skips them
       # and falls back to the newest tag pushed outside the window, a frozen end-of-life one such as 25-slim.
