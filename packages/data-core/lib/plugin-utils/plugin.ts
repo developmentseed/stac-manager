@@ -3,9 +3,7 @@
 import { SchemaField, SchemaFieldObject } from '../schema/types';
 
 export type PluginEditSchema =
-  | (SchemaFieldObject & { type: 'root' })
-  | undefined
-  | symbol;
+  (SchemaFieldObject & { type: 'root' }) | undefined | symbol;
 
 export interface PluginHook {
   // Name of the target plugin.
