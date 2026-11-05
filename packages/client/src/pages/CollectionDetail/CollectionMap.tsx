@@ -39,7 +39,7 @@ function CollectionMap({ collection }: CollectionMapProps) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [_, ...data] = collection.extent.spatial.bbox;
       return {
-        type: 'FeatureCollection',
+        type: 'FeatureCollection' as const,
         features: data.map(([x1, y1, x2, y2]) => bboxPolygon([x1, y1, x2, y2]))
       };
     }
