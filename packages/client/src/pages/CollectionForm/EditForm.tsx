@@ -17,8 +17,50 @@ import {
 import { InnerPageHeaderSticky } from '$components/InnerPageHeader';
 import { CollecticonForm } from '$components/icons/form';
 import { AppNotification, NotificationButton } from '$components/Notifications';
+import { inspectBbox } from '$utils/bbox';
 
 type FormView = 'fields' | 'json';
+
+// The generic schema → Yup validation only knows each bbox corner is a number;
+// it can't express the geographic rules (ranges, ordering, zero-area). Build
+// Formik errors for `values.spatial` (number[][]) keyed at spatial.<i>.<corner>
+// so they render inline on the offending coordinate input.
+function buildSpatialErrors(values: any): { spatial: any[] } | undefined {
+  const spatial = values?.spatial;
+  if (!Array.isArray(spatial)) return undefined;
+
+  const spatialErrors: any[] = [];
+  let hasError = false;
+  spatial.forEach((bbox: unknown, i: number) => {
+    const issues = inspectBbox(bbox);
+    if (!issues.length) return;
+    const row: (string | undefined)[] = [];
+    // First issue per corner wins — enough to point the user at the field.
+    issues.forEach(({ index, message }) => {
+      if (row[index] === undefined) row[index] = message;
+    });
+    spatialErrors[i] = row;
+    hasError = true;
+  });
+
+  return hasError ? { spatial: spatialErrors } : undefined;
+}
+
+// Deep-merge two Formik error trees. `base` (schema errors) wins on a leaf
+// conflict so a "must be a number" isn't clobbered by a range message; `extra`
+// (bbox errors) fills the gaps. Returns undefined when both are empty.
+function mergeErrors(base: any, extra: any): any {
+  if (extra === undefined || extra === null) return base ?? undefined;
+  if (base === undefined || base === null) return extra;
+  if (typeof base === 'string' || typeof extra === 'string') return base;
+
+  const out: any = Array.isArray(base) || Array.isArray(extra) ? [] : {};
+  const keys = new Set([...Object.keys(base), ...Object.keys(extra)]);
+  keys.forEach((key) => {
+    out[key] = mergeErrors(base[key], extra[key]);
+  });
+  return out;
+}
 
 export function EditForm(props: {
   initialData?: any;
@@ -56,8 +98,15 @@ export function EditForm(props: {
             validate={(values) => {
               if (view === 'json') return;
 
-              const [, error] = validatePluginsFieldsData(plugins, values);
-              if (error) return error;
+              const [, schemaError] = validatePluginsFieldsData(
+                plugins,
+                values
+              );
+              const merged = mergeErrors(
+                schemaError,
+                buildSpatialErrors(values)
+              );
+              if (merged) return merged;
             }}
           >
             {({ handleSubmit, values, isSubmitting }) => (
