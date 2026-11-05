@@ -2,7 +2,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/developmentseed/stac-manager
   pullPolicy: IfNotPresent
-  tag: 1.0.3
+  tag: 1.0.4
 imagePullSecrets: []
 nameOverride: ''
 fullnameOverride: ''
