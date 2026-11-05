@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.4](https://github.com/developmentseed/stac-manager/compare/v1.0.3...v1.0.4) (2026-11-05)
+
+
+### Bug Fixes
+
+* **deps:** bump the npm group with 26 updates ([#115](https://github.com/developmentseed/stac-manager/issues/115)) ([cff83ba](https://github.com/developmentseed/stac-manager/commit/cff83baa0b3a0efe1089f6830cc22f81fa83e53c))
+* **docker:** multi-stage build, shrink image size from 3.75GB to 55MB ([#108](https://github.com/developmentseed/stac-manager/issues/108)) ([0f5f965](https://github.com/developmentseed/stac-manager/commit/0f5f965183c221a5a6f3b43142611d2e0bb17d31))
+
 ## [1.0.3](https://github.com/developmentseed/stac-manager/compare/v1.0.2...v1.0.3) (2026-06-12)
 
 
