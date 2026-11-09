@@ -4,6 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { ChakraProvider } from '@chakra-ui/react';
 import { StacApiProvider } from '@developmentseed/stac-react';
 import { PluginConfigProvider } from '@stac-manager/data-core';
+import { setWorkerUrl } from 'maplibre-gl';
 
 import { App } from './App';
 import system from './theme/theme';
@@ -11,6 +12,12 @@ import { config } from './plugin-system/config';
 import { AuthProvider, useAuth } from './auth/Context';
 import Api, { ApiContext } from './api';
 import { Toaster } from './components/Toaster';
+
+// maplibre-gl finds its worker from import.meta.url, which Parcel bakes into a
+// file:// URL. Without this, the worker fails and GeoJSON sources never load.
+setWorkerUrl(
+  new URL('npm:maplibre-gl/dist/maplibre-gl-worker.mjs', import.meta.url).href
+);
 
 const publicUrl = process.env.PUBLIC_URL || '';
 const stacApiUrl = process.env.REACT_APP_STAC_API!;
