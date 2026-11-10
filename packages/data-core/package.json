@@ -24,7 +24,7 @@
     "lib": "lib"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.37.0",
+    "@chakra-ui/react": "^3.38.0",
     "@emotion/react": "^11.13.3",
     "formik": "^2.4.6",
     "lodash-es": "^4.17.21",

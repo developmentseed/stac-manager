@@ -34,7 +34,7 @@
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "devDependencies": {
     "@babel/core": "^7.26.0",
-    "@chakra-ui/cli": "^3.37.0",
+    "@chakra-ui/cli": "^3.38.0",
     "@parcel/reporter-bundle-analyzer": "^2.12.0",
     "@parcel/reporter-bundle-buddy": "^2.12.0",
     "@playwright/test": "^1.64.1",
@@ -54,7 +54,7 @@
     "watcher": "^2.3.1"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.37.0",
+    "@chakra-ui/react": "^3.38.0",
     "@developmentseed/stac-react": "^1.0.0-alpha.3",
     "@devseed-ui/collecticons-chakra": "^4.0.0",
     "@emotion/react": "^11.11.3",
@@ -62,7 +62,7 @@
     "@mapbox/mapbox-gl-draw": "^1.5.2",
     "@mapbox/mapbox-gl-draw-static-mode": "^1.0.1",
     "@parcel/core": "^2.12.0",
-    "@radiantearth/stac-fields": "^1.6.2",
+    "@radiantearth/stac-fields": "^1.7.0",
     "@stac-manager/data-core": "*",
     "@stac-manager/data-plugins": "*",
     "@stac-manager/data-widgets": "*",
