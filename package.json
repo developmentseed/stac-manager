@@ -46,6 +46,12 @@
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.12.1"
   },
+  "//": "overrides.nx.undici: nx 23 pins undici 7.29.0 and lerna 10 caps nx below 24. Remove once lerna accepts nx >=24.0.3.",
+  "overrides": {
+    "nx": {
+      "undici": "^7.30.1"
+    }
+  },
   "@parcel/resolver-default": {
     "packageExports": true
   }
