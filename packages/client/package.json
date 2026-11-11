@@ -67,7 +67,7 @@
     "@stac-manager/data-plugins": "*",
     "@stac-manager/data-widgets": "*",
     "@testing-library/dom": "^10.4.2",
-    "@testing-library/jest-dom": "^6.6.2",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",
     "@turf/bbox": "^7.4.0",
