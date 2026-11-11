@@ -3,7 +3,7 @@ import Map, { Source, Layer, MapRef, ErrorEvent } from 'react-map-gl/maplibre';
 import { StacItem } from 'stac-ts';
 import getBbox from '@turf/bbox';
 
-import { BackgroundTiles } from '$components/Map';
+import { BackgroundTiles, sanitizeBbox } from '$components/Map';
 
 const resultsOutline = {
   'line-color': '#C53030',
@@ -30,11 +30,18 @@ export function ItemMap(
 
   // Fit the map view around the current results bbox
   useEffect(() => {
-    const bounds = item && getBbox(item as GeoJSON.Feature);
+    if (!map || !item) return;
 
-    if (map && bounds) {
-      const [x1, y1, x2, y2] = bounds;
-      map.fitBounds([x1, y1, x2, y2], { padding: 30, duration: 0 });
+    const bounds = sanitizeBbox(getBbox(item as GeoJSON.Feature));
+    if (!bounds) return;
+
+    // maxZoom keeps a zero-area geometry (a single point) from fitting to an
+    // absurd zoom; the guard stops a still-degenerate extent from crashing.
+    try {
+      map.fitBounds(bounds, { padding: 30, duration: 0, maxZoom: 12 });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn('Unable to fit map to item extent', error);
     }
   }, [item, map]);
 
