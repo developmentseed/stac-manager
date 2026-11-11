@@ -66,7 +66,7 @@ exports[`ArrayFieldset renders layout correctly 3`] = `
   >
     <button
       aria-label="Add item"
-      class="chakra-button css-17zd4y0"
+      class="chakra-button css-rgct3v"
       type="button"
     >
       <svg
@@ -108,7 +108,7 @@ exports[`ArrayFieldset renders layout correctly 4`] = `
     <div>
       <button
         aria-label="Remove item"
-        class="chakra-button css-15coqsv"
+        class="chakra-button css-1nechz1"
         type="button"
       >
         <svg
@@ -142,7 +142,7 @@ exports[`ArrayFieldset renders layout correctly 4`] = `
   >
     <button
       aria-label="Add item"
-      class="chakra-button css-17zd4y0"
+      class="chakra-button css-rgct3v"
       type="button"
     >
       <svg
@@ -191,7 +191,7 @@ exports[`ArrayFieldset renders layout correctly 5`] = `
     <div>
       <button
         aria-label="Remove item"
-        class="chakra-button css-15coqsv"
+        class="chakra-button css-1nechz1"
         type="button"
       >
         <svg
@@ -225,7 +225,7 @@ exports[`ArrayFieldset renders layout correctly 5`] = `
   >
     <button
       aria-label="Add item"
-      class="chakra-button css-17zd4y0"
+      class="chakra-button css-rgct3v"
       type="button"
     >
       <svg
