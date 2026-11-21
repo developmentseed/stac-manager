@@ -3,7 +3,7 @@ import Map, { Layer, Source, MapRef } from 'react-map-gl/maplibre';
 import { LngLatBounds } from 'maplibre-gl';
 import bboxPolygon from '@turf/bbox-polygon';
 
-import { BackgroundTiles } from '../../components/Map';
+import { BackgroundTiles, sanitizeBbox } from '../../components/Map';
 import { StacCollection } from 'stac-ts';
 
 const extentOutline = {
@@ -47,19 +47,27 @@ function CollectionMap({ collection }: CollectionMapProps) {
 
   // Fit the map view around the current collection extent
   useEffect(() => {
-    if (collection && map) {
-      let [x1, y1, x2, y2] = collection.extent.spatial.bbox[0];
-      const bounds = new LngLatBounds([x1, y1, x2, y2]);
-      for (
-        let i = 1, len = collection.extent.spatial.bbox.length;
-        i < len;
-        i++
-      ) {
-        [x1, y1, x2, y2] = collection.extent.spatial.bbox[i];
-        bounds.extend([x1, y1, x2, y2]);
-      }
-      [x1, y1, x2, y2] = bounds.toArray().flat();
-      map.fitBounds([x1, y1, x2, y2], { padding: 30, duration: 0 });
+    if (!collection || !map) return;
+
+    const sanitized = collection.extent.spatial.bbox
+      .map(sanitizeBbox)
+      .filter((b): b is [number, number, number, number] => b !== null);
+    if (sanitized.length === 0) return;
+
+    const bounds = new LngLatBounds(sanitized[0]);
+    for (let i = 1; i < sanitized.length; i++) {
+      const [x1, y1, x2, y2] = sanitized[i];
+      bounds.extend([x1, y1, x2, y2]);
+    }
+
+    // maxZoom keeps a zero-area extent (a single point, e.g. a bbox like
+    // [-90, 90, -90, 90]) from fitting to an absurd zoom level. Guard the
+    // call so a still-degenerate extent can't take the whole app down.
+    try {
+      map.fitBounds(bounds, { padding: 30, duration: 0, maxZoom: 12 });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn('Unable to fit map to collection extent', error);
     }
   }, [collection, map]);
 

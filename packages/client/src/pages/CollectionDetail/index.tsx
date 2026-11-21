@@ -23,6 +23,7 @@ import {
 } from '@chakra-ui/react';
 import { useCollection, useStacSearch } from '@developmentseed/stac-react';
 import {
+  CollecticonCircleExclamation,
   CollecticonEllipsisVertical,
   CollecticonEye,
   CollecticonPencil,
@@ -36,6 +37,7 @@ import { InnerPageHeader } from '$components/InnerPageHeader';
 import { StacBrowserMenuItem } from '$components/StacBrowserMenuItem';
 import { ItemCard, ItemCardLoading } from '$components/ItemCard';
 import { zeroPad } from '$utils/format';
+import { summarizeBboxIssues } from '$utils/bbox';
 import { ButtonWithAuth } from '$components/auth/ButtonWithAuth';
 import { DeleteMenuItem } from '$components/DeleteMenuItem';
 import SmartLink from '$components/SmartLink';
@@ -104,6 +106,14 @@ function CollectionDetail() {
     if (!collections) return;
     submit();
   }, [collections, submit]);
+
+  // Surface a non-blocking heads-up when the stored spatial extent is invalid
+  // or degenerate. The map clamps such bboxes so it won't crash, but the view
+  // would otherwise silently misrepresent the data.
+  const bboxIssues = useMemo(
+    () => summarizeBboxIssues(collection?.extent?.spatial?.bbox),
+    [collection]
+  );
 
   const dateLabel = useMemo(() => {
     if (!collection) {
@@ -202,6 +212,34 @@ function CollectionDetail() {
             </Heading>
           </Box>
         </Flex>
+
+        {bboxIssues.length > 0 && (
+          <Flex
+            mx='8'
+            gap='3'
+            p='4'
+            borderRadius='md'
+            bg='danger.50'
+            borderWidth='1px'
+            borderColor='danger.200'
+            alignItems='flex-start'
+          >
+            <CollecticonCircleExclamation color='danger.500' />
+            <Box>
+              <Text fontWeight='bold' color='danger.600'>
+                This collection&apos;s spatial extent looks invalid
+              </Text>
+              {bboxIssues.map((message) => (
+                <Text key={message} fontSize='sm'>
+                  {message}
+                </Text>
+              ))}
+              <Text fontSize='sm' color='base.400'>
+                The map may not display the extent correctly.
+              </Text>
+            </Box>
+          </Flex>
+        )}
 
         <Grid templateColumns='repeat(12, 1fr)' gap={8}>
           <GridItem colSpan={8}>
