@@ -51,10 +51,7 @@ updates:
           - "major"
         patterns:
           - "*"
-      npm-security:
-        applies-to: security-updates
-        patterns:
-          - "*"
+      # No security-updates group: while a grouped security PR is open, Dependabot defers fixes for packages not already in it.
 
   # Weekly, as the nginx digest carries the OS fixes.
   # Proposes the next Node.js major for the node base image; .nvmrc and the client's engines field need the same bump.
