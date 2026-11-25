@@ -19,7 +19,7 @@ RUN npm i
 RUN npm run all:build
 
 # The runtime image only serves static files: no Node.js, npm or node_modules.
-FROM docker.io/nginx/nginx-unprivileged:1.31.8-alpine-slim@sha256:2f293597c9eea53645c61d70942d32b544a8007aeb586e0237e6ad637323b81b
+FROM docker.io/nginx/nginx-unprivileged:1.31.10-alpine-slim@sha256:f4afc48254dc77ea692ec6979d220e5b1176331c636a4d51c502ffdded6789bd
 
 WORKDIR /app
 
